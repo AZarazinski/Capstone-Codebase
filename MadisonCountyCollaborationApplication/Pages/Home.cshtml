@@ -1,0 +1,64 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.HomeModel
+@{
+}
+@{
+   
+
+    if (HttpContext.Session.GetString("username") != null)
+    {
+        <p>@Model.HttpContext.Session.GetString("username")</p>
+    }
+}
+<form asp-page-handler="Select" method="post" id="collabForm">
+    <input type="hidden" name="CollaborationID" id="collabIdInput" value="" />
+    <div class="box-table">
+        @{
+            foreach (var prod in Model.CollaborationList)
+            {
+                <div class="card" data-collab-id="@prod.collabID" onclick="selectCollaboration(@prod.collabID)">
+                    <div class="card-header">
+                        @prod.collabName
+                    </div>
+                    <div class="card-body">
+                        @prod.notesAndInfo
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        function selectCollaboration(collabId) {
+            // Set the value of the hidden input to the collaboration ID
+            document.getElementById('collabIdInput').value = collabId;
+            // Submit the form
+            document.getElementById('collabForm').submit();
+        }
+    </script>
+}
+
+<br />
+@* creating collab *@
+<form asp-page="HomePage" asp-page-handler="Create">
+    <input type="submit" value="Create New Collaboration" class="btn btn-primary" />
+</form>
+<br />
+@* knowledge items *@
+<form asp-page="HomePage" asp-page-handler="ViewKnowledgeItems">
+    <input type="submit" value="View Knowledge Items" class="btn btn-primary" />
+</form>
+<br />
+@* datasets *@
+<form asp-page="HomePage" asp-page-handler="ViewDatasets">
+    <input type="submit" value="View Datasets" class="btn btn-primary" />
+</form>
+<br />
+@* logging out *@
+<div class="position-fixed bottom-0 end-0 p-3">
+    <form asp-page="HomePage" asp-page-handler="LogOut">
+        <input type="submit" value="Log Out" class="btn btn-secondary" />
+    </form>
+</div>

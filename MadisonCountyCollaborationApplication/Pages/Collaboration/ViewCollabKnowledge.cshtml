@@ -1,0 +1,109 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Collaboration.ViewCollabKnowledgeModel
+@{
+}
+ if (HttpContext.Session.GetString("username") != null)
+    {
+<p>@Model.HttpContext.Session.GetString("username")</p>
+    }
+    if (HttpContext.Session.GetInt32("collaborationID") != null)
+    {
+<div class="text-center">
+    <h1 class="display-4">Collaboration @Model.HttpContext.Session.GetInt32("collaborationID") Knowledge</h1>
+</div>
+    }
+    else
+    {
+<div class="text-center">
+    <h1 class="display-4">Collaboration Knowledge</h1>
+</div>
+    }
+}
+@* displaying knowledge *@
+<form asp-page-handler="SelectKnowledge" method="post" id="knowledgeForm">
+    <input type="hidden" name="knowledgeItemID" id="knowledgeIdInput" value="" />
+    <div class="box-table">
+        @{
+            foreach (var prod in Model.KnowledgeList)
+            {
+                <div class="card" data-collab-id="@prod.knowledgeItemID" onclick="selectKnowledge(@prod.knowledgeItemID)">
+                    <div class="card-header">
+                        @prod.title
+                    </div>
+                    <div class="card-body">
+                        @prod.KISubject
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</form>
+@section Scripts {
+    <script>
+        function selectKnowledge(knowledgeId) {
+            // Set the value of the hidden input to the collaboration ID
+            document.getElementById('knowledgeIdInput').value = knowledgeId;
+            // Submit the form
+            document.getElementById('knowledgeForm').submit();
+        }
+    </script>
+}
+@* displaying SWOT *@
+<div class="container">
+    <h2>SWOT Analysis</h2>
+    <div class="row">
+        @foreach (var item in Model.swotItemsList)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">@item.title</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title pricing-card-title">@item.category</h5>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li><strong>Strengths:</strong> @item.strengths.Substring(0, Math.Min(50, item.strengths.Length))...</li>
+                            <li><strong>Weaknesses:</strong> @item.weaknesses.Substring(0, Math.Min(50, item.weaknesses.Length))...</li>
+                        </ul>
+                        <form asp-page="collabKnowledge" asp-page-handler="ViewSWOT" method="post">
+                            <input type="hidden" name="swotID" value="@item.swotID" />
+                            <button type="submit" class="btn btn-secondary btn-lg btn-block btn-outline-primary">View Details</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="Modal@item.swotID" tabindex="-1" role="dialog" aria-labelledby="ModalLabel@item.swotID" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ModalLabel@item.swotID">@item.title - Details</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Category:</strong> @item.category</p>
+                            <p><strong>Strengths:</strong> @item.strengths</p>
+                            <p><strong>Weaknesses:</strong> @item.weaknesses</p>
+                            <p><strong>Opportunities:</strong> @item.opportunities</p>
+                            <p><strong>Threats:</strong> @item.threats</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<br />
+@* adding new knowledge *@
+<form asp-page="collabKnowledge" asp-page-handler="Knowledge">
+    <div class="d-grid gap-2">
+        <input type="submit" value="Add New Knowledge" class="btn btn-primary" />
+    </div>
+</form>
+

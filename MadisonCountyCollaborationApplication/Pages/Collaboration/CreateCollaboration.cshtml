@@ -1,0 +1,59 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Collaboration.CreateCollaborationModel
+@{
+}
+
+@{
+   
+
+    if (HttpContext.Session.GetString("username") != null)
+    {
+        <p>@Model.HttpContext.Session.GetString("username")</p>
+    }
+}
+<div class="text-center">
+    <h1 class="display-4">Create Collaboration</h1>
+</div>
+<form asp-page="CreateCollaboration" asp-page-handler="Create">
+    @* collab name *@
+    <input placeholder="Collaboration Name " type="text" asp-for="NewC.collabName" class="form-control" />
+    <span asp-validation-for="NewC.collabName" class="text-danger"></span>
+    <br />
+    @* notes and info *@
+    <input placeholder="Notes" type="text" asp-for="NewC.notesAndInfo" class="form-control" />
+    <span asp-validation-for="NewC.notesAndInfo" class="text-danger"></span>
+    <br />
+    <div class="row">
+        <div class="col-md-6">
+            @* privacy select *@
+            <select class="form-select" id="PrivacySelect" asp-for="NewC.collabType">
+                <option value="">Choose Privacy</option>
+                <option value="Public">Public</option>
+                <option value="Private">Private</option>
+            </select>
+            <span asp-validation-for="NewC.collabType" class="text-danger"></span>
+
+        </div>
+        <div class="col-md-6">
+            @* creation date *@
+            <input type="datetime-local" class="form-control" asp-for="NewC.dateCreated" />
+            <span asp-validation-for="NewC.dateCreated" class="text-danger"></span>
+
+        </div>
+    </div>
+    <br />
+    <div class="d-grid gap-2">
+        <input type="submit" value="Create New Collaboration" class="btn btn-primary" />
+    </div>
+</form>
+<div class="text-center mt-4">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <form method="post" asp-page-handler="Populate" class="d-inline">
+            <button type="submit" class="btn btn-info btn-sm me-2">Populate</button>
+        </form>
+        <form method="post" asp-page-handler="Clear" class="d-inline">
+            <button type="submit" class="btn btn-warning btn-sm">Clear</button>
+        </form>
+    </div>
+</div>
+<br />

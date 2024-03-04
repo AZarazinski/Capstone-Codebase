@@ -1,0 +1,43 @@
+﻿@page
+@using System.Data
+@using System.Data.SqlClient
+@model MadisonCountyCollaborationApplication.Pages.Dataset.ViewDataModel
+@{
+}
+
+<div class="text-center">
+    <h1 class="display-4">Data</h1>
+</div>
+@* diaplaying each row and column of table *@
+<h2>Dataset: @Model.Data</h2>
+<!-- Table to display the dataset's data -->
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <!-- Loop through each column in the dataset and display column names -->
+            @foreach (DataColumn column in Model.Data.Columns)
+            {
+                <th>@column.ColumnName</th>
+            }
+
+            }
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Loop through each row in the dataset and display row data -->
+        @foreach (DataRow row in Model.Data.Rows)
+        {
+            <tr>
+                @foreach (DataColumn column in Model.Data.Columns)
+                {
+                    <td>@row[column.ColumnName]</td>
+                }
+            </tr>
+        }
+
+    </tbody>
+</table>
+@* adding data to collab *@
+<form asp-page-handler="AddCollabData">
+    <input type="submit" value="Add to Collaboration" class="btn btn-secondary" />
+</form>

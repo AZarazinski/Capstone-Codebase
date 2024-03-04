@@ -1,0 +1,49 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Collaboration.ViewCollabPlanModel
+@{
+}
+@{
+    if (HttpContext.Session.GetString("username") != null)
+    {
+        <p>@Model.HttpContext.Session.GetString("username")</p>
+    }
+    if (HttpContext.Session.GetInt32("planID") != null)
+    {
+        <div class="text-center">
+            <h1 class="display-4">Plan @Model.HttpContext.Session.GetInt32("planID")</h1>
+        </div>
+    }
+    else
+    {
+        <div class="text-center">
+            <h1 class="display-4">Plan Page</h1>
+        </div>
+    }
+}
+@* contents table *@
+<table class="table table-bordered table-responsive table-hover">
+    <thead>
+        <tr>
+            <th>Plan Step:</th>
+            <th>Plan Contents:</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var prod in Model.ContentList)
+            {
+                <tr>
+                    <td class="text-danger">@prod.planStep</td>
+                    <td>@prod.planContents</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<br />
+@* add content *@
+<form asp-page="Plans" asp-page-handler="AddContents">
+    <div class="d-grid gap-2">
+        <input type="submit" value="Add Plan Contents" class="btn btn-primary" />
+    </div>
+</form>

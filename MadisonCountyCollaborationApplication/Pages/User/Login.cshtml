@@ -1,0 +1,57 @@
+﻿@page 
+@model MadisonCountyCollaborationApplication.Pages.Users.LoginModel
+@{
+}
+
+<div class="text-center">
+    <h1 class="display-4">Login Page</h1>
+</div>
+<form asp-page="Login" asp-page-handler="LoginHandler">
+    <input placeholder="UserName:" asp-for="Username" class="form-control" id="Username" />
+    <span asp-validation-for="Username" class="text-danger"></span>
+    <br />
+    <input placeholder="Password: " asp-for="Password" class="form-control" type="password" id="Password" />
+    <span asp-validation-for="Password" class="text-danger"></span>
+    <br />
+    <div class="d-grid gap-2">
+        <input type="submit" value="Log In" class="btn btn-primary" />
+
+    </div>
+</form>
+<br />
+@* adding user *@
+<form asp-page="Login" asp-page-handler="AddUser">
+    <input type="submit" value="Add New User" class="btn btn-primary" />
+</form>
+
+<br />
+<form method="post" asp-page-handler="Populate">
+    <button type="button" class="btn btn-secondary" onclick="populateFields()">Populate</button>
+</form>
+<br />
+
+<form method="post" asp-page-handler="Clear">
+    <button type="button" class="btn btn-secondary" onclick="clearFields()">Clear</button>
+</form>
+
+@{
+    if (HttpContext.Session.GetString("username") != null)
+    {
+        <p class="text-success">@ViewData["LoginMessage"]</p>
+    }
+    else
+    {
+        <p class="text-danger">@ViewData["LoginMessage"]</p>
+    }
+}
+
+<script>
+    function populateFields() {
+        document.getElementById('Username').value = 'demoUser';
+        document.getElementById('Password').value = 'demoPW';
+    }
+    function clearFields() {
+        document.getElementById('Username').value = '';
+        document.getElementById('Password').value = '';
+    }
+</script>

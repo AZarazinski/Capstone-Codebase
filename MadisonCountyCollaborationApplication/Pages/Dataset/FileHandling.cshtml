@@ -1,0 +1,33 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Dataset.FileHandlingModel
+@{
+}
+
+@{
+    string imagesDir = Directory.GetCurrentDirectory(); // <!-- Get information about files in the directory -->
+    imagesDir += @"\wwwroot\fileupload\";
+    <p>@imagesDir</p>
+    <br />
+    DirectoryInfo imagesFolder = new DirectoryInfo(imagesDir);
+
+    var fileListing = imagesFolder.GetFiles();
+
+    foreach (var file in fileListing) // Loop through each file in the directory and display as a link
+    {
+        <a href="/fileupload/@file.Name" target="_blank">@file.Name</a>
+        <br />
+    }
+}
+
+@if (!ModelState.IsValid) // <!-- Display error messages if model state is not valid -->
+{
+    foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+    {
+        <div class="alert alert-danger">@error.ErrorMessage</div>
+    }
+}
+
+@if (TempData["SuccessMessage"] != null) // <!-- Display success message if TempData contains it -->
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}

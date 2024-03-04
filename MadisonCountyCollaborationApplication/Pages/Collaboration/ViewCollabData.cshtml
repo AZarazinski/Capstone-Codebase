@@ -1,0 +1,54 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Collaboration.ViewCollabDataModel
+@{
+}
+@{
+  
+
+    if (HttpContext.Session.GetString("username") != null)
+    {
+        <p>@Model.HttpContext.Session.GetString("username")</p>
+    }
+    if (HttpContext.Session.GetInt32("collaborationID") != null)
+    {
+        <div class="text-center">
+            <h1 class="display-4">Collaboration @Model.HttpContext.Session.GetInt32("collaborationID") Datasets</h1>
+        </div>
+    }
+    else
+    {
+        <div class="text-center">
+            <h1 class="display-4">Collaboration Knowledge</h1>
+        </div>
+    }
+}
+@* displaying datasets *@
+<form asp-page-handler="Select" method="post" id="dataForm">
+    <input type="hidden" name="DatasetID" id="dataIdInput" value="" />
+    <div class="box-table">
+        @{
+            foreach (var prod in Model.DatasetList)
+            {
+                <div class="card" data-collab-id="@prod.ID" onclick="selectDataset(@prod.ID)">
+                    <div class="card-header">
+                        @prod.Name
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        function selectDataset(dataId) {
+            // Set the value of the hidden input to the dataset ID
+            document.getElementById('dataIdInput').value = dataId;
+            // Submit the form
+            document.getElementById('dataForm').submit();
+        }
+    </script>
+}
+<form asp-page="collabDatasets" asp-page-handler="Analysis">
+    <input type="submit" value="Add New Analysis" class="btn btn-primary" />
+</form>

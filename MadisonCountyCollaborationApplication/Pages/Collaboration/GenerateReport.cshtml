@@ -1,0 +1,147 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Collaboration.GenerateReportModel
+@{
+}
+
+@{
+    //Zach Apecechea, Justin Tersoglio and Andrew Zarazinski
+
+
+    if (HttpContext.Session.GetString("username") != null)
+    {
+        <p>@Model.HttpContext.Session.GetString("username")</p>
+    }
+    else
+    {
+
+    }
+}
+<div class="text-sm-end">
+    <p>This report is generated for @Model.currentUserFirstName @Model.currentUserLastName on @Model.currentsession</p>
+</div>
+<div class="text-center">
+    <h1 class="display-4">Report for @Model.collabName</h1>
+    <h2 class="display-6">Collaboration Created on @Model.collabdateCreated</h2>
+</div>
+<br />
+<br />
+<div class="text-center">
+    <h1 class="display-4">Main Analysis</h1>
+</div>
+<br />
+<div class="text-center">
+    <h1 class="display-5">Collaboration Plans</h1>
+</div>
+<table class="table table-bordered table-responsive table-hover">
+    <thead>
+        <tr>
+            <th>Plan Name:</th>
+            <th>Description:</th>
+            <th>Created On:</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var prod in Model.PlansList)
+            {
+                <tr>
+                    <td>@prod.planName</td>
+                    <td>@prod.planDesc</td>
+                    <td>@prod.dateCreated</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<br />
+<div class="text-center">
+    <h1 class="display-5">SWOTs</h1>
+</div>
+<table class="table table-bordered table-responsive table-hover">
+    <thead>
+        <tr>
+            <th>Title:</th>
+            <th>Strengths:</th>
+            <th>Weaknesses:</th>
+            <th>Opportunities:</th>
+            <th>Threats:</th>
+            <th>Category:</th>
+            <th>Created On:</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var prod in Model.SwotList)
+            {
+                <tr>
+                    <td>@prod.title</td>
+                    <td>@prod.strengths</td>
+                    <td>@prod.weaknesses</td>
+                    <td>@prod.opportunities</td>
+                    <td>@prod.threats</td>
+                    <td>@prod.category</td>
+                    <td>@prod.swotDate</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<br />
+<div class="text-center">
+    <h1 class="display-5">Research</h1>
+    <h2 class="display-6">Collaboration KnowledgeItems</h2>
+</div>
+<table class="table table-bordered table-responsive table-hover">
+    <thead>
+        <tr>
+            <th>Title:</th>
+            <th>Subject:</th>
+            <th>Category:</th>
+            <th>Information:</th>
+            <th>Created On:</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var prod in Model.KnowledgeItemsList)
+            {
+                <tr>
+                    <td>@prod.title</td>
+                    <td>@prod.KISubject</td>
+                    <td>@prod.category</td>
+                    <td>@prod.information</td>
+                    <td>@prod.KMDate</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<br />
+<div class="text-center">
+    <h1 class="display-5">Contributors</h1>
+</div>
+<table class="table table-bordered table-responsive table-hover">
+    <thead>
+        <tr>
+            <th>First Name:</th>
+            <th>Last Name:</th>
+            <th>Username:</th>
+            <th>Email:</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var prod in Model.UsersList)
+            {
+                <tr>
+                    <td>@prod.firstName</td>
+                    <td>@prod.lastName</td>
+                    <td>@prod.userName</td>
+                    <td>@prod.email</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+

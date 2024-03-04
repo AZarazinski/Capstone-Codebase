@@ -1,0 +1,63 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Collaboration.AddEditUsersModel
+@{
+}
+@* Header  *@
+@if (TempData["AddUserToCollabMSG"] != null)
+{
+    var messageType = TempData["MessageType"].ToString();
+    var messageClass = messageType == "Success" ? "alert-success" : "alert-danger";
+    <div class="alert @messageClass" role="alert" style="opacity: 0.9;">
+        @TempData["AddUserToCollabMSG"].ToString()
+    </div>
+}
+
+@{
+    if (HttpContext.Session.GetString("username") != null)
+    {
+        <p>@Model.HttpContext.Session.GetString("username")</p>
+    }
+    if (HttpContext.Session.GetInt32("collaborationID") != null)
+    {
+        <div class="text-center">
+            <h1 class="display-4">Add/Edit Users for Collaboration @Model.collabName</h1>
+        </div>
+    }
+    else
+    {
+        <div class="text-center">
+            <h1 class="display-4">Add/Edit Users</h1>
+        </div>
+    }
+}
+@* selecting user to add *@
+<form asp-page="AddEditUsers" asp-page-handler="AddUserToCollab" method="post">
+    Add user:
+    <br />
+    <div class="input-group mb-3">
+        <input type="text" name="input" aria-label="Username or Email" class="form-control" placeholder="Username/Email" aria-describeby="buttonaddon" />
+    </div>
+</form>
+@* current collaborators table *@
+<table class="table table-bordered table-hover">
+    <caption>Current Collaborators</caption>
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Username</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.UserList)
+        {
+            <tr>
+                <td>@item.firstName</td>
+                <td>@item.lastName</td>
+                <td>@item.email</td>
+                <td>@item.userName</td>
+            </tr>
+        }
+    </tbody>
+</table>
