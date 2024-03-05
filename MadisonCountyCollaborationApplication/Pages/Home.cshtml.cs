@@ -45,22 +45,10 @@ namespace MadisonCountyCollaborationApplication.Pages
                 return OnGet();
             }
         }
-        public IActionResult OnPostLogOut()
-        {
-            HttpContext.Session.Remove("username");
-            return RedirectToPage("/User/Login");
-        }
+       
 
-        public IActionResult OnPostViewKnowledgeItems()
-        {
-            HttpContext.Session.SetInt32("collaborationID", 0);
-            return RedirectToPage("/KnowledgeItems");
-        }
-        public IActionResult OnPostViewDatasets()
-        {
-            HttpContext.Session.SetInt32("collaborationID", 0);
-            return RedirectToPage("/Datasets");
-        }
+        
+        
 
         public List<DataClasses.Collaboration> CollaborationList { get; set; }
 

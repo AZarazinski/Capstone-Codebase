@@ -4,11 +4,6 @@
 }
 <div class="row">
     <div class="col-md-3">
-        @* adding new message *@
-        <form asp-page="CollaborationLanding" asp-page-handler="Message">
-            <input class="btn btn-primary" type="submit" value="Collab Message">
-        </form>
-        <br />
         @* adding user to collab *@
         <form asp-page="CollaborationLanding" asp-page-handler="AddUsers" method="post">
             <input type="hidden" asp-for="@Model.CollabID" value="@Model.CollabID" />
@@ -17,11 +12,7 @@
 
 
         <br />
-        @* Knowledge Items *@
-        <form asp-page="CollaborationLanding" asp-page-handler="Knowledge">
-            <input type="submit" value="Knowledge Items" class="btn btn-primary" />
-        </form>
-        <br />
+ 
         @* Datasets *@
         <form asp-page="CollaborationLanding" asp-page-handler="Datasets">
             <input type="submit" value="Datasets" class="btn btn-primary" />
@@ -31,10 +22,7 @@
             <input type="submit" value="Add Plan" class="btn btn-primary" />
         </form>
         <br />
-        @* Generate Report *@
-        <form asp-page="CollaborationLanding" asp-page-handler="GenerateReport" method="post">
-            <input type="submit" value="Generate Report" class="btn btn-primary" />
-        </form>
+       
     </div>
 
     <div class="col-md-9">

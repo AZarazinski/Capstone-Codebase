@@ -67,7 +67,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
 
         public IActionResult OnPostHome()
         {
-            return RedirectToPage("../HomePage");
+            return RedirectToPage("../Home");
         }
         public IActionResult OnPostAddPlan()
         {
@@ -78,20 +78,14 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
 
             return RedirectToPage("AddEditUsers");
         }
-        public IActionResult OnPostMessage()
-        {
-            return RedirectToPage("Message");
-        }
+        
         public IActionResult OnPostPlan()
         {
             HttpContext.Session.SetInt32("planID", PlanID);
             return RedirectToPage("ViewCollabPlan");
 
         }
-        public IActionResult OnPostKnowledge()
-        {
-            return RedirectToPage("ViewCollabKnowledge");
-        }
+        
         public IActionResult OnPostDatasets()
         {
             return RedirectToPage("ViewCollabData");
@@ -112,10 +106,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
             return RedirectToPage("ViewCollabPlan");
 
         }
-        public IActionResult OnPostGenerateReport()
-        {
-
-            return RedirectToPage("GenerateReport");
-        }
+        
     }
 }

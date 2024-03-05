@@ -23,7 +23,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Users
             DBClass.CreateAndHashUser(NewUser);
             DBClass.MainDBconnection.Close();
 
-            return RedirectToPage("/Login");
+            return RedirectToPage("Login");
         }
         public IActionResult OnPostClearInputs()
         {

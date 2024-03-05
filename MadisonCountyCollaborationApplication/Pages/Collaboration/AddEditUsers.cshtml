@@ -12,24 +12,6 @@
     </div>
 }
 
-@{
-    if (HttpContext.Session.GetString("username") != null)
-    {
-        <p>@Model.HttpContext.Session.GetString("username")</p>
-    }
-    if (HttpContext.Session.GetInt32("collaborationID") != null)
-    {
-        <div class="text-center">
-            <h1 class="display-4">Add/Edit Users for Collaboration @Model.collabName</h1>
-        </div>
-    }
-    else
-    {
-        <div class="text-center">
-            <h1 class="display-4">Add/Edit Users</h1>
-        </div>
-    }
-}
 @* selecting user to add *@
 <form asp-page="AddEditUsers" asp-page-handler="AddUserToCollab" method="post">
     Add user:

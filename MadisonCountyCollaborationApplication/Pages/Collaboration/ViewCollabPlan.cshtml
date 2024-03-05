@@ -3,10 +3,7 @@
 @{
 }
 @{
-    if (HttpContext.Session.GetString("username") != null)
-    {
-        <p>@Model.HttpContext.Session.GetString("username")</p>
-    }
+    
     if (HttpContext.Session.GetInt32("planID") != null)
     {
         <div class="text-center">
@@ -42,7 +39,7 @@
 </table>
 <br />
 @* add content *@
-<form asp-page="Plans" asp-page-handler="AddContents">
+<form asp-page="ViewCollabPlan" asp-page-handler="AddContents">
     <div class="d-grid gap-2">
         <input type="submit" value="Add Plan Contents" class="btn btn-primary" />
     </div>

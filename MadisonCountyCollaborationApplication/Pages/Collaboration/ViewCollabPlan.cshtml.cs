@@ -52,7 +52,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
 
         public IActionResult OnPostAddContents()
         {
-            return RedirectToPage("/PlanContents");
+            return RedirectToPage("AddPlanContents");
         }
     }
 }

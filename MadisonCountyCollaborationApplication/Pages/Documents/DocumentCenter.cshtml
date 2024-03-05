@@ -49,7 +49,7 @@
         <br />
         <div class="row">
             <div class="col-md-6">
-                @* allowing to add dataset *@
+                @* allowing to add document *@
                 <form method="post" enctype="multipart/form-data" asp-action="FileUpload">
                     <div class="form-group">
                         <div class="col-md-10">
@@ -65,21 +65,9 @@
                 </form>
 
             </div>
-            <div class="col-md-6">
-                @* removing dataset *@
-                <form asp-page="Datasets">
-                    <div class="d-grid gap-2">
-                        <input type="submit" value="Remove Dataset" class="btn btn-primary" />
-                    </div>
-                </form>
-            </div>
+            
         </div>
     </div>
 
-    <div class="col-md-3">
-        @* searching dataset *@
-        <form asp-page="Datasets">
-            <input type="submit" value="Search Datasets" class="btn btn-primary" />
-        </form>
-    </div>
+     
 </div>

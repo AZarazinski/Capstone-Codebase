@@ -3,10 +3,7 @@
 @{
 }
 @{
-    if (HttpContext.Session.GetString("username") != null)
-    {
-        <p>@Model.HttpContext.Session.GetString("username")</p>
-    }
+
     if (HttpContext.Session.GetInt32("collaborationID") != null)
     {
         <div class="text-center">
@@ -21,7 +18,7 @@
     }
 }
 
-<form asp-page="AddPlan" asp-page-handler="Create">
+<form asp-page="AddCollabPlan" asp-page-handler="Create">
     @* plan name box *@
     <input placeholder="Plan Name" type="text" asp-for="NewP.planName" class="form-control" />
     <span asp-validation-for="NewP.planName" class="text-danger"></span>

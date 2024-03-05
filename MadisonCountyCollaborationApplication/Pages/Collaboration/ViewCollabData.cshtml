@@ -5,10 +5,6 @@
 @{
   
 
-    if (HttpContext.Session.GetString("username") != null)
-    {
-        <p>@Model.HttpContext.Session.GetString("username")</p>
-    }
     if (HttpContext.Session.GetInt32("collaborationID") != null)
     {
         <div class="text-center">

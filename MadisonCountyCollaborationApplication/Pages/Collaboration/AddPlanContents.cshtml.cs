@@ -22,7 +22,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
             else
             {
                 HttpContext.Session.SetString("LoginError", "You must login to access that page!");
-                return RedirectToPage("/User/Login");
+                return RedirectToPage("../User/Login");
             }
         }
         public IActionResult OnPostCreate()
@@ -37,7 +37,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
 
             DBClass.CreatePlanContents(NewC);
             DBClass.MainDBconnection.Close();
-            return RedirectToPage("/Plans");
+            return RedirectToPage("ViewCollabPlan");
         }
     }
 }

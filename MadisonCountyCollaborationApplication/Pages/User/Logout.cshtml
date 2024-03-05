@@ -1,0 +1,12 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.User.LogoutModel
+@{
+}
+
+
+<h3>Are you sure you want to log out?</h3>
+
+<form asp-page="Logout" method="post">
+    <button type="submit" name="submitAction" value="LogOut" class="btn btn-danger">Yes</button>
+    <button type="submit" name="submitAction" value="Stay" class="btn btn-success">No</button>
+</form>

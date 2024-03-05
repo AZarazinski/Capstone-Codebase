@@ -58,7 +58,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
                 {
                     HttpContext.Session.SetInt32("datasetID", DatasetID);
                     DBClass.MainDBconnection.Close();
-                    return RedirectToPage("/ViewData");
+                    return RedirectToPage("../Dataset/ViewData");
 
                 }
                 else

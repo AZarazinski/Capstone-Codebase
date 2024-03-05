@@ -35,7 +35,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
             }
             DBClass.CreatePlan(NewP);
             DBClass.MainDBconnection.Close();
-            return RedirectToPage("/Collaboration");
+            return RedirectToPage("CollaborationLanding");
         }
         public IActionResult OnPostPopulate()
         {
