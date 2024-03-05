@@ -47,7 +47,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         }
         public IActionResult OnPostAddCollabData()
         {
-            return RedirectToPage("/AddCollabData");
+            return RedirectToPage("AddCollabData");
         }
     }
 }

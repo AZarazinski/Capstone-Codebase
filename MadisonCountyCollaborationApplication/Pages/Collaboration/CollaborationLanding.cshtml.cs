@@ -67,34 +67,34 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
 
         public IActionResult OnPostHome()
         {
-            return RedirectToPage("/HomePage");
+            return RedirectToPage("../HomePage");
         }
         public IActionResult OnPostAddPlan()
         {
-            return RedirectToPage("/AddCollabPlan");
+            return RedirectToPage("AddCollabPlan");
         }
         public IActionResult OnPostAddUsers()
         {
 
-            return RedirectToPage("/AddEditUsers");
+            return RedirectToPage("AddEditUsers");
         }
         public IActionResult OnPostMessage()
         {
-            return RedirectToPage("/Message");
+            return RedirectToPage("Message");
         }
         public IActionResult OnPostPlan()
         {
             HttpContext.Session.SetInt32("planID", PlanID);
-            return RedirectToPage("/ViewCollabPlan");
+            return RedirectToPage("ViewCollabPlan");
 
         }
         public IActionResult OnPostKnowledge()
         {
-            return RedirectToPage("/ViewCollabKnowledge");
+            return RedirectToPage("ViewCollabKnowledge");
         }
         public IActionResult OnPostDatasets()
         {
-            return RedirectToPage("/ViewCollabData");
+            return RedirectToPage("ViewCollabData");
         }
         public IActionResult OnPostAutoPopulateValues()
         {
@@ -109,13 +109,13 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
         public IActionResult OnPostAsync(int planID)
         {
             HttpContext.Session.SetInt32("planID", PlanID);
-            return RedirectToPage("/ViewCollabPlan");
+            return RedirectToPage("ViewCollabPlan");
 
         }
         public IActionResult OnPostGenerateReport()
         {
 
-            return RedirectToPage("/GenerateReport");
+            return RedirectToPage("GenerateReport");
         }
     }
 }

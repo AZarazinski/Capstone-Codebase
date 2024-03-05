@@ -62,7 +62,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Users
         }
         public IActionResult OnPostAddUser()
         {
-            return RedirectToPage("/CreateUser");
+            return RedirectToPage("CreateUser");
         }
     }
 }

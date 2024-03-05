@@ -1,11 +1,11 @@
 ﻿@page
-@model MadisonCountyCollaborationApplication.Pages.Collaboration.AddCollabKnowledgeModel
+@model AddCollabDataModel
 @{
 }
-<h4>Add Knowledge Items to Collaboration: </h4>
-@* displaying collab table *@
+<h4>Add Data to Collaboration: </h4>
+@* collaboration table *@
 <form asp-page-handler="Select" method="post" id="collabForm">
-    <input type="hidden" name="NewA.collabID" id="collabIdInput" value="" />
+    <input type="hidden" name="NewD.collabID" id="collabIdInput" value="" />
     <div class="box-table">
         @{
             foreach (var prod in Model.CollaborationList)

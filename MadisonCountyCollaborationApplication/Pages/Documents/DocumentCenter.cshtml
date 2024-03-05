@@ -1,0 +1,85 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Documents.DocumentCenterModel
+
+@{
+    if (HttpContext.Session.GetString("username") != null)
+    {
+        <p>@Model.HttpContext.Session.GetString("username")</p>
+    }
+}
+<div class="text-center">
+    <h1 class="display-4">View Documents</h1>
+</div>
+<div class="row">
+    <div class="col-md-9">
+        @* showing all datasets *@
+        <form asp-page-handler="Select" method="post" id="dataForm">
+            <input type="hidden" name="DocumentID" id="dataIdInput" value="" />
+            <div class="box-table">
+                @{
+                    
+                        string documentDir = Directory.GetCurrentDirectory();
+                        documentDir += @"\wwwroot\Documents\";
+                        <br />
+                        DirectoryInfo documentFolder = new DirectoryInfo(documentDir);
+
+                        var fileListing = documentFolder.GetFiles();
+
+                        foreach (var file in fileListing)
+                        {
+                            <a href="/Documents/@file.Name" target="_blank">@file.Name</a>
+
+                            <br />
+                        
+                        }
+                }
+            </div>
+        </form>
+
+        @section Scripts {
+            <script>
+                function selectDataset(dataId) {
+                    // Set the value of the hidden input to the dataset ID
+                    document.getElementById('dataIdInput').value = dataId;
+                    // Submit the form
+                    document.getElementById('dataForm').submit();
+                }
+            </script>
+        }
+        <br />
+        <div class="row">
+            <div class="col-md-6">
+                @* allowing to add dataset *@
+                <form method="post" enctype="multipart/form-data" asp-action="FileUpload">
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            <input asp-for="FileList" type="file" multiple class="btn btn-primary" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            <input type="submit" value="Upload File(s)" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="col-md-6">
+                @* removing dataset *@
+                <form asp-page="Datasets">
+                    <div class="d-grid gap-2">
+                        <input type="submit" value="Remove Dataset" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        @* searching dataset *@
+        <form asp-page="Datasets">
+            <input type="submit" value="Search Datasets" class="btn btn-primary" />
+        </form>
+    </div>
+</div>

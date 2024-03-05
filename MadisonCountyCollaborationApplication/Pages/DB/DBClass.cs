@@ -1,6 +1,7 @@
 ﻿using MadisonCountyCollaborationApplication.Pages.DataClasses;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection.Metadata;
 
 namespace MadisonCountyCollaborationApplication.Pages.DB
 {
@@ -251,6 +252,19 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             cmdKnowledgeRead.Connection = MainDBconnection;
             cmdKnowledgeRead.Connection.ConnectionString = MainDBconnString;
             cmdKnowledgeRead.CommandText = "SELECT * FROM DataSets";
+            cmdKnowledgeRead.Connection.Open(); // Open connection here, close in Model!
+
+            SqlDataReader tempReader = cmdKnowledgeRead.ExecuteReader();
+
+            return tempReader;
+        }
+
+        public static SqlDataReader DocReader()
+        {
+            SqlCommand cmdKnowledgeRead = new SqlCommand();
+            cmdKnowledgeRead.Connection = MainDBconnection;
+            cmdKnowledgeRead.Connection.ConnectionString = MainDBconnString;
+            cmdKnowledgeRead.CommandText = "SELECT * FROM Documents";
             cmdKnowledgeRead.Connection.Open(); // Open connection here, close in Model!
 
             SqlDataReader tempReader = cmdKnowledgeRead.ExecuteReader();
@@ -550,22 +564,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         }
         //functions for adding values to databases
 
-        public static void CreateKnowledgeItem(MadisonCountyCollaborationApplication.Pages.DataClasses.KnowledgeItems ki)
-        {
-            String sqlQuery = "INSERT INTO KnowledgeItems (title, KISubject, category, information, KMDate) VALUES('";
-            sqlQuery += ki.title + "','";
-            sqlQuery += ki.KISubject + "','";
-            sqlQuery += ki.category + "','";
-            sqlQuery += ki.information + "','";
-            sqlQuery += ki.KMDate + "')";
 
-            SqlCommand cmdProductRead = new SqlCommand();
-            cmdProductRead.Connection = MainDBconnection;
-            cmdProductRead.Connection.ConnectionString = MainDBconnString;
-            cmdProductRead.CommandText = sqlQuery;
-            cmdProductRead.Connection.Open();
-            cmdProductRead.ExecuteNonQuery();
-        }
 
         public static void CreateDataset(String title)
         {
@@ -977,5 +976,42 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                 userCommand.ExecuteNonQuery();
             }
         }
+
+    
+
+        //public static SqlDataReader DocumentReader(int documentID)
+        //{
+        //    using (SqlConnection connection = new SqlConnection("your_connection_string"))
+        //    {
+        //        string selectQuery = "SELECT DocumentName, DocumentContent FROM Documents WHERE DocumentID = @id";
+        //        SqlCommand command = new SqlCommand(selectQuery, connection);
+        //        command.Parameters.AddWithValue("@id", documentID);
+
+        //        connection.Open();
+        //        using (SqlDataReader reader = command.ExecuteReader())
+        //        {
+        //            if (reader.Read())
+        //            {
+        //                string fileName = (string)reader["DocumentName"];
+        //                byte[] pdfData = (byte[])reader["DocumentContent"];
+
+        //                return new DocumentInfo
+        //                {
+        //                    DocumentName = fileName,
+        //                    DocumentContent = pdfData
+        //                };
+        //            }
+        //            else
+        //            {
+        //                return null;
+        //            }
+        //        }
+        //    }
+
+        //}
+
+
+
+
     }
 }

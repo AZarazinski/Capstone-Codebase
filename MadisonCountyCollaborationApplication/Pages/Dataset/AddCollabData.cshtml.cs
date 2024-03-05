@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data.SqlClient;
 
-namespace MadisonCountyCollaborationApplication.Pages.Collaboration
+namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
     public class AddCollabDataModel : PageModel
     {
         [BindProperty]
-        public MadisonCountyCollaborationApplication.Pages.DataClasses.DatasetAssist NewD { get; set; }
+        public DataClasses.DatasetAssist NewD { get; set; }
         public List<DataClasses.Collaboration> CollaborationList { get; set; }
 
 
@@ -31,7 +31,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
                 {
                     CollaborationList.Add(new DataClasses.Collaboration
                     {
-                        collabID = Int32.Parse(CollaborationReader["collabID"].ToString()),
+                        collabID = int.Parse(CollaborationReader["collabID"].ToString()),
                         collabName = CollaborationReader["collabName"].ToString(),
                         notesAndInfo = CollaborationReader["notesAndInfo"].ToString(),
                         collabType = CollaborationReader["collabType"].ToString()

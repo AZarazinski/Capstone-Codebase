@@ -12,7 +12,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
     public class FileHandlingModel : PageModel
     {
-        private static readonly string CollabAppString = "server=Localhost;Database=Lab3;Trusted_Connection=True";
+        private static readonly string MainDBconnString = "server=Localhost;Database=Lab4;Trusted_Connection=True";
         // Method to check session before accessing the page
         public IActionResult OnGetSessionCheck()
         {
@@ -53,7 +53,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 
             // Redirect to a success page and optionally pass the table name for confirmation.
             TempData["TableName"] = Path.GetFileNameWithoutExtension(filePath);
-            return RedirectToPage("/Datasets");
+            return RedirectToPage("DatasetLandin");
         }
         // Method to process a CSV file asynchronously
         private async Task ProcessCsvFile(string filePath)
@@ -87,7 +87,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         // Method to create table from CSV data
         private async Task CreateTableFromCsv(string tableName, string[] headers, IEnumerable<IDictionary<string, object>> records)
         {
-            using (var connection = new SqlConnection(CollabAppString))
+            using (var connection = new SqlConnection(MainDBconnString))
             {
                 await connection.OpenAsync();
                 var createTableSql = GenerateTableCreationSql(tableName, headers);
@@ -132,7 +132,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         {
             List<string> datasetNames = new List<string>();
             string sqlQuery = "SELECT FileName FROM DataSets"; // Adjust if your actual table name differs
-            using (var connection = new SqlConnection(CollabAppString)) // Use the actual connection string variable
+            using (var connection = new SqlConnection(MainDBconnString)) // Use the actual connection string variable
             using (var command = new SqlCommand(sqlQuery, connection))
             {
                 connection.Open();
@@ -155,7 +155,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             // Assuming the DataSet table has a column named "TableName"
             string addFileQuery = @"INSERT INTO DataSets (dataSetName) VALUES (@FileName);";
 
-            using (var connection = new SqlConnection(CollabAppString))
+            using (var connection = new SqlConnection(MainDBconnString))
             {
                 await connection.OpenAsync();
                 using (var command = new SqlCommand(addFileQuery, connection))

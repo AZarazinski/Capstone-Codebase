@@ -22,7 +22,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
         public String? firstName { get; set; }
         public String? lastName { get; set; }
         public String? email { get; set; }
-        public List<KnowledgeItems> KnowledgeItemsList { get; set; } = new List<KnowledgeItems>();
+        
         public int KnowledgeItemsID { get; set; }
         public String? title { get; set; }
         public String? KISubject { get; set; }
@@ -83,20 +83,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
                 DBClass.MainDBconnection.Close();
 
                 // KnowledgeItems for the Collab
-                SqlDataReader GetKnowledgeItemsFromCollabReader = DBClass.GetKnowledgeItemsFromCollabReader(collabID);
-                while (GetKnowledgeItemsFromCollabReader.Read())
-                {
-                    KnowledgeItemsList.Add(new KnowledgeItems
-                    {
-                        knowledgeItemID = Int32.Parse(GetKnowledgeItemsFromCollabReader["knowledgeItemID"].ToString()),
-                        title = GetKnowledgeItemsFromCollabReader["title"].ToString(),
-                        KISubject = GetKnowledgeItemsFromCollabReader["KISubject"].ToString(),
-                        category = GetKnowledgeItemsFromCollabReader["category"].ToString(),
-                        information = GetKnowledgeItemsFromCollabReader["information"].ToString(),
-                        KMDate = GetKnowledgeItemsFromCollabReader.GetDateTime(GetKnowledgeItemsFromCollabReader.GetOrdinal("KMDate"))
-                    });
-                }
-                DBClass.MainDBconnection.Close();
+        
 
                 SqlDataReader GeSWOTFromCollabReader = DBClass.CollabSWOTReader(collabID);
                 while (GeSWOTFromCollabReader.Read())

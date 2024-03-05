@@ -50,7 +50,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             else
             {
                 HttpContext.Session.SetString("LoginError", "You must login to access that page!");
-                return RedirectToPage("/Login");
+                return RedirectToPage("../User/Login");
             }
         }
         //adding datataset
@@ -68,7 +68,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     if (!formFile.FileName.EndsWith(".csv"))
                     {
                         ModelState.AddModelError("FileList", "Only CSV files are allowed.");
-                        return RedirectToPage("/Datasets");
+                        return RedirectToPage("Datasets");
                     }
                     // full path to file in temp location
                     var filePath = Directory.GetCurrentDirectory() + @"\wwwroot\fileupload\" + formFile.FileName;
@@ -79,12 +79,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     {
                         formFile.CopyTo(stream);
                     }
-                    return RedirectToPage("/FileHandling", new { filePath = filePath });
+                    return RedirectToPage("FileHandling", new { filePath = filePath });
                    
 
                 }
             }
-            return RedirectToPage("/Datasets");
+            return RedirectToPage("DatasetLanding");
         }
 
         //selecting dataset
@@ -96,7 +96,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 {
                     HttpContext.Session.SetInt32("datasetID", DatasetID);
                     DBClass.MainDBconnection.Close();
-                    return RedirectToPage("/ViewData");
+                    return RedirectToPage("ViewData");
 
                 }
                 else

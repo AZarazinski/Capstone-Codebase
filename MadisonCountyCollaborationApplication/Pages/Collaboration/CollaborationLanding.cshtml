@@ -5,12 +5,12 @@
 <div class="row">
     <div class="col-md-3">
         @* adding new message *@
-        <form asp-page="Collaboration" asp-page-handler="Message">
+        <form asp-page="CollaborationLanding" asp-page-handler="Message">
             <input class="btn btn-primary" type="submit" value="Collab Message">
         </form>
         <br />
         @* adding user to collab *@
-        <form asp-page="Collaboration" asp-page-handler="AddUsers" method="post">
+        <form asp-page="CollaborationLanding" asp-page-handler="AddUsers" method="post">
             <input type="hidden" asp-for="@Model.CollabID" value="@Model.CollabID" />
             <button type="submit" class="btn btn-primary">Add Users to Collaboration</button>
         </form>
@@ -18,21 +18,21 @@
 
         <br />
         @* Knowledge Items *@
-        <form asp-page="Collaboration" asp-page-handler="Knowledge">
+        <form asp-page="CollaborationLanding" asp-page-handler="Knowledge">
             <input type="submit" value="Knowledge Items" class="btn btn-primary" />
         </form>
         <br />
         @* Datasets *@
-        <form asp-page="Collaboration" asp-page-handler="Datasets">
+        <form asp-page="CollaborationLanding" asp-page-handler="Datasets">
             <input type="submit" value="Datasets" class="btn btn-primary" />
         </form>
         <br />
-        <form asp-page="Collaboration" asp-page-handler="AddPlan">
+        <form asp-page="CollaborationLanding" asp-page-handler="AddPlan">
             <input type="submit" value="Add Plan" class="btn btn-primary" />
         </form>
         <br />
         @* Generate Report *@
-        <form asp-page="Collaboration" asp-page-handler="GenerateReport" method="post">
+        <form asp-page="CollaborationLanding" asp-page-handler="GenerateReport" method="post">
             <input type="submit" value="Generate Report" class="btn btn-primary" />
         </form>
     </div>
