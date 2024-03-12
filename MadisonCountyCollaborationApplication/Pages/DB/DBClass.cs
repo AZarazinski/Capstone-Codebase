@@ -110,23 +110,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             return false;
         }
 
-        public static bool KnowledgeExist(int dataID)
-        {
-
-            SqlCommand cmdProductRead = new SqlCommand();
-            cmdProductRead.Connection = MainDBconnection;
-            cmdProductRead.Connection.ConnectionString = MainDBconnString;
-            cmdProductRead.Parameters.AddWithValue("@knowledgeID", dataID);
-            cmdProductRead.CommandText = "Select Count(*) FROM KnowledgeItems WHERE knowledgeItemID = @knowledgeID";
-            cmdProductRead.Connection.Open();
-            if (((int)cmdProductRead.ExecuteScalar()) > 0)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
+  
 
         public static SqlDataReader DatasetReader()
         {

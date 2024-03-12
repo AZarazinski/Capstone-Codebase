@@ -62,7 +62,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     NewD.datasetID = (int)HttpContext.Session.GetInt32("datasetID");
                     DBClass.CreateDataAssist(NewD);
                     DBClass.MainDBconnection.Close();
-                    return RedirectToPage("/Collaboration");
+                    return RedirectToPage("DatasetLanding");
 
                 }
                 else

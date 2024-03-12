@@ -53,7 +53,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 
             // Redirect to a success page and optionally pass the table name for confirmation.
             TempData["TableName"] = Path.GetFileNameWithoutExtension(filePath);
-            return RedirectToPage("DatasetLandin");
+            return RedirectToPage("DatasetLanding");
         }
         // Method to process a CSV file asynchronously
         private async Task ProcessCsvFile(string filePath)

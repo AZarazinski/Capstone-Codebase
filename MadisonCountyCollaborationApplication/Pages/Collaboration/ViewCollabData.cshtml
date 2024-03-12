@@ -35,7 +35,7 @@
     </div>
 </form>
 
-@section Scripts {
+@* @section Scripts {
     <script>
         function selectDataset(dataId) {
             // Set the value of the hidden input to the dataset ID
@@ -44,7 +44,16 @@
             document.getElementById('dataForm').submit();
         }
     </script>
-}
-<form asp-page="collabDatasets" asp-page-handler="Analysis">
-    <input type="submit" value="Add New Analysis" class="btn btn-primary" />
+@* }
+<form asp-page="ViewCollabData" asp-page-handler="Analysis">
+    <input type="submit" value="Add New Dataset" class="btn btn-primary" />
 </form>
+ *@ 
+
+<h4>To add a new dataset to this collaboration:</h4>
+<ol>
+    <li>Go to the Data Center</li>
+    <li>Select a dataset you want to add</li>
+    <li>Click add to collaboration</li>
+    <li>Select the collaboration you want to add it to</li>
+</ol>
