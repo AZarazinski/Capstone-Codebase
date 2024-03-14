@@ -1,13 +1,15 @@
 ﻿@page
 @model MadisonCountyCollaborationApplication.Pages.Dataset.DatasetLandingModel
 
+
+
 <div class="text-center">
     <h1 class="display-4">View Datasets</h1>
 </div>
 <div class="row">
     <div class="col-md-9">
         @* showing all datasets *@
-        <form asp-page-handler="Select" method="post" id="dataForm">
+        @* <form asp-page-handler="Select" method="post" id="dataForm">
             <input type="hidden" name="DatasetID" id="dataIdInput" value="" />
             <div class="box-table">
                 @{
@@ -22,8 +24,8 @@
                 }
             </div>
         </form>
-
-        @section Scripts {
+ *@
+        @* @section Scripts {
             <script>
                 function selectDataset(dataId) {
                     // Set the value of the hidden input to the dataset ID
@@ -32,7 +34,7 @@
                     document.getElementById('dataForm').submit();
                 }
             </script>
-        }
+        } *@
         <br />
         <div class="row">
             <div class="col-md-6">
@@ -58,3 +60,14 @@
 
     
 </div>
+
+
+<div class="datasets"
+<ul>
+    @{
+        foreach (var dataset in Model.DatasetList)
+        {
+            <li> <a asp-page="ViewData" asp-route-datasetID="@dataset.ID">@dataset.Name</a> </li>
+        }
+    }
+</ul>
