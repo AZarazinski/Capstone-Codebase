@@ -33,17 +33,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Documents
                     + HttpContext.Session.GetString("username")
                     + " successful!";
 
-                //SqlDataReader DocumentReader = DBClass.DocReader();
-                //while (DocumentReader.Read())
-                //{
-                //    DocumentList.Add(new DataClasses.Documents
-                //    {
-                //        DocumentID = Int32.Parse(DocumentReader["DocumentID"].ToString()),
-                //        DocumentName = DocumentReader["DocumentName"].ToString()
-
-                //    });
-                //}
-                //DBClass.MainDBconnection.Close();
+        
                 return Page();
             }
             else
@@ -86,32 +76,34 @@ namespace MadisonCountyCollaborationApplication.Pages.Documents
             return RedirectToPage("/DocumentCenter");
         }
 
-        ////selecting dataset
-        //public IActionResult OnPostSelect()
-        //{
-        //    if (DocumentID != null && DocumentID > 0)
-        //    {
-        //        if (DBClass.DatasetExist(DocumentID))
-        //        {
-        //            HttpContext.Session.SetInt32("DocumentID", DocumentID);
-        //            DBClass.MainDBconnection.Close();
-        //            return RedirectToPage("/ViewDocuments");
-
-        //        }
-        //        else
-        //        {
-        //            DBClass.MainDBconnection.Close();
-        //            ViewData["CollabNotExistMessage"] = "That collaboration does not exist.";
-        //            return OnGet();
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        ViewData["CollabNotExistMessage"] = "That collaboration does not exist.";
-        //        return OnGet();
-        //    }
-        //}
 
     }
 }
+
+
+//string connectionString = "your_connection_string_here";
+//string filePath = @"path_to_your_file_here";
+//string fileName = Path.GetFileName(filePath);
+
+//// Assuming your FileTable has columns: [name], [file_stream], and [path_locator] (automatically managed by SQL Server)
+//// Adjust your INSERT statement according to your table's schema.
+//string sqlQuery = "INSERT INTO Lab4FileTable (name, file_stream) OUTPUT INSERTED.stream_id VALUES (@FileName, @FileData);";
+
+//// Read the file into a byte array
+//byte[] fileData = File.ReadAllBytes(filePath);
+
+//using (SqlConnection connection = new SqlConnection(connectionString))
+//{
+//    connection.Open();
+
+//    using (SqlCommand command = new SqlCommand(sqlQuery, connection))
+//    {
+//        // Parameterize to avoid SQL injection
+//        command.Parameters.Add("@FileName", SqlDbType.VarChar).Value = fileName;
+//        command.Parameters.Add("@FileData", SqlDbType.VarBinary, fileData.Length).Value = fileData;
+
+//        // Execute the command and retrieve the new Stream ID if needed
+//        var streamId = command.ExecuteScalar();
+//        Console.WriteLine($"File saved successfully. Stream ID: {streamId}");
+//    }
+//}

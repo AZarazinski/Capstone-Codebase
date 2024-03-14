@@ -12,7 +12,7 @@ namespace MadisonCountyCollaborationApplication.Pages.User
         {
             if (Request.Form["submitAction"] == "LogOut")
             {
-                HttpContext.Session.SetString("username", "");
+                HttpContext.Session.Clear();
                 return RedirectToPage("Login");
             }
             else if (Request.Form["submitAction"] == "Stay")

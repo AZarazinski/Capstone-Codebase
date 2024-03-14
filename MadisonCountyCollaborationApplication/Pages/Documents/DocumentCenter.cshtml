@@ -1,12 +1,7 @@
 ﻿@page
 @model MadisonCountyCollaborationApplication.Pages.Documents.DocumentCenterModel
 
-@{
-    if (HttpContext.Session.GetString("username") != null)
-    {
-        <p>@Model.HttpContext.Session.GetString("username")</p>
-    }
-}
+
 <div class="text-center">
     <h1 class="display-4">View Documents</h1>
 </div>
