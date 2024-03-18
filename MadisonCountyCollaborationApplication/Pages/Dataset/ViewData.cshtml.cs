@@ -10,19 +10,17 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
     {
         public List<Attributes> AttributeList { get; set; }
         [BindProperty]
-        public int datasetID { get; set; }
+        public int DatasetID { get; set; }
         [BindProperty]
-        public string datasetName { get; set; }
+        public string DatasetName { get; set; }
 
-        //[BindProperty]
-        public String?[,] values { get; set; }
         public DataTable Data { get; private set; }
 
         public ViewDataModel()
         {
             AttributeList = new List<Attributes>();
         }
-        public IActionResult OnGet()
+        public IActionResult OnGet(int datasetID)
         {
             if (HttpContext.Session.GetString("username") != null)
             {
@@ -30,10 +28,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     + HttpContext.Session.GetString("username")
                     + " successful!";
 
-                datasetID = (int)HttpContext.Session.GetInt32("datasetID");
-                datasetName = DBClass.ExtractDatasetName(datasetID);
+                DatasetID = datasetID;
+                DatasetName = DBClass.ExtractDatasetName(DatasetID);
                 DBClass.MainDBconnection.Close();
-                Data = DBClass.FetchDataForTable(datasetName + datasetID.ToString());
+                Data = DBClass.FetchDataForTable(DatasetName + DatasetID.ToString());
                 DBClass.MainDBconnection.Close();
             
 
