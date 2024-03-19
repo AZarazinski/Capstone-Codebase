@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Reflection.Metadata;
+using static MadisonCountyCollaborationApplication.Pages.Dataset.ViewDataModel;
 
 namespace MadisonCountyCollaborationApplication.Pages.DB
 {
@@ -19,24 +20,72 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             "Server=Localhost;Database=AUTH;Trusted_Connection=True";
 
 
-        public static bool StoredProcedureLogin(string Username, string Password)
+
+        //GENERAL READER STATEMENT -- PARKER T. SHORT
+        public static SqlDataReader GeneralReaderQuery(string sqlQuery)
         {
-
-            SqlCommand cmdProductRead = new SqlCommand();
-            cmdProductRead.Connection = MainDBconnection;
-            cmdProductRead.Connection.ConnectionString = MainDBconnString;
-            cmdProductRead.CommandType = System.Data.CommandType.StoredProcedure;
-            cmdProductRead.Parameters.AddWithValue("@Username", Username);
-            cmdProductRead.Parameters.AddWithValue("@Password", Password);
-            cmdProductRead.CommandText = "sp_Lab4Login";
-            cmdProductRead.Connection.Open();
-            if (((int)cmdProductRead.ExecuteScalar()) > 0)
-            {
-                return true;
-            }
-
-            return false;
+            var connection = new SqlConnection(MainDBconnString);
+            var cmdGeneralRead = new SqlCommand(sqlQuery, connection);
+            connection.Open();
+            return cmdGeneralRead.ExecuteReader(CommandBehavior.CloseConnection);
         }
+        //GENERAL INSERT STATEMENT -- PARKER T. SHORT 
+        public static void GeneralInsertQuery(string sqlQuery)
+        {
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var cmdGeneralRead = new SqlCommand(sqlQuery, connection))
+                {
+                    connection.Open();
+                    cmdGeneralRead.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static List<CollaborationOption> FetchCollaborations()
+        {
+            var collaborations = new List<CollaborationOption>();
+            string sqlQuery = "SELECT collabID, collabName FROM Collaboration";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var command = new SqlCommand(sqlQuery, connection))
+                {
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            collaborations.Add(new CollaborationOption
+                            {
+                                CollabID = reader.GetInt32(reader.GetOrdinal("collabID")),
+                                Name = reader.GetString(reader.GetOrdinal("collabName"))
+                            });
+                        }
+                    }
+                }
+            }
+            return collaborations;
+        }
+
+        public static void InsertIntoDataAssists(int selectedCollabID, int datasetID)
+        {
+            string sqlQuery = "INSERT INTO DataAssists (collabID, datasetID) VALUES (@CollabID, @DatasetID)";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var cmd = new SqlCommand(sqlQuery, connection))
+                {
+                    cmd.Parameters.AddWithValue("@CollabID", selectedCollabID);
+                    cmd.Parameters.AddWithValue("@DatasetID", datasetID);
+
+                    connection.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
 
         //Functions for displaying tables
         public static SqlDataReader CollaborationReader()
@@ -64,18 +113,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
             return tempReader;
         }
-        public static SqlDataReader CollaborationGetAllNames()
-        {
-            SqlCommand cmdContentRead = new SqlCommand();
-            cmdContentRead.Connection = MainDBconnection;
-            cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT collabName FROM Collaboration";
-            cmdContentRead.Connection.Open(); // Open connection here, close in Model!
 
-            SqlDataReader tempReader = cmdContentRead.ExecuteReader();
-
-            return tempReader;
-        }
         public static bool CollaborationExist(int collabID)
         {
 
@@ -125,33 +163,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             return tempReader;
         }
 
-        public static SqlDataReader DocReader()
-        {
-            SqlCommand cmdKnowledgeRead = new SqlCommand();
-            cmdKnowledgeRead.Connection = MainDBconnection;
-            cmdKnowledgeRead.Connection.ConnectionString = MainDBconnString;
-            cmdKnowledgeRead.CommandText = "SELECT * FROM Documents";
-            cmdKnowledgeRead.Connection.Open(); // Open connection here, close in Model!
-
-            SqlDataReader tempReader = cmdKnowledgeRead.ExecuteReader();
-
-            return tempReader;
-        }
-
-        
-
-        public static SqlDataReader UsersReader()
-        {
-            SqlCommand cmdUserRead = new SqlCommand();
-            cmdUserRead.Connection = MainDBconnection;
-            cmdUserRead.Connection.ConnectionString = MainDBconnString;
-            cmdUserRead.CommandText = "SELECT * FROM Users";
-            cmdUserRead.Connection.Open(); // Open connection here, close in Model!
-
-            SqlDataReader tempReader = cmdUserRead.ExecuteReader();
-
-            return tempReader;
-        }
+       
         public static SqlDataReader PlansReader(int CollabID)
         {
             SqlCommand cmdPlanRead = new SqlCommand();
@@ -429,57 +441,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             return false;
         }
         
-
-        public static SqlDataReader GetPlansFromCollabReader(int collabID)
-        {
-            SqlCommand cmdQuery = new SqlCommand();
-            cmdQuery.Connection = MainDBconnection;
-            cmdQuery.Connection.ConnectionString = MainDBconnString;
-            cmdQuery.CommandText = @"SELECT 
-                                         planID, planID, planName, planDesc, dateCreated
-                                     FROM 
-                                         Plans
-                                    WHERE 
-                                         collabID = @collabID";
-            cmdQuery.Parameters.AddWithValue("@collabID", collabID);
-
-            cmdQuery.Connection.Open();
-
-            SqlDataReader resultReader = cmdQuery.ExecuteReader();
-
-            return resultReader;
-        }
-
-        public static SqlDataReader GetUsersFromCollabReader(int collabID)
-        {
-            // Create a new connection instance specifically for this operation.
-            SqlConnection conn = new SqlConnection(MainDBconnString);
-
-            // Create the command object with the SQL query and associate it with the connection.
-            SqlCommand cmdQuery = new SqlCommand();
-            cmdQuery.Connection = conn; // Use the newly created connection
-            cmdQuery.CommandText = @"SELECT 
-                                        u.userID, u.firstName, u.lastName, u.email, u.userName
-                                     FROM 
-                                        Users u, Contributes con, Collaboration c
-                                     WHERE 
-                                        u.userID = con.userID AND con.collabID = c.collabID AND c.collabID = @collabID";
-            cmdQuery.Parameters.AddWithValue("@collabID", collabID);
-
-            // Open the connection right before executing the reader.
-            conn.Open();
-
-            // Execute the reader with CommandBehavior.CloseConnection to ensure the connection closes when the reader is closed.
-            SqlDataReader resultReader = cmdQuery.ExecuteReader(CommandBehavior.CloseConnection);
-
-            // Return the reader to the caller.
-            return resultReader;
-        }
-
-
-
         
-
         // Combined Hashed Password and Insert User Method
         public static void CreateAndHashUser(MadisonCountyCollaborationApplication.Pages.DataClasses.Users newUser)
         {

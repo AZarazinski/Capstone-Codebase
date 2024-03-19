@@ -5,11 +5,27 @@
 @{
 }
 
-<div class="text-center">
-    <h1 class="display-4">Data</h1>
+
+<h2>@Model.DatasetName</h2>
+
+<div class="CollabAdd">
+
 </div>
-@* diaplaying each row and column of table *@
-<h2>Dataset: @Model.DatasetName</h2>
+
+
+<form method="post" asp-page-handler="RedirectToAnalysis">
+    <div class="input-group mb-2">
+        <label class="input-group-text" for="analysisSelect">Select Analysis</label>
+        <select class="form-select" id="analysisSelect" name="analysisType" aria-label="Select Analysis">
+            <option value="SingleRegression">Single Regression</option>
+            <option value="MultiRegression">Multi Regression</option>
+            <option value="Simulation">Monte Carlo Simulation</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<br />
+
 <!-- Table to display the dataset's data -->
 <table class="table table-bordered table-hover">
     <thead>
@@ -41,3 +57,13 @@
 <form asp-page-handler="AddCollabData">
     <input type="submit" value="Add to Collaboration" class="btn btn-secondary" />
 </form>
+
+
+<form method="post" asp-page-handler="AddCollabData">
+    <div class="form-group">
+        <label for="collabDropdown">Select Collaboration</label>
+        <select asp-for="SelectedCollabID" asp-items="Model.CollaborationOptions" class="form-control" id="collabDropdown"></select>
+    </div>
+    <button type="submit" class="btn btn-secondary">Add to Collaboration</button>
+</form>
+

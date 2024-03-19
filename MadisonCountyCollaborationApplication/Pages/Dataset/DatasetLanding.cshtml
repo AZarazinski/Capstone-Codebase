@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-md-9">
         @* showing all datasets *@
-        @* <form asp-page-handler="Select" method="post" id="dataForm">
+        <form asp-page-handler="Select" method="post" id="dataForm">
             <input type="hidden" name="DatasetID" id="dataIdInput" value="" />
             <div class="box-table">
                 @{
@@ -24,8 +24,8 @@
                 }
             </div>
         </form>
- *@
-        @* @section Scripts {
+
+        @section Scripts {
             <script>
                 function selectDataset(dataId) {
                     // Set the value of the hidden input to the dataset ID
@@ -34,7 +34,7 @@
                     document.getElementById('dataForm').submit();
                 }
             </script>
-        } *@
+        }
         <br />
         <div class="row">
             <div class="col-md-6">
@@ -62,7 +62,7 @@
 </div>
 
 
-<div class="datasets"
+@* <div class="datasets"
 <ul>
     @{
         foreach (var dataset in Model.DatasetList)
@@ -71,3 +71,4 @@
         }
     }
 </ul>
+ *@

@@ -1,0 +1,82 @@
+﻿@page
+@using System.Data
+@using System.Data.SqlClient
+@model MadisonCountyCollaborationApplication.Pages.Dataset.SingleRegressionModel
+@{
+}
+
+<div class="text-center">
+    <h1 class="display-4">Data</h1>
+</div>
+
+<form id="dataForm" method="post">
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="IndependentVariable">Independent Variable</label>
+        <select class="form-select" name="Independent" id="Independent" aria-label="Independent Variable">
+            @foreach (DataColumn column in Model.Data.Columns)
+            {
+                <option value="@column.ColumnName">@column.ColumnName</option>
+            }
+        </select>
+    </div>
+    <br />
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="DependentVariable">Dependent Variable</label>
+        <select class="form-select" name="Dependent" id="Dependent" aria-label="Dependent Variable">
+            @foreach (DataColumn column in Model.Data.Columns)
+            {
+                <option value="@column.ColumnName">@column.ColumnName</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<div id="jsonResponse" style="white-space: pre-wrap;"></div>
+<div id="plotlyChart"></div>
+@section Scripts {
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('dataForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the form from submitting traditionally
+
+                var formData = new FormData(this);
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData, // FormData is used here, ensure server expects this
+                    // No need to set 'Content-Type': 'application/json', as we're sending FormData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json(); // Parses the JSON response into a JavaScript object
+                    })
+                    .then(data => {
+                        // Convert the JavaScript object to a string and display it
+                        document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
+
+                        // Assuming data.Fields contains the necessary information for the plot
+                        if (data.Fields && data.Fields.length > 0) {
+                            // Prepare data for Plotly
+                            var plotData = [data.Fields[0]]; // Wrap in an array if not already an array
+                            var layout = {
+                                title: 'Your Plot Title',
+                                xaxis: { title: 'X Axis' },
+                                yaxis: { title: 'Y Axis' }
+                            };
+
+                            // Create Plotly plot
+                            Plotly.newPlot('plotlyChart', plotData, layout);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('jsonResponse').textContent = 'Error fetching data: ' + error.toString();
+                    });
+            });
+        });
+    </script>
+}
