@@ -19,7 +19,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         [BindProperty]
         public string DependentVariable { get; set; }
         public DataTable Data { get; private set; }
-
         [BindProperty]
         public int datasetID { get; set; }
         [BindProperty]

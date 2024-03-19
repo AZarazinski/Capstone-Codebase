@@ -1,0 +1,108 @@
+﻿@page
+@model _488Labs.Pages.MonteCarloModel
+@{
+}
+<div class="row">
+    <div class="col-md-4">
+        Number of iterations:
+        <input type="number" class="form-control" placeholder="Iterations" aria-label="Iterations">
+    </div>
+    <div class="col-md-4">
+        Number of Years:
+        <input type="number" class="form-control" placeholder="Years" aria-label="Iterations">
+    </div>
+    <div class="col-md-4">
+        <label class="input-group-text" for="constant">Constant Growth</label>
+        <select class="form-select" id="constant" name="constantGrowth" aria-label="Select Growth">
+            <option selected value=true>Constant Growth</option>
+            <option value=false>Nonconstant Growth</option>
+        </select>
+    </div>
+</div>
+
+<br />
+<h4 class="display-4">Taxes: </h4>
+<div class="row">
+    <div class="col-md-3">
+        Initial Value:
+        <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations">
+    </div>
+
+    <div class="col-md-3">
+        <label class="input-group-text" for="TaxParameters[1]">Distribution</label>
+        <select class="form-select" id="TaxDistribution" name="distribution" aria-label="Select distribution">
+            <option selected value="Constant">Constant</option>
+            <option value="Uniform">Uniform</option>
+            <option value="Triangular">Triangular</option>
+            <option value="Normal">Normal</option>
+            <option value="Lognormal">Lognormal</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param1" aria-label="Iterations">
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param2" aria-label="Iterations">
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param3" aria-label="Iterations">
+    </div>
+</div>
+<br />
+
+<h4 class="display-4">Intergovernmental: </h4>
+<div class="row">
+    <div class="col-md-3">
+        Initial Value:
+        <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations">
+    </div>
+
+    <div class="col-md-3">
+        <label class="input-group-text" for="TaxParameters[1]">Distribution</label>
+        <select class="form-select" id="TaxDistribution" name="distribution" aria-label="Select distribution">
+            <option selected value="Constant">Constant</option>
+            <option value="Uniform">Uniform</option>
+            <option value="Triangular">Triangular</option>
+            <option value="Normal">Normal</option>
+            <option value="Lognormal">Lognormal</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param1" aria-label="Iterations">
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param2" aria-label="Iterations">
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param3" aria-label="Iterations">
+    </div>
+</div>
+<br />
+
+<h4 class="display-4">Other: </h4>
+<div class="row">
+    <div class="col-md-3">
+        Initial Value:
+        <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations">
+    </div>
+
+    <div class="col-md-3">
+        <label class="input-group-text" for="TaxParameters[1]">Distribution</label>
+        <select class="form-select" id="TaxDistribution" name="distribution" aria-label="Select distribution">
+            <option selected value="Constant">Constant</option>
+            <option value="Uniform">Uniform</option>
+            <option value="Triangular">Triangular</option>
+            <option value="Normal">Normal</option>
+            <option value="Lognormal">Lognormal</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param1" aria-label="Iterations">
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param2" aria-label="Iterations">
+    </div>
+    <div class="col-md-2">
+        <input type="text" class="form-control" placeholder="param3" aria-label="Iterations">
+    </div>
+</div>
