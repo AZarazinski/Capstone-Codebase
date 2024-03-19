@@ -5,9 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
 using Plotly.NET.CSharp;
+using Plotly.NET.ImageExport;
 using Plotly.NET.Interactive;
 using System.Text.Json;
 using Newtonsoft.Json;
+using PdfSharpCore.Pdf;
+using PdfSharpCore.Drawing;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 
 namespace MadisonCountyCollaborationApplication.Pages.Dataset
@@ -123,7 +129,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 TypeNameHandling = TypeNameHandling.None,
                 Formatting = Formatting.None
             });
-
             return Content(jsonResponse, "application/json");
             // return Content(ChartConfigJson, "application/json");
         }
@@ -149,38 +154,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             return (m, b, rSquared);
         }
 
-        public (Vector<double> coefficients, double rSquared) CalculateMultipleLinearRegression(List<List<double>> independentValues, List<double> dependentValues)
-        {
-            if (independentValues.Any(x => x.Count != dependentValues.Count))
-                throw new InvalidOperationException("All lists must have the same number of elements.");
-
-            var rowCount = dependentValues.Count;
-            var columnCount = independentValues.Count + 1; // +1 for intercept
-            var matrixX = Matrix<double>.Build.Dense(rowCount, columnCount, 1); // Initialize with 1s for intercept
-            var vectorY = Vector<double>.Build.Dense(dependentValues.ToArray());
-
-            // Fill matrix X
-            for (int i = 0; i < rowCount; i++)
-            {
-                for (int j = 1; j < columnCount; j++)
-                {
-                    matrixX[i, j] = independentValues[j - 1][i];
-                }
-            }
-
-            // Solve for coefficients
-            var matrixXT = matrixX.Transpose();
-            var matrixXTX = matrixXT * matrixX;
-            var matrixXTY = matrixXT * vectorY;
-            var coefficients = matrixXTX.Inverse() * matrixXTY;
-
-            // Calculate R-squared
-            var yMean = vectorY.Average();
-            var ssTotal = vectorY.Sum(y => Math.Pow(y - yMean, 2));
-            var ssResidual = vectorY.Zip(matrixX * coefficients, (y, f) => Math.Pow(y - f, 2)).Sum();
-            var rSquared = 1 - ssResidual / ssTotal;
-
-            return (coefficients, rSquared);
-        }
+        
     }
 }

@@ -1,14 +1,129 @@
-using iTextSharp.text.pdf.parser.clipper;
+//using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Org.BouncyCastle.Bcpg.OpenPgp;
+using Plotly.NET.CSharp;
+using Newtonsoft.Json;
+//using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace _488Labs.Pages
 {
     public class MonteCarloModel : PageModel
     {
-        public void OnGet()
+        [BindProperty]
+        public int iterations { get; set; }
+        [BindProperty]
+        public int years { get; set; }
+        [BindProperty]
+        public bool constant {  get; set; }
+
+        [BindProperty]
+        public List<string> taxParams { get; set; }
+        [BindProperty] 
+        public List<string> govParams { get; set; }
+        [BindProperty]
+        public List<string> otherParams { get; set; }
+
+        [BindProperty]
+        public string taxInitial { get; set; }
+        [BindProperty]
+        public string taxDist { get; set; }
+        [BindProperty]
+        public string taxParam1 { get; set; }
+        [BindProperty]
+        public string taxParam2 { get; set; }
+        [BindProperty]
+        public string taxParam3 { get; set; }
+
+        [BindProperty]
+        public string govInitial { get; set; }
+        [BindProperty]
+        public string govDist { get; set; }
+        [BindProperty]
+        public string govParam1 { get; set; }
+        [BindProperty]
+        public string govParam2 { get; set; }
+        [BindProperty]
+        public string govParam3 { get; set; }
+
+        [BindProperty]
+        public string otherInitial { get; set; }
+        [BindProperty]
+        public string otherDist { get; set; }
+        [BindProperty]
+        public string otherParam1 { get; set; }
+        [BindProperty]
+        public string otherParam2 { get; set; }
+        [BindProperty]
+        public string otherParam3 { get; set; }
+        public string ChartConfigJson { get; private set; }
+
+
+
+        public IActionResult OnGet()
         {
+            if (HttpContext.Session.GetString("username") != null)
+            {
+                ViewData["LoginMessage"] = "Login for "
+                    + HttpContext.Session.GetString("username")
+                    + " successful!";
+                return Page();
+            }
+            else
+            {
+                HttpContext.Session.SetString("LoginError", "You must login to access that page!");
+                return RedirectToPage("/Login");
+            }
+        }
+        public IActionResult OnPost()
+        {
+            taxParams.Add(taxInitial);
+            taxParams.Add(taxDist);
+            taxParams.Add(taxParam1);
+            taxParams.Add(taxParam2);
+            taxParams.Add(taxParam3);
+
+            govParams.Add(govInitial);
+            govParams.Add(govDist);
+            govParams.Add(govParam1);
+            govParams.Add(govParam2);
+            govParams.Add(govParam3);
+
+            otherParams.Add(otherInitial);
+            otherParams.Add(otherDist);
+            otherParams.Add(otherParam1);
+            otherParams.Add(otherParam2);
+            otherParams.Add(otherParam3);
+
+            double[] results = RevenueSimple(iterations, years, constant, taxParams, govParams, otherParams);
+            var chart = Chart.Histogram<double, double, string>(X: results)
+                .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
+                .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Frequency"));
+
+            //var chart = Chart.Histogram(x:results.ToList());
+
+            //.WithTraceInfo("Data Points", ShowLegend: true)
+            //.WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Independent Variable"))
+            //.WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Dependent Variable"));
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // Ignore circular references
+                TypeNameHandling = TypeNameHandling.None, // Additional setting to avoid $type insertion
+                Formatting = Formatting.None // Use None for smaller payload; use Indented for readable JSON
+            };
+
+            var chartJson = JsonConvert.SerializeObject(chart, settings);
+            ChartConfigJson = chartJson;
+            var response = new
+            {
+                Data = new { Fields = new[] { results } } // This is your existing data structure
+            };
+            var jsonResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.None,
+                Formatting = Formatting.None
+            });
+            return Content(jsonResponse, "application/json");
         }
         //parameters follow: (current value, distribution name, statistical parameters)
         public double[] ExpenseComplex(int iterations, int years, bool constant, List<String> administrationParameters,
@@ -244,10 +359,10 @@ namespace _488Labs.Pages
                 if (Convert.ToDouble(distribution[2]) <= Convert.ToDouble(distribution[3]) &
                     Convert.ToDouble(distribution[2]) < Convert.ToDouble(distribution[4]))
                 {
-                    if (Convert.ToDouble(distribution[3]) <= Convert.ToDouble(distribution[4]))
+                    if (Convert.ToDouble(distribution[4]) <= Convert.ToDouble(distribution[3]))
                     {
-                        return new DataClasses.Triangular(new Random(), Convert.ToDouble(distribution[2]), Convert.ToDouble(distribution[3]),
-                            Convert.ToDouble(distribution[4]));
+                        return new DataClasses.Triangular(new Random(), Convert.ToDouble(distribution[2]), Convert.ToDouble(distribution[4]),
+                            Convert.ToDouble(distribution[3]));
                     }
                     else
                     {

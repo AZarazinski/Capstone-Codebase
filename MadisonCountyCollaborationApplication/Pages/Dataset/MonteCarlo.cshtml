@@ -2,107 +2,196 @@
 @model _488Labs.Pages.MonteCarloModel
 @{
 }
-<div class="row">
-    <div class="col-md-4">
-        Number of iterations:
-        <input type="number" class="form-control" placeholder="Iterations" aria-label="Iterations">
-    </div>
-    <div class="col-md-4">
-        Number of Years:
-        <input type="number" class="form-control" placeholder="Years" aria-label="Iterations">
-    </div>
-    <div class="col-md-4">
-        <label class="input-group-text" for="constant">Constant Growth</label>
-        <select class="form-select" id="constant" name="constantGrowth" aria-label="Select Growth">
-            <option selected value=true>Constant Growth</option>
-            <option value=false>Nonconstant Growth</option>
-        </select>
-    </div>
-</div>
 
-<br />
-<h4 class="display-4">Taxes: </h4>
-<div class="row">
-    <div class="col-md-3">
-        Initial Value:
-        <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations">
+<form method="post">
+    <div class="row">
+        <div class="col-md-4">
+            Number of iterations:
+            <input type="number" class="form-control" placeholder="Iterations" aria-label="Iterations" asp-for="iterations">
+        </div>
+        <div class="col-md-4">
+            Years Simulated:
+            <input type="number" class="form-control" placeholder="Years" aria-label="Years" asp-for="years">
+        </div>
+        <div class="col-md-4">
+            <label class="input-group-text" for="constant">Constant Growth</label>
+            <select class="form-select" id="constant" name="constantGrowth" aria-label="Select Growth">
+                <option selected value=true>Constant Growth</option>
+                <option value=false>Nonconstant Growth</option>
+            </select>
+        </div>
     </div>
 
-    <div class="col-md-3">
-        <label class="input-group-text" for="TaxParameters[1]">Distribution</label>
-        <select class="form-select" id="TaxDistribution" name="distribution" aria-label="Select distribution">
-            <option selected value="Constant">Constant</option>
-            <option value="Uniform">Uniform</option>
-            <option value="Triangular">Triangular</option>
-            <option value="Normal">Normal</option>
-            <option value="Lognormal">Lognormal</option>
-        </select>
-    </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param1" aria-label="Iterations">
-    </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param2" aria-label="Iterations">
-    </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param3" aria-label="Iterations">
-    </div>
-</div>
-<br />
+    @* Taxes *@
+    <br />
+    <h4 class="display-4">Taxes: </h4>
+    <div class="row">
+        <div class="col-md-3">
+            <input type="text" class="form-control" placeholder="Initial Value" aria-label="Initial value" asp-for="taxInitial">
+        </div>
 
-<h4 class="display-4">Intergovernmental: </h4>
-<div class="row">
-    <div class="col-md-3">
-        Initial Value:
-        <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations">
+        <div class="col-md-3">
+            <label class="input-group-text" for="TaxDistribution">Distribution</label>
+            <select class="form-select" id="TaxDistribution" name="taxDist" aria-label="Select distribution">
+                <option selected value="Constant">Constant</option>
+                <option value="Uniform">Uniform</option>
+                <option value="Triangular">Triangular</option>
+                <option value="Normal">Normal</option>
+                <option value="Lognormal">Lognormal</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="taxParam1">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="taxParam2">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="taxParam3">
+        </div>
     </div>
+    <br />
 
-    <div class="col-md-3">
-        <label class="input-group-text" for="TaxParameters[1]">Distribution</label>
-        <select class="form-select" id="TaxDistribution" name="distribution" aria-label="Select distribution">
-            <option selected value="Constant">Constant</option>
-            <option value="Uniform">Uniform</option>
-            <option value="Triangular">Triangular</option>
-            <option value="Normal">Normal</option>
-            <option value="Lognormal">Lognormal</option>
-        </select>
-    </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param1" aria-label="Iterations">
-    </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param2" aria-label="Iterations">
-    </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param3" aria-label="Iterations">
-    </div>
-</div>
-<br />
+    @* Intergovernmental *@
+    <h4 class="display-4">Intergovernmental: </h4>
+    <div class="row">
+        <div class="col-md-3">
+            <input type="text" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="govInitial">
+        </div>
 
-<h4 class="display-4">Other: </h4>
-<div class="row">
-    <div class="col-md-3">
-        Initial Value:
-        <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations">
+        <div class="col-md-3">
+            <label class="input-group-text" for="GovDistribution">Distribution</label>
+            <select class="form-select" id="GovDistribution" name="govDist" aria-label="Select distribution">
+                <option selected value="Constant">Constant</option>
+                <option value="Uniform">Uniform</option>
+                <option value="Triangular">Triangular</option>
+                <option value="Normal">Normal</option>
+                <option value="Lognormal">Lognormal</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="govParam1">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="govParam2">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="govParam3">
+        </div>
     </div>
+    <br />
 
-    <div class="col-md-3">
-        <label class="input-group-text" for="TaxParameters[1]">Distribution</label>
-        <select class="form-select" id="TaxDistribution" name="distribution" aria-label="Select distribution">
-            <option selected value="Constant">Constant</option>
-            <option value="Uniform">Uniform</option>
-            <option value="Triangular">Triangular</option>
-            <option value="Normal">Normal</option>
-            <option value="Lognormal">Lognormal</option>
-        </select>
+
+    @* Other *@
+    <h4 class="display-4">Other: </h4>
+    <div class="row">
+        <div class="col-md-3">
+            Initial Value:
+            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="otherInitial">
+        </div>
+
+        <div class="col-md-3">
+            <label class="input-group-text" for="otherDistribution">Distribution</label>
+            <select class="form-select" id="otherDistribution" name="otherDist" aria-label="Select distribution">
+                <option selected value="Constant">Constant</option>
+                <option value="Uniform">Uniform</option>
+                <option value="Triangular">Triangular</option>
+                <option value="Normal">Normal</option>
+                <option value="Lognormal">Lognormal</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="otherParam1">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="otherParam2">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="otherParam3">
+        </div>
     </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param1" aria-label="Iterations">
+    <br />
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary" type="submit">Run Simulation</button>
     </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param2" aria-label="Iterations">
-    </div>
-    <div class="col-md-2">
-        <input type="text" class="form-control" placeholder="param3" aria-label="Iterations">
-    </div>
-</div>
+    <br />
+</form>
+
+@section Scripts {
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('dataForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the form from submitting traditionally
+
+                var formData = new FormData(this);
+                var independentVariableName = "Revenue";
+                var dependentVariableName = "Frequency";
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Added to print JSON data to check formatting
+                        // document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
+
+                        var xValues = data.Data.Fields[0];
+                        var xMin = Math.min(...xValues);
+                        var xMax = Math.max(...xValues);
+                        // Extend the x-range significantly
+                        var xExtension = (xMax - xMin) * 0.5; // Extend by 10% of the range on both sides
+                        var extendedXMin = 0;
+                        var extendedXMax = xMax + xExtension;
+
+                        // Generate points for the regression line using the extended range
+
+                        var plotData = [{
+                            x: xValues,
+                            type: 'histogram',
+                            name: 'Data Points'
+                        }];
+
+                        var layout = {
+                            title: "Simulated Revenue Frequencies",
+                            xaxis: { title: independentVariableName },
+                            yaxis: { title: dependentVariableName },
+                            annotations: [{
+                                x: 0.5,
+                                y: 1.13,
+                                xref: 'paper',
+                                yref: 'paper',
+                                showarrow: false,
+                                font: { size: 16 }
+                            }]
+                        };
+
+                        Plotly.newPlot('plotlyChart', plotData, layout);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('jsonResponse').textContent = 'Error fetching data: ' + error.toString();
+                    });
+            });
+        });
+        document.getElementById('saveGraph').addEventListener('click', function () {
+            Plotly.toImage('plotlyChart', { format: 'png' }).then(function (dataUrl) {
+                // Send this dataUrl to the server
+                fetch('/YourController/SaveGraph', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ imageData: dataUrl })
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data); // Handle the server response, e.g., showing a success message
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+
+    </script>
+}

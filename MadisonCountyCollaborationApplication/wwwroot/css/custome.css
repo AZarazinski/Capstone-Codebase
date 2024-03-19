@@ -1,0 +1,273 @@
+﻿body {
+    /* background-color: #032030;  Your desired background color */
+}
+
+/* Light Theme Colors */
+:root {
+    --color-bg: #ffffff; /* Background */
+    --color-primary: #D5DEEF; /* Primary */
+    --color-secondary: #B1C9EF; /* Secondary */
+    --color-tertiary: #8AAEE0; /* Tertiary */
+    --color-accent1: #8AAEE0; /*#628ECB;*/ /* Accent 1 */
+    --color-accent2: #395886; /* Accent 2 */
+    --text-color: #000000; /* Black text for light background */
+    --color-white: #ffffff;
+    --color-black: #000000;
+    /* Other light theme colors as needed */
+}
+
+/* Dark Theme Colors */
+body.dark-mode {
+    --color-bg: #032030; /* Background */
+    --color-primary: #022B42; /* Primary */
+    --color-secondary: #003554; /* Secondary */
+    --color-tertiary: #004D74; /* Tertiary */
+    --color-accent1: #006494; /* Accent 1 */
+    --color-accent2: #006DA4; /* Accent 2 */
+    --text-color: #ffffff; /* Black text for light background */
+    --color-white: #ffffff;
+    --color-black: #000000;
+    /* Other dark theme colors as needed */
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-primary);
+    color: var(--text-color);
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-accent1);
+}
+
+.btn-secondary {
+    background-color: var(--color-secondary);
+    border-color: var(--color-accent2);
+}
+
+.btn-tertiary {
+    background-color: var(--color-tertiary);
+    /* Tertiary buttons might need a different text color for contrast */
+    color: var(--color-bg);
+    border-color: var(--color-accent1);
+}
+
+/* You can apply similar styles to other elements such as tables, headers, etc. */
+
+/* Table colors for light mode */
+table {
+    border-color: var(--color-accent1);
+}
+
+    table th,
+    table td {
+        color: var(--text-color);
+    }
+
+/* Table colors for dark mode */
+body.dark-mode table {
+    border-color: var(--color-accent2);
+}
+
+    body.dark-mode table th,
+    body.dark-mode table td {
+        color: var(--text-color);
+    }
+
+
+/* Other elements where text color should change between themes */
+.navbar, .footer, .btn, a, .nav-link {
+    color: var(--text-color);
+}
+
+/* Specific overrides for elements that need different colors */
+.navbar {
+    background-color: var(--color-accent2);
+}
+
+/* Ensure links are also styled correctly */
+a, .nav-link {
+    color: var(--text-color);
+    text-decoration: none; /* Optional: if you don't want underlines */
+}
+
+    a:hover, .nav-link:hover {
+        text-decoration: underline; /* Optional: if you want underline on hover */
+    }
+
+/* Update table text colors for dark mode */
+body.dark-mode table th,
+body.dark-mode table td {
+    color: var(--text-color); /* This will be white in dark mode */
+}
+
+/* Similarly, update button text colors for dark mode if needed */
+body.dark-mode .btn {
+    color: var(--text-color); /* This will be white in dark mode */
+}
+
+/* You can further customize other elements as needed */
+/* Slider bar here*/
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+    /* Hide default HTML checkbox */
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc; /* Slider background for light mode */
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+input:checked + .slider {
+    background-color: #2196F3; /* Slider background for dark mode */
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+/* Card Layout for HomePage of Collaborations */
+.box-table {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    backgroud: var(--bg);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    text-color: var(--text-color);
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+.card-header {
+    background-color: var(--color-tertiary);
+    color: var(--text-color);
+    padding: 10px 15px;
+    font-size: 1.25em;
+}
+
+.card-body {
+    padding: 15px;
+    color: #333;
+}
+
+/* Style for the clickable plan name */
+.plan-name-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-color);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+    /* Change color on hover */
+    .plan-name-btn:hover {
+        color: var(--color-secondary);
+    }
+
+.tag {
+    display: inline-flex; /* Changed from inline-block to inline-flex to align items */
+    align-items: center; /* Centers the 'X' vertically */
+    margin: 2px;
+    padding: 5px 10px;
+    background-color: var(--color-primary); /* Light blue background */
+    color: var(--color-black); /* Text color */
+    border-radius: 15px;
+    border: 1px solid var(--color-accent1); /* Border color */
+    font-size: 0.875em; /* Smaller font size */
+    box-shadow: 0 2px 2px rgba(0,0,0,0.1); /* Slight shadow for depth */
+    cursor: pointer; /* Changes cursor to pointer */
+}
+
+.remove-tag {
+    display: inline-block; /* Inline-block ensures the 'X' is treated as text for alignment */
+    margin-left: 8px;
+    color: var(--color-accent2); /* Darker blue for the 'X' */
+    cursor: pointer; /* Changes cursor to pointer */
+    font-size: 0.875em; /* Same as tag font size for consistency */
+}
+
+    /* Hover effect for the remove button */
+    .remove-tag:hover {
+        color: var(--color-tertiary); /* Even darker blue for the 'X' on hover */
+    }
+
+/* Styles for the container of tags */
+#selectedIndependentVariables {
+    display: flex; /* Displays children (tags) inline */
+    flex-wrap: wrap; /* Allows wrapping onto the next line */
+    align-items: center; /* Aligns tags vertically */
+    margin-bottom: 10px; /* Adds space between tags and the dropdown */
+}
+
+
+/* Dark mode specific styles */
+body.dark-mode .tag {
+    background-color: var(--color-secondary); /* Darker background for tags */
+    color: var(--color-white); /* White text */
+    border: 1px solid var(--color-accent1); /* Border color */
+}
+
+body.dark-mode .remove-tag {
+    color: var(--color-white); /* White 'X' */
+}
+
+    body.dark-mode .remove-tag:hover {
+        color: var(--color-accent1); /* Light blue 'X' on hover */
+    }

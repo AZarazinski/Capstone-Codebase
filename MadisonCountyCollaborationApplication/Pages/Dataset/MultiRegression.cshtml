@@ -1,0 +1,74 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Dataset.MultiRegressionModel
+@using System.Data
+@{
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+<form id="dataForm" method="post">
+    <!-- Dependent Variable -->
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="DependentVariable">Dependent Variable</label>
+        <select class="form-select" name="Dependent" id="DependentVariable" aria-label="Dependent Variable">
+            @foreach (DataColumn column in Model.Data.Columns)
+            {
+                <option value="@column.ColumnName">@column.ColumnName</option>
+            }
+        </select>
+    </div>
+    <br />
+    <!-- Independent Variable(s) -->
+    <!-- Container for selected independent variables (tags) -->
+    <div id="selectedIndependentVariables" class="mb-3">
+        <!-- Selected independent variables will go here as tags -->
+    </div>
+
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="IndependentVariableDropdown">Independent Variables</label>
+        <select class="form-select" id="IndependentVariableDropdown" aria-label="Independent Variables">
+            <option value="">Select an Independent Variable</option>
+            @foreach (DataColumn column in Model.Data.Columns)
+            {
+                <option value="@column.ColumnName">@column.ColumnName</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const dropdown = document.getElementById('IndependentVariableDropdown');
+        const selectedContainer = document.getElementById('selectedIndependentVariables');
+
+        dropdown.addEventListener('change', function () {
+            const value = this.value;
+            if (value && !document.getElementById(`tag-${value}`)) {
+                addTag(value);
+            }
+            dropdown.value = ''; // Reset dropdown
+        });
+
+        function addTag(value) {
+            const tag = document.createElement('div');
+            tag.className = 'tag';
+            tag.id = `tag-${value}`;
+            tag.textContent = value;
+
+            const removeBtn = document.createElement('span');
+            removeBtn.className = 'remove-tag';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.onclick = function () {
+                tag.remove();
+            };
+
+            tag.appendChild(removeBtn);
+            selectedContainer.appendChild(tag);
+        }
+    });
+</script>
+
