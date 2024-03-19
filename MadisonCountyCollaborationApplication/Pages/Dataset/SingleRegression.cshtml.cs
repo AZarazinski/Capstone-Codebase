@@ -1,15 +1,13 @@
-using MadisonCountyCollaborationApplication.Pages.DB;
 using MadisonCountyCollaborationApplication.Pages.DataClasses;
+using MadisonCountyCollaborationApplication.Pages.DB;
+using MathNet.Numerics.LinearAlgebra;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Newtonsoft.Json;
 using System.Data;
-using System.Numerics;
 using Plotly.NET.CSharp;
 using Plotly.NET.Interactive;
 using System.Text.Json;
 using Newtonsoft.Json;
-using MathNet.Numerics;
 
 
 namespace MadisonCountyCollaborationApplication.Pages.Dataset
@@ -92,6 +90,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             // Serialize the chart to JSON for use in the client-side code
             // Chart[] charts = {chart, chart2}
             //Chart.Combine(charts)
+
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // Ignore circular references
@@ -107,7 +106,27 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             // Instead of redirecting, return the chart configuration JSON
             //return RedirectToPage("ChartDisplay", new {xdata = independentDataList, ydata = dependentDataList});
             //return RedirectToPage();
-            return Content(ChartConfigJson, "application/json");
+            // Assuming you have calculated m and b
+            var regressionEquation = $"y = {m:F3}x + {b:F3}";
+
+            // Prepare the response object, now including the regression equation
+            var response = new
+            {
+                Data = new { Fields = new[] { independentDataList, dependentDataList } }, // This is your existing data structure
+                RegressionEquation = regressionEquation,
+                RegressionLine = new { M = m, B = b } // Include regression line details for plotting
+            };
+
+            // Convert to JSON and return
+            var jsonResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.None,
+                Formatting = Formatting.None
+            });
+
+            return Content(jsonResponse, "application/json");
+            // return Content(ChartConfigJson, "application/json");
         }
 
         public (double m, double b, double rSquared) CalculateLinearRegression(List<double> xVals, List<double> yVals)
@@ -131,38 +150,38 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             return (m, b, rSquared);
         }
 
-        //public (Vector<double> coefficients, double rSquared) CalculateMultipleLinearRegression(List<List<double>> independentValues, List<double> dependentValues)
-        //{
-        //    if (independentValues.Any(x => x.Count != dependentValues.Count))
-        //        throw new InvalidOperationException("All lists must have the same number of elements.");
+        public (Vector<double> coefficients, double rSquared) CalculateMultipleLinearRegression(List<List<double>> independentValues, List<double> dependentValues)
+        {
+            if (independentValues.Any(x => x.Count != dependentValues.Count))
+                throw new InvalidOperationException("All lists must have the same number of elements.");
 
-        //    var rowCount = dependentValues.Count;
-        //    var columnCount = independentValues.Count + 1; // +1 for intercept
-        //    var matrixX = MathNet.Numerics.LinearAlgebra.Matrix<double>.Build.Dense(rowCount, columnCount, 1); // Initialize with 1s for intercept
-        //    var vectorY = MathNet.Numerics.LinearAlgebra.Vector<double>.Build.Dense(dependentValues.ToArray());
+            var rowCount = dependentValues.Count;
+            var columnCount = independentValues.Count + 1; // +1 for intercept
+            var matrixX = Matrix<double>.Build.Dense(rowCount, columnCount, 1); // Initialize with 1s for intercept
+            var vectorY = Vector<double>.Build.Dense(dependentValues.ToArray());
 
-        //    // Fill matrix X
-        //    for (int i = 0; i < rowCount; i++)
-        //    {
-        //        for (int j = 1; j < columnCount; j++)
-        //        {
-        //            matrixX[i, j] = independentValues[j - 1][i];
-        //        }
-        //    }
+            // Fill matrix X
+            for (int i = 0; i < rowCount; i++)
+            {
+                for (int j = 1; j < columnCount; j++)
+                {
+                    matrixX[i, j] = independentValues[j - 1][i];
+                }
+            }
 
-        //    // Solve for coefficients
-        //    var matrixXT = matrixX.Transpose();
-        //    var matrixXTX = matrixXT * matrixX;
-        //    var matrixXTY = matrixXT * vectorY;
-        //    var coefficients = matrixXTX.Inverse() * matrixXTY;
+            // Solve for coefficients
+            var matrixXT = matrixX.Transpose();
+            var matrixXTX = matrixXT * matrixX;
+            var matrixXTY = matrixXT * vectorY;
+            var coefficients = matrixXTX.Inverse() * matrixXTY;
 
-        //    // Calculate R-squared
-        //    var yMean = vectorY.Average();
-        //    var ssTotal = vectorY.Sum(y => Math.Pow(y - yMean, 2));
-        //    var ssResidual = vectorY.Zip(matrixX * coefficients, (y, f) => Math.Pow(y - f, 2)).Sum();
-        //    var rSquared = 1 - ssResidual / ssTotal;
+            // Calculate R-squared
+            var yMean = vectorY.Average();
+            var ssTotal = vectorY.Sum(y => Math.Pow(y - yMean, 2));
+            var ssResidual = vectorY.Zip(matrixX * coefficients, (y, f) => Math.Pow(y - f, 2)).Sum();
+            var rSquared = 1 - ssResidual / ssTotal;
 
-        //    return (coefficients, rSquared);
-        //}
+            return (coefficients, rSquared);
+        }
     }
 }

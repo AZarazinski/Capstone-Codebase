@@ -31,8 +31,9 @@
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
-
-<div id="jsonResponse" style="white-space: pre-wrap;"></div>
+<br />
+<div id="jsonResponse" style="white-space: pre-wrap;"></div> @*For Reading JSON to check for errors/format*@
+@*Chart Display*@
 <div id="plotlyChart"></div>
 @section Scripts {
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -42,35 +43,60 @@
                 event.preventDefault(); // Prevent the form from submitting traditionally
 
                 var formData = new FormData(this);
+                var independentVariableName = document.getElementById('Independent').options[document.getElementById('Independent').selectedIndex].text;
+                var dependentVariableName = document.getElementById('Dependent').options[document.getElementById('Dependent').selectedIndex].text;
 
                 fetch(this.action, {
                     method: 'POST',
-                    body: formData, // FormData is used here, ensure server expects this
-                    // No need to set 'Content-Type': 'application/json', as we're sending FormData
+                    body: formData,
                 })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json(); // Parses the JSON response into a JavaScript object
-                    })
+                    .then(response => response.json())
                     .then(data => {
-                        // Convert the JavaScript object to a string and display it
-                        document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
+                        // Added to print JSON data to check formatting
+                        // document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
 
-                        // Assuming data.Fields contains the necessary information for the plot
-                        if (data.Fields && data.Fields.length > 0) {
-                            // Prepare data for Plotly
-                            var plotData = [data.Fields[0]]; // Wrap in an array if not already an array
-                            var layout = {
-                                title: 'Your Plot Title',
-                                xaxis: { title: 'X Axis' },
-                                yaxis: { title: 'Y Axis' }
-                            };
+                        var xValues = data.Data.Fields[0];
+                        var xMin = Math.min(...xValues);
+                        var xMax = Math.max(...xValues);
+                        // Extend the x-range significantly
+                        var xExtension = (xMax - xMin) * 0.5; // Extend by 10% of the range on both sides
+                        var extendedXMin = 0;
+                        var extendedXMax = xMax + xExtension;
 
-                            // Create Plotly plot
-                            Plotly.newPlot('plotlyChart', plotData, layout);
-                        }
+                        // Generate points for the regression line using the extended range
+                        var regressionLineX = [extendedXMin, extendedXMax];
+                        var regressionLineY = regressionLineX.map(x => data.RegressionLine.M * x + data.RegressionLine.B);
+
+                        var plotData = [{
+                            x: xValues,
+                            y: data.Data.Fields[1],
+                            mode: 'markers',
+                            type: 'scatter',
+                            name: 'Data Points'
+                        }, {
+                            x: regressionLineX,
+                            y: regressionLineY,
+                            mode: 'lines',
+                            type: 'scatter',
+                            name: 'Regression Line'
+                        }];
+
+                        var layout = {
+                            title: 'Relationship between ' + independentVariableName + ' and ' + dependentVariableName,
+                            xaxis: { title: independentVariableName },
+                            yaxis: { title: dependentVariableName },
+                            annotations: [{
+                                x: 0.5,
+                                y: 1.13,
+                                xref: 'paper',
+                                yref: 'paper',
+                                text: 'Regression Equation: ' + data.RegressionEquation,
+                                showarrow: false,
+                                font: { size: 16 }
+                            }]
+                        };
+
+                        Plotly.newPlot('plotlyChart', plotData, layout);
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -78,5 +104,6 @@
                     });
             });
         });
+
     </script>
 }
