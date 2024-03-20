@@ -1,7 +1,7 @@
-using iTextSharp.text.pdf.parser.clipper;
+//using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Org.BouncyCastle.Bcpg.OpenPgp;
+//using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace _488Labs.Pages
 {

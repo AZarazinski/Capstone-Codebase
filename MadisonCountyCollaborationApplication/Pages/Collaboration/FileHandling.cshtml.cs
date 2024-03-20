@@ -1,14 +1,13 @@
+using CsvHelper.Configuration;
+using CsvHelper;
 using MadisonCountyCollaborationApplication.Pages.DB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data.SqlClient;
 using System.Dynamic;
-using System.Formats.Asn1;
 using System.Globalization;
-using CsvHelper;
-using CsvHelper.Configuration;
+using System.Data.SqlClient;
 
-namespace MadisonCountyCollaborationApplication.Pages.Dataset
+namespace MadisonCountyCollaborationApplication.Pages.Collaboration
 {
     public class FileHandlingModel : PageModel
     {
@@ -82,6 +81,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 
                 await CreateTableFromCsv(tableName + tableID, headers, records);
                 await AddFileToDataSet(tableName);
+                
             }
         }
         // Method to create table from CSV data
@@ -168,6 +168,55 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             }
         }
 
+        //private async Task AddDataAssist(string tableName)
+        //{
+        //    string getDatasetID = @"SELECT datasetID FROM DataSets WHERE dataSetName =" + tableName + ";";
+
+        //    using (var DatasetIDReader = DBClass.GeneralReaderQuery(getDatasetID)
+        //    {
+        //        int DatasetID = DatasetIDReader["datasetID"];
+        //    }
+
+        //}
+
+        private async Task AddDataAssist(string tableName)
+        {
+            int datasetID = 0;
+            int collabID = HttpContext.Session.GetInt32("collaborationID").Value;
+
+            // Query to get the dataset ID
+            string getDatasetIDQuery = "SELECT datasetID FROM DataSets WHERE dataSetName =" + tableName + ";";
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(getDatasetIDQuery, connection))
+                {
+                    
+                    command.Parameters.AddWithValue("@TableName", tableName);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (reader.Read()) 
+                        {
+                            datasetID = reader.GetInt32(0); 
+                        }
+                    }
+                }
+            }
+
+            string insertDataAssistQuery = "INSERT INTO DataAssist (datasetID, collabID) VALUES (@DatasetID, @CollabID);";
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(insertDataAssistQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@DatasetID", datasetID);
+                    command.Parameters.AddWithValue("@CollabID", collabID);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
 
 
     }

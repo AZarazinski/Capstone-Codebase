@@ -65,6 +65,97 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
             }
         }
 
+        public async Task<IActionResult> OnPostUploadAsync(IFormFile fileUpload)
+        {
+            // Check if there's a file to upload
+            if (fileUpload != null && fileUpload.Length > 0)
+            {
+                // Retrieve CollaborationID from session
+                int? collabID = HttpContext.Session.GetInt32("collaborationID");
+                if (collabID == null)
+                {
+                    // Handle the case where CollaborationID is not found in session
+                    // You might want to redirect the user or show an error message
+                    ModelState.AddModelError("", "Collaboration ID is missing. Please select a collaboration first.");
+                    return Page();
+                }
+
+                var fileName = Path.GetFileName(fileUpload.FileName);
+                var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
+
+                // Handle different file types based on extension
+                if (fileExtension == ".csv")
+                {
+
+                    //var filePath = Directory.GetCurrentDirectory() + @"\wwwroot\fileupload\" + fileName;
+
+                    //using (var stream = new FileStream(filePath = filePath))
+                    //{
+                    //    fileName.CopyTo(stream);
+                    //}
+                    //return RedirectToPage("FileHandling", new {filePath = filePath })
+                    
+                }
+                else if (fileExtension == ".pdf")
+                {
+                    // Retrieve CollaborationID from session
+                    int CollabID = HttpContext.Session.GetInt32("collaborationID").Value;
+
+                    // Define the folder names associated with collaboration IDs
+                    var folders = new Dictionary<int, string>
+                    {
+                        { 3, "Admin" },
+                        { 1, "Budgeting" },
+                        { 5, "Economic" },
+                        { 4, "Management" },
+                        { 2, "Revenue" }
+                    };
+
+                    // Determine the correct folder name based on the collaboration ID
+                    string folderName = folders[CollabID];
+
+                    // Construct the path where the file should be saved
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents", folderName, fileName);
+
+                    // Ensure the directory exists
+                    var directory = Path.GetDirectoryName(filePath);
+                    Directory.CreateDirectory(directory); // CreateDirectory is a no-op if the directory already exists
+
+                    // Save the file
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await fileUpload.CopyToAsync(fileStream);
+                    }
+
+                    // Optionally, add a message or logic after successfully saving the file
+                    // ...
+                    return Page(); // Or redirect to another page as needed
+                }
+                else if (fileExtension == ".docx")
+                {
+                    // Handle DOCX file specific to collabID
+                }
+                else
+                {
+                    // Handle unsupported file types or set an error message
+                    ModelState.AddModelError("", "Unsupported file type.");
+                    return Page();
+                }
+
+                // Optionally save the file or process it as needed
+                // Make sure to associate it with collabID in your storage or database
+            }
+            else
+            {
+                // Handle the case where no file was uploaded
+                ModelState.AddModelError("", "Please select a file to upload.");
+                return Page();
+            }
+
+            return RedirectToPage(); // Or redirect to another page as needed
+        }
+
+
         public IActionResult OnPostHome()
         {
             return RedirectToPage("../Home");
