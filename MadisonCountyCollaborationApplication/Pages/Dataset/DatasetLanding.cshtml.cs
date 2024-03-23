@@ -68,7 +68,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     if (!formFile.FileName.EndsWith(".csv"))
                     {
                         ModelState.AddModelError("FileList", "Only CSV files are allowed.");
-                        return RedirectToPage("Datasets");
+                        return RedirectToPage("DatasetLanding");
                     }
                     // full path to file in temp location
                     var filePath = Directory.GetCurrentDirectory() + @"\wwwroot\fileupload\" + formFile.FileName;

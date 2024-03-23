@@ -52,13 +52,13 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
 
             // Redirect to a success page and optionally pass the table name for confirmation.
             TempData["TableName"] = Path.GetFileNameWithoutExtension(filePath);
-            return RedirectToPage("DatasetLanding");
+            return RedirectToPage("CollaborationLanding");
         }
         // Method to process a CSV file asynchronously
         private async Task ProcessCsvFile(string filePath)
         {
             string tableName = Path.GetFileNameWithoutExtension(filePath).Replace(" ", "_").Replace("-", "_");
-            string tableID = (DBClass.ExtractDatasetID() + 1).ToString();
+            string fullTableName = tableName + (DBClass.ExtractDatasetID() + 1).ToString(); // Construct the full table name
             DBClass.MainDBconnection.Close();
 
             using (var reader = new StreamReader(filePath))
@@ -79,11 +79,58 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
                     records.Add(record);
                 }
 
-                await CreateTableFromCsv(tableName + tableID, headers, records);
-                await AddFileToDataSet(tableName);
-                
+                await CreateTableFromCsv(fullTableName, headers, records);
+                await AddFileToDataSet(fullTableName); // Assume this inserts the dataset name into DataSets
+            }
+
+            // After CSV processing and dataset insertion
+            int datasetID = await GetDatasetID(fullTableName); // Retrieve the newly inserted dataset ID. Implement this method based on prior instructions.
+            int collabID = (int)HttpContext.Session.GetInt32("collaborationID"); // Retrieve CollabID from session
+
+            await InsertIntoDataAssist(collabID, datasetID); // Insert the association into DataAssist. Implement this method based on prior instructions.
+        }
+
+
+    private async Task<int> GetDatasetID(string tableName)
+        {
+            string sqlQuery = @"SELECT datasetID FROM DataSets WHERE dataSetName = @TableName;";
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(sqlQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@TableName", tableName);
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (reader.Read())
+                        {
+                            return reader.GetInt32(0); // Assuming datasetID is the first column
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Dataset not found after upload.");
+                        }
+                    }
+                }
             }
         }
+
+        private async Task InsertIntoDataAssist(int collabID, int datasetID)
+        {
+            string sqlQuery = @"INSERT INTO DataAssists (collabID, datasetID) VALUES (@CollabID, @DatasetID);";
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(sqlQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@CollabID", collabID);
+                    command.Parameters.AddWithValue("@DatasetID", datasetID);
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+
         // Method to create table from CSV data
         private async Task CreateTableFromCsv(string tableName, string[] headers, IEnumerable<IDictionary<string, object>> records)
         {
@@ -125,6 +172,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
                     }
                 }
                 transaction.Commit();
+
+                
             }
         }
         // method to retrieve datasets
@@ -168,55 +217,46 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
             }
         }
 
+        
+
         //private async Task AddDataAssist(string tableName)
         //{
-        //    string getDatasetID = @"SELECT datasetID FROM DataSets WHERE dataSetName =" + tableName + ";";
+        //    int datasetID = 0;
+        //    int collabID = HttpContext.Session.GetInt32("collaborationID").Value;
 
-        //    using (var DatasetIDReader = DBClass.GeneralReaderQuery(getDatasetID)
+        //    // Query to get the dataset ID
+        //    string getDatasetIDQuery = "SELECT datasetID FROM DataSets WHERE dataSetName =" + tableName + ";";
+        //    using (var connection = new SqlConnection(MainDBconnString))
         //    {
-        //        int DatasetID = DatasetIDReader["datasetID"];
+        //        await connection.OpenAsync();
+        //        using (var command = new SqlCommand(getDatasetIDQuery, connection))
+        //        {
+
+        //            command.Parameters.AddWithValue("@TableName", tableName);
+
+        //            using (var reader = await command.ExecuteReaderAsync())
+        //            {
+        //                if (reader.Read()) 
+        //                {
+        //                    datasetID = reader.GetInt32(0); 
+        //                }
+        //            }
+        //        }
         //    }
 
+        //    string insertDataAssistQuery = "INSERT INTO DataAssist (datasetID, collabID) VALUES (@DatasetID, @CollabID);";
+        //    using (var connection = new SqlConnection(MainDBconnString))
+        //    {
+        //        await connection.OpenAsync();
+        //        using (var command = new SqlCommand(insertDataAssistQuery, connection))
+        //        {
+        //            command.Parameters.AddWithValue("@DatasetID", datasetID);
+        //            command.Parameters.AddWithValue("@CollabID", collabID);
+
+        //            await command.ExecuteNonQueryAsync();
+        //        }
+        //    }
         //}
-
-        private async Task AddDataAssist(string tableName)
-        {
-            int datasetID = 0;
-            int collabID = HttpContext.Session.GetInt32("collaborationID").Value;
-
-            // Query to get the dataset ID
-            string getDatasetIDQuery = "SELECT datasetID FROM DataSets WHERE dataSetName =" + tableName + ";";
-            using (var connection = new SqlConnection(MainDBconnString))
-            {
-                await connection.OpenAsync();
-                using (var command = new SqlCommand(getDatasetIDQuery, connection))
-                {
-                    
-                    command.Parameters.AddWithValue("@TableName", tableName);
-
-                    using (var reader = await command.ExecuteReaderAsync())
-                    {
-                        if (reader.Read()) 
-                        {
-                            datasetID = reader.GetInt32(0); 
-                        }
-                    }
-                }
-            }
-
-            string insertDataAssistQuery = "INSERT INTO DataAssist (datasetID, collabID) VALUES (@DatasetID, @CollabID);";
-            using (var connection = new SqlConnection(MainDBconnString))
-            {
-                await connection.OpenAsync();
-                using (var command = new SqlCommand(insertDataAssistQuery, connection))
-                {
-                    command.Parameters.AddWithValue("@DatasetID", datasetID);
-                    command.Parameters.AddWithValue("@CollabID", collabID);
-
-                    await command.ExecuteNonQueryAsync();
-                }
-            }
-        }
 
 
     }

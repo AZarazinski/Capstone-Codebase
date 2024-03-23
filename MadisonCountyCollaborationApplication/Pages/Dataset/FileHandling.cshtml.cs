@@ -53,7 +53,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 
             // Redirect to a success page and optionally pass the table name for confirmation.
             TempData["TableName"] = Path.GetFileNameWithoutExtension(filePath);
-            return RedirectToPage("DatasetLanding");
+            return RedirectToPage("CollaborationLanding");
         }
         // Method to process a CSV file asynchronously
         private async Task ProcessCsvFile(string filePath)
@@ -84,6 +84,47 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 await AddFileToDataSet(tableName);
             }
         }
+
+        private async Task<int> GetDatasetID(string tableName)
+        {
+            string sqlQuery = @"SELECT datasetID FROM DataSets WHERE dataSetName = @TableName;";
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(sqlQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@TableName", tableName);
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (reader.Read())
+                        {
+                            return reader.GetInt32(0); // Assuming datasetID is the first column
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("Dataset not found after upload.");
+                        }
+                    }
+                }
+            }
+        }
+
+        private async Task InsertIntoDataAssist(int collabID, int datasetID)
+        {
+            string sqlQuery = @"INSERT INTO DataAssist (collabID, datasetID) VALUES (@CollabID, @DatasetID);";
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(sqlQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@CollabID", collabID);
+                    command.Parameters.AddWithValue("@DatasetID", datasetID);
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+
         // Method to create table from CSV data
         private async Task CreateTableFromCsv(string tableName, string[] headers, IEnumerable<IDictionary<string, object>> records)
         {
