@@ -1,10 +1,7 @@
 //using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Plotly.NET.CSharp;
-using Newtonsoft.Json;
-using _488Labs.Pages.DataClasses;
-//using Org.BouncyCastle.Bcpg.OpenPgp;
+
 
 namespace _488Labs.Pages
 {

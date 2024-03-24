@@ -1,55 +1,151 @@
 ﻿@page
+@using System.Data.SqlClient;
+@using MadisonCountyCollaborationApplication.Pages.DB;
+@using System.IO;
 @model MadisonCountyCollaborationApplication.Pages.Collaboration.CollaborationLandingModel
 @{
+    var documentsFolderPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents");
+    var collabFolderMap = new Dictionary<int, string>
+    {
+        { 3, "Admin" },
+        { 1, "Budgeting" },
+        { 5, "Economic" },
+        { 4, "Management" },
+        { 2, "Revenue" }
+    };
+
+    string currentCollabFolderName;
+    collabFolderMap.TryGetValue(Model.collabID, out currentCollabFolderName);
+    var currentCollabFolderPath = System.IO.Path.Combine(documentsFolderPath, currentCollabFolderName);
 }
-<div class="row">
-    <div class="col-md-3">
-        @* adding user to collab *@
-        <form asp-page="CollaborationLanding" asp-page-handler="AddUsers" method="post">
-            <input type="hidden" asp-for="@Model.CollabID" value="@Model.CollabID" />
-            <button type="submit" class="btn btn-primary">Add Users to Collaboration</button>
-        </form>
 
+<head>
+    <style>
+        .upload {
+            position: relative;
+            float: right;
+        }
+    </style>
+</head>
 
-        <br />
- 
-        @* Datasets *@
-        <form asp-page="CollaborationLanding" asp-page-handler="Datasets">
-            <input type="submit" value="Datasets" class="btn btn-primary" />
-        </form>
-        <br />
-        <form asp-page="CollaborationLanding" asp-page-handler="AddPlan">
-            <input type="submit" value="Add Plan" class="btn btn-primary" />
-        </form>
-        <br />
-       
-    </div>
+<div class="upload">
+    <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+        <label for="fileUpload">Choose a file:</label>
+        <input type="file" id="fileUpload" name="fileUpload" />
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</div>
 
-    <div class="col-md-9">
-        @* plan tables  *@
-        <table class="table table-bordered table-responsive table-hover">
+<h1>@Model.CollabName (@Model.collabID)</h1>
+
+<!-- Radio buttons for toggling tables -->
+<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+    <input type="radio" class="btn-check" name="toggle-btn" id="btncheck1" autocomplete="off" checked>
+    <label class="btn btn-outline-primary" for="btncheck1">All Items</label>
+
+    <input type="radio" class="btn-check" name="toggle-btn" id="btncheck2" autocomplete="off">
+    <label class="btn btn-outline-primary" for="btncheck2">Documents</label>
+
+    <input type="radio" class="btn-check" name="toggle-btn" id="btncheck3" autocomplete="off">
+    <label class="btn btn-outline-primary" for="btncheck3">Datasets</label>
+</div>
+
+<!-- Dataset Table -->
+<div class="container">
+    <table id="DatasetTable" class="table table-bordered table-responsive table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Item Type</th>
+                <th>Owner</th>
+                <th>Date Uploaded</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                string sqlQuery = @"
+            SELECT
+            Datasets.datasetID, Datasets.dataSetName
+            FROM Datasets
+            INNER JOIN DataAssists
+            ON DataAssists.datasetID = Datasets.datasetID
+            WHERE DataAssists.CollabID = " + Model.collabID + ";";
+
+                SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
+
+                while (DatasetReader.Read())
+                {
+                    <tr>
+                        <td>@DatasetReader["datasetID"].ToString()</td>
+                        <td>@DatasetReader["dataSetName"].ToString()</td> <!-- Make sure to output the actual dataset name here -->
+                        <td>Dataset</td>
+                        <td>Owner Name</td> <!-- This should also be retrieved from the database -->
+                        <td>Today</td> <!-- Replace 'Today' with the actual upload date from the database, if available -->
+                    </tr>
+                }
+
+                DatasetReader.Close(); // Always close the SqlDataReader when done
+            }
+        </tbody>
+
+    </table>
+</div>
+
+<!-- Documents Table -->
+<div class="container">
+    @* Table for Documents *@
+    @if (!string.IsNullOrEmpty(currentCollabFolderName) && Directory.Exists(currentCollabFolderPath))
+    {
+        <table id="DocumentTable" class="table">
             <thead>
                 <tr>
-                    <th>Name:</th>
-                    <th>Description:</th>
+                    <th>Document Name</th>
+                    <th>Type</th>
+                    <th>File Size (KB)</th>
                 </tr>
             </thead>
             <tbody>
-                @{
-                    foreach (var prod in Model.PlansList)
-                    {
-                        <tr>
-                            <td>
-                                <form method="post" style="display:inline;">
-                                    <input type="hidden" name="planID" value="@prod.planID" />
-                                    <button type="submit" class="plan-name-btn">@prod.planName</button>
-                                </form>
-                            </td>
-                            <td>@prod.planDesc</td>
-                        </tr>
-                    }
+                @foreach (var filePath in Directory.GetFiles(currentCollabFolderPath))
+                {
+                    var fileInfo = new FileInfo(filePath);
+                    <tr>
+                        <td>@System.IO.Path.GetFileName(filePath)</td>
+                        <td>@System.IO.Path.GetExtension(filePath).TrimStart('.').ToUpperInvariant()</td>
+                        <td>@(fileInfo.Length / 1024)</td> <!-- File size in KB -->
+                    </tr>
                 }
             </tbody>
         </table>
-    </div>
+    }
+    else
+    {
+        <p>No documents found for this collaboration.</p>
+    }
 </div>
+
+@section Scripts {
+    <script>
+        // Function to toggle the display of tables based on the selected radio button
+        function toggleTables() {
+            // Grab the tables by their IDs
+            var allItemsTable = document.getElementById('DatasetTable');
+            var documentsTable = document.getElementById('DocumentTable');
+            
+            // Check the value of the selected radio button
+            var selectedValue = document.querySelector('input[name="toggle-btn"]:checked').id;
+            
+            // Show/hide tables based on selected radio button
+            allItemsTable.style.display = (selectedValue === 'btncheck1') ? 'block' : 'none';
+            documentsTable.style.display = (selectedValue === 'btncheck2') ? 'block' : 'none';
+        }
+        
+        // Event listener for changes on radio buttons
+        document.querySelectorAll('input[name="toggle-btn"]').forEach((radio) => {
+            radio.addEventListener('change', toggleTables);
+        });
+        
+        // Initial call to set the correct table display on page load
+        toggleTables();
+    </script>
+}
