@@ -2,8 +2,8 @@
 {
     public class Constant: Distribution
     {
-        private double constant;
-        private Random rand;
+        public double constant;
+        public Random rand;
         //public Constant(double value, Random rand) : base(rand)
         //{
         //    constant = value;

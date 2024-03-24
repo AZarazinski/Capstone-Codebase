@@ -2,10 +2,10 @@
 {
     public class Triangular : Distribution
     {
-        private Random rand;
-        private double min;
-        private double max;
-        private double likely;
+        public Random rand;
+        public double min;
+        public double max;
+        public double likely;
         public Triangular(Random rand, double low, double high, double most) : base(rand)
         {
             min = low;

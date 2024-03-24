@@ -2,9 +2,9 @@
 {
     public class Uniform : Distribution
     {
-        private Random rand;
-        private double min;
-        private double max;
+        public Random rand;
+        public double min;
+        public double max;
         public Uniform(Random rand, double low, double high) : base(rand)
         {
             min = low;

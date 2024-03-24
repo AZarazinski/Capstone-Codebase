@@ -4,6 +4,28 @@
 @model MadisonCountyCollaborationApplication.Pages.Dataset.SingleRegressionModel
 @{
 }
+@if (ViewData.ContainsKey("ErrorMessage"))
+{
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            var errorMessage = "@ViewData["ErrorMessage"]";
+            // Display the error message at the top of the screen
+            alert(errorMessage); // For simplicity, using an alert, but you can customize this
+        });
+    </script>
+}
+<div id="notification-area"></div>
+@if (ViewData.ContainsKey("ErrorMessage"))
+{
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            var errorMessage = "@Html.Raw(ViewData["ErrorMessage"])";
+            var notificationArea = document.getElementById('notification-area');
+            notificationArea.innerHTML = '<div class="alert alert-danger" role="alert">' + errorMessage + '</div>';
+        });
+    </script>
+}
+
 
 <div class="text-center">
     <h1 class="display-4">Data</h1>
@@ -35,6 +57,12 @@
 <div id="jsonResponse" style="white-space: pre-wrap;"></div> @*For Reading JSON to check for errors/format*@
 @*Chart Display*@
 <div id="plotlyChart"></div>
+<br />
+<form id="saveGraph" method="post" asp-page-handler="SaveGraph">
+
+<button type ="submit" class="btn btn-secondary" id="saveGraph">Save Graph</button>
+</form>
+
 @section Scripts {
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
@@ -102,6 +130,23 @@
                         console.error('Error:', error);
                         document.getElementById('jsonResponse').textContent = 'Error fetching data: ' + error.toString();
                     });
+            });
+        });
+        document.getElementById('saveGraph').addEventListener('click', function () {
+            Plotly.toImage('plotlyChart', { format: 'png' }).then(function (dataUrl) {
+                // Send this dataUrl to the server
+                fetch('/YourController/SaveGraph', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ imageData: dataUrl })
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data); // Handle the server response, e.g., showing a success message
+                    })
+                    .catch(error => console.error('Error:', error));
             });
         });
 
