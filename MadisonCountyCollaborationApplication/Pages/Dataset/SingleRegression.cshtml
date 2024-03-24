@@ -4,6 +4,28 @@
 @model MadisonCountyCollaborationApplication.Pages.Dataset.SingleRegressionModel
 @{
 }
+@if (ViewData.ContainsKey("ErrorMessage"))
+{
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            var errorMessage = "@ViewData["ErrorMessage"]";
+            // Display the error message at the top of the screen
+            alert(errorMessage); // For simplicity, using an alert, but you can customize this
+        });
+    </script>
+}
+<div id="notification-area"></div>
+@if (ViewData.ContainsKey("ErrorMessage"))
+{
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            var errorMessage = "@Html.Raw(ViewData["ErrorMessage"])";
+            var notificationArea = document.getElementById('notification-area');
+            notificationArea.innerHTML = '<div class="alert alert-danger" role="alert">' + errorMessage + '</div>';
+        });
+    </script>
+}
+
 
 <div class="text-center">
     <h1 class="display-4">Data</h1>

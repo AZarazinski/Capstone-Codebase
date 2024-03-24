@@ -2,119 +2,167 @@
 @model _488Labs.Pages.MonteCarloModel
 @{
 }
-
+<div class="text-center">
+    <h1 class="display-4">Simple Rev Simulation</h1>
+</div>
+<br />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-page-handler="RevComp" method="post">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="submit">Complicated Revenue</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <form asp-page-handler="Expense" method="post">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="submit">Expenses</button>
+            </div>
+        </form>
+    </div>
+</div>
+<br />
 <form method="post">
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             Number of iterations:
             <input type="number" class="form-control" placeholder="Iterations" aria-label="Iterations" asp-for="iterations">
         </div>
-        <div class="col-md-4">
-            Years Simulated:
-            <input type="number" class="form-control" placeholder="Years" aria-label="Years" asp-for="years">
+        <div class="col-md-6">
+            Number of Years:
+            <input type="number" class="form-control" placeholder="Years" aria-label="Years"asp-for="years">
         </div>
-        <div class="col-md-4">
-            <label class="input-group-text" for="constant">Constant Growth</label>
-            <select class="form-select" id="constant" name="constantGrowth" aria-label="Select Growth">
-                <option selected value=true>Constant Growth</option>
-                <option value=false>Nonconstant Growth</option>
-            </select>
-        </div>
+
     </div>
 
-    @* Taxes *@
     <br />
+
     <h4 class="display-4">Taxes: </h4>
     <div class="row">
-        <div class="col-md-3">
-            <input type="text" class="form-control" placeholder="Initial Value" aria-label="Initial value" asp-for="taxInitial">
+        <div class="col-md-2">
+            Initial Value:
+            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Taxes.initial">
         </div>
 
-        <div class="col-md-3">
-            <label class="input-group-text" for="TaxDistribution">Distribution</label>
-            <select class="form-select" id="TaxDistribution" name="taxDist" aria-label="Select distribution">
-                <option selected value="Constant">Constant</option>
-                <option value="Uniform">Uniform</option>
-                <option value="Triangular">Triangular</option>
-                <option value="Normal">Normal</option>
-                <option value="Lognormal">Lognormal</option>
-            </select>
+        <div class="col-md-2">
+            <label class="input-group-text" for="Taxes_dist">Distribution</label>
+            <div class="input-group">
+                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="Taxes.dist">
+                    <option selected value="Constant">Constant</option>
+                    <option value="Uniform">Uniform</option>
+                    <option value="Triangular">Triangular</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Lognormal">Lognormal</option>
+                </select>
+            </div>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="taxParam1">
+            <label class="input-group-text" for="Taxes_growth">Growth Type</label>
+            <div class="input-group">
+                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="Taxes.growth">
+                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Nonconstant">Nonconstant Growth</option>
+                    <option value="None">No Growth</option>
+                </select>
+            </div>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="taxParam2">
+            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Taxes.param1">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="taxParam3">
+            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Taxes.param2">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Taxes.param3">
         </div>
     </div>
     <br />
 
-    @* Intergovernmental *@
     <h4 class="display-4">Intergovernmental: </h4>
     <div class="row">
-        <div class="col-md-3">
-            <input type="text" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="govInitial">
+        <div class="col-md-2">
+            Initial Value:
+            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Gov.initial">
         </div>
 
-        <div class="col-md-3">
-            <label class="input-group-text" for="GovDistribution">Distribution</label>
-            <select class="form-select" id="GovDistribution" name="govDist" aria-label="Select distribution">
-                <option selected value="Constant">Constant</option>
-                <option value="Uniform">Uniform</option>
-                <option value="Triangular">Triangular</option>
-                <option value="Normal">Normal</option>
-                <option value="Lognormal">Lognormal</option>
+        <div class="col-md-2">
+            <label class="input-group-text" for="Gov_dist">Distribution</label>
+            <div class="input-group">
+                <select class="form-select" id="Gov_dist" aria-label="Select distribution" asp-for="Gov.dist">
+                    <option selected value="Constant">Constant</option>
+                    <option value="Uniform">Uniform</option>
+                    <option value="Triangular">Triangular</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Lognormal">Lognormal</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <label class="input-group-text" for="Gov_growth">Growth Type</label>
+            <div class="input-group">
+            <select class="form-select" id="Gov_growth" aria-label="Select Growth" asp-for="Gov.growth">
+                <option selected value="Constant">Constant Growth</option>
+                <option value="Nonconstant">Nonconstant Growth</option>
+                <option value="None">No Growth</option>
             </select>
+            </div>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="govParam1">
+            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Gov.param1">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="govParam2">
+            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Gov.param2">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="govParam3">
+            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Gov.param3">
         </div>
     </div>
     <br />
 
-
-    @* Other *@
     <h4 class="display-4">Other: </h4>
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             Initial Value:
-            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="otherInitial">
+            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Other.initial">
         </div>
 
-        <div class="col-md-3">
-            <label class="input-group-text" for="otherDistribution">Distribution</label>
-            <select class="form-select" id="otherDistribution" name="otherDist" aria-label="Select distribution">
+        <div class="col-md-2">
+            <label class="input-group-text" for="Other_dist">Distribution</label>
+            <div class="input-group">
+            <select class="form-select" id="Other_dist" aria-label="Select distribution" asp-for="Other.dist">
                 <option selected value="Constant">Constant</option>
                 <option value="Uniform">Uniform</option>
                 <option value="Triangular">Triangular</option>
                 <option value="Normal">Normal</option>
                 <option value="Lognormal">Lognormal</option>
             </select>
+            </div>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="otherParam1">
+            <label class="input-group-text" for="Other_growth">Growth Type</label>
+            <div class="input-group">
+            <select class="form-select" id="Other_growth" aria-label="Select Growth" asp-for="Other.growth">
+                <option selected value="Constant">Constant Growth</option>
+                <option value="Nonconstant">Nonconstant Growth</option>
+                <option value="None">No Growth</option>
+            </select>
+            </div>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="otherParam2">
+            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Other.param1">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="otherParam3">
+            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Other.param2">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Other.param3">
         </div>
     </div>
     <br />
     <div class="d-grid gap-2">
         <button class="btn btn-primary" type="submit">Run Simulation</button>
     </div>
-    <br />
 </form>
 
 @section Scripts {

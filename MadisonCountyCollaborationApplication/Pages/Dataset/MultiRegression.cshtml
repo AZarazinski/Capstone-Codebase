@@ -3,42 +3,55 @@
 @using System.Data
 @{
 }
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-
 
 <form id="dataForm" method="post">
     <!-- Dependent Variable -->
     <div class="input-group mb-3">
         <label class="input-group-text" for="DependentVariable">Dependent Variable</label>
         <select class="form-select" name="Dependent" id="DependentVariable" aria-label="Dependent Variable">
-            @foreach (DataColumn column in Model.Data.Columns)
+            @if (Model.Data.Columns != null)
             {
-                <option value="@column.ColumnName">@column.ColumnName</option>
+                foreach (DataColumn column in Model.Data.Columns)
+                {
+                    <option value="@column.ColumnName">@column.ColumnName</option>
+                }
             }
         </select>
     </div>
     <br />
-    <!-- Independent Variable(s) -->
-    <!-- Container for selected independent variables (tags) -->
-    <div id="selectedIndependentVariables" class="mb-3">
-        <!-- Selected independent variables will go here as tags -->
-    </div>
-
+    <!-- Independent Variables -->
     <div class="input-group mb-3">
-        <label class="input-group-text" for="IndependentVariableDropdown">Independent Variables</label>
-        <select class="form-select" id="IndependentVariableDropdown" aria-label="Independent Variables">
-            <option value="">Select an Independent Variable</option>
-            @foreach (DataColumn column in Model.Data.Columns)
+        <label class="input-group-text" for="IndependentVariables">Independent Variables</label>
+        <select multiple class="form-select" name="IndependentVariables" id="IndependentVariables" aria-label="Independent Variables">
+            <option value="">Select Independent Variables</option>
+            @if (Model.Data.Columns != null)
             {
-                <option value="@column.ColumnName">@column.ColumnName</option>
+                foreach (DataColumn column in Model.Data.Columns)
+                {
+                    <option value="@column.ColumnName">@column.ColumnName</option>
+                }
             }
         </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+
+@if (Model.Intercept != 0 && Model.Slopes != null)
+{
+    <p>Intercept: @Model.Intercept</p>
+    <ul>
+        @foreach (var slope in Model.Slopes)
+        {
+            <li>Slope: @slope</li>
+        }
+    </ul>
+}
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -68,7 +81,45 @@
 
             tag.appendChild(removeBtn);
             selectedContainer.appendChild(tag);
+
+            // Add hidden input for the independent variable
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'IndependentVariables';
+            hiddenInput.value = value;
+
+            tag.appendChild(hiddenInput);
+            selectedContainer.appendChild(tag);
         }
     });
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById('dataForm');
+        const independentVariableDropdown = document.getElementById('IndependentVariableDropdown');
+        const independentVariablesHolder = document.getElementById('independentVariablesHolder'); // Ensure this hidden input exists
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Assuming 'independentVariablesHolder' is a hidden input that will hold the selected independent variables
+            // This logic might need to be adjusted based on how you're capturing the selections (e.g., onClick of the dropdown options)
+            let selectedOptions = [...document.querySelectorAll('#selectedIndependentVariables .tag')].map(tag => tag.textContent.trim());
+            independentVariablesHolder.value = selectedOptions.join(',');
+
+            // After setting the value, manually submit the form data using Fetch API or another AJAX method to prevent page refresh
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form),
+                headers: { 'Accept': 'application/json' },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Process your data here
+                    console.log(data);
+                    // Display regression result on the page
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    });
+
 </script>
 

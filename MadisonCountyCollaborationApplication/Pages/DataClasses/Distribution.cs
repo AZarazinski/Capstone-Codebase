@@ -4,7 +4,7 @@ namespace _488Labs.Pages.DataClasses
 {
     public class Distribution
     {
-        private Random rand;
+        public Random rand;
         public Distribution(Random random)
         {
             rand = random;

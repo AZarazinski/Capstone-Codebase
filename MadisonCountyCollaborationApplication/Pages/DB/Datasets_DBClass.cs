@@ -34,5 +34,38 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             }
             return values;
         }
+        public static (List<List<double>> independents, List<double> dependent) FetchRegressionData(string[] independentColumns, string dependentColumn, string dataSet)
+        {
+            var independentValues = new List<List<double>>();
+            foreach (var column in independentColumns)
+            {
+                independentValues.Add(new List<double>()); // Initialize each list for independent variables
+            }
+            var dependentValues = new List<double>();
+
+            using (SqlConnection connection = new SqlConnection(MainDBconnString))
+            {
+                // Build the SELECT statement dynamically to include all independent columns and the dependent column
+                string columns = string.Join(", ", independentColumns) + ", " + dependentColumn;
+                using (SqlCommand cmd = new SqlCommand($"SELECT {columns} FROM {dataSet}", connection))
+                {
+                    connection.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            for (int i = 0; i < independentColumns.Length; i++)
+                            {
+                                // Assuming all data is numeric and convertible to double
+                                independentValues[i].Add(Convert.ToDouble(reader[independentColumns[i]]));
+                            }
+                            dependentValues.Add(Convert.ToDouble(reader[dependentColumn]));
+                        }
+                    }
+                }
+            }
+            return (independentValues, dependentValues);
+        }
+
     }
 }

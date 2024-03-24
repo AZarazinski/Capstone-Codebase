@@ -259,13 +259,9 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                 }
             }
             return dataTable;
-        }
-        
-        
-        //functions for adding values to databases
+        }        
 
-
-
+        //functions for adding values to 
         public static void CreateDataset(String title)
         {
             String sqlQuery = "INSERT INTO DataSets (dataSetName) VALUES('";
@@ -278,9 +274,6 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             cmdProductRead.Connection.Open();
             cmdProductRead.ExecuteNonQuery();
         }
-        
-
-        
         public static void CreatePlanContents(MadisonCountyCollaborationApplication.Pages.DataClasses.Contents Con)
         {
             String sqlQuery = "INSERT INTO PlanContents (contents, step, sequenceNumber, planID) VALUES('";

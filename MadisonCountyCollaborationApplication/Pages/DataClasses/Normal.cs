@@ -2,9 +2,9 @@
 {
     public class Normal : Distribution
     {
-        private Random rand;
-        private double mean;
-        private double variance;
+        public Random rand;
+        public double mean;
+        public double variance;
         public Normal(Random rand, double mu, double sigma) : base(rand)
         {
             mean = mu;
