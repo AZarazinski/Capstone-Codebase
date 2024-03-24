@@ -1,11 +1,11 @@
-using _488Labs.Pages.DataClasses;
+using MadisonCountyCollaborationApplication.Pages.DataClasses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Plotly.NET.CSharp;
 
 
-namespace _488Labs.Pages
+namespace MadisonCountyCollaborationApplication.Pages
 {
     public class MonteCarloRevCompModel : PageModel
     {

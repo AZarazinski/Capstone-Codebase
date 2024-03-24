@@ -1,6 +1,7 @@
-﻿using System.Reflection.Metadata;
+﻿using MadisonCountyCollaborationApplication.Pages.DataClasses;
+using System.Reflection.Metadata;
 
-namespace _488Labs.Pages.DataClasses
+namespace MadisonCountyCollaborationApplication.Pages.DataClasses
 {
     public class Lognormal : Distribution
     {

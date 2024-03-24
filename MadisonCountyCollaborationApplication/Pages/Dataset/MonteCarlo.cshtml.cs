@@ -1,9 +1,12 @@
 //using iTextSharp.text.pdf.parser.clipper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Plotly.NET.CSharp;
+using Newtonsoft.Json;
+using MadisonCountyCollaborationApplication.Pages.DataClasses;
 
 
-namespace _488Labs.Pages
+namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
     public class MonteCarloModel : PageModel
     {

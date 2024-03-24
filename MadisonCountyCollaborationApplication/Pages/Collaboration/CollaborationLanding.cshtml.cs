@@ -131,156 +131,86 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
         public async Task<IActionResult> OnPostUploadAsync(IFormFile fileUpload)
         {
             // Check if there's a file to upload
-            if (fileUpload != null && fileUpload.Length > 0)
+            if (fileUpload == null || fileUpload.Length <= 0)
             {
-                // Retrieve CollaborationID from session
-                int? collabID = HttpContext.Session.GetInt32("collaborationID");
-                if (collabID == null)
-                {
-                    // Handle the case where CollaborationID is not found in session
-                    // You might want to redirect the user or show an error message
-                    ModelState.AddModelError("", "Collaboration ID is missing. Please select a collaboration first.");
-                    return Page();
-                }
-
-                var fileName = Path.GetFileName(fileUpload.FileName);
-                var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
-
-                // Handle different file types based on extension
-                if (fileExtension == ".csv")
-                {
-                    var filePath = Directory.GetCurrentDirectory() + @"\wwwroot\fileupload\" + fileName;
-
-                    string queryName = Path.GetFileNameWithoutExtension(fileName);
-
-
-                    string sqlQuery = @"SELECT COUNT(*) FROM DataSets WHERE dataSetName = '" + queryName + "';";
-
-
-                    using (var reader = DBClass.GeneralReaderQuery(sqlQuery))
-                    {
-
-                        if (reader.Read() && (int)reader[0] > 0)
-                        {
-
-                            ViewData["DatasetError"] = "This Dataset already exists. Please upload a new one";
-                            return Page();
-
-                        }
-                        else
-                        {
-
-                            using (var stream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await fileUpload.CopyToAsync(stream);
-                            }
-
-                            return RedirectToPage("FileHandling", new { filePath = filePath });
-                        }
-
-                    }
-
-                    //_ = CsvHandlerAsync(fileName, fileUpload);
-
-                    //return Page();
-
-                }
-                else if (fileExtension == ".pdf")
-                {
-                    // Retrieve CollaborationID from session
-                    int CollabID = HttpContext.Session.GetInt32("collaborationID").Value;
-
-                    // Define the folder names associated with collaboration IDs
-                    var folders = new Dictionary<int, string>
-                    {
-                        { 3, "Admin" },
-                        { 1, "Budgeting" },
-                        { 5, "Economic" },
-                        { 4, "Management" },
-                        { 2, "Revenue" }
-                    };
-
-                    // Determine the correct folder name based on the collaboration ID
-                    string folderName = folders[CollabID];
-
-                    // Construct the path where the file should be saved
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents", folderName, fileName);
-
-                    // Ensure the directory exists
-                    var directory = Path.GetDirectoryName(filePath);
-                    Directory.CreateDirectory(directory); // CreateDirectory is a no-op if the directory already exists
-
-                    // Save the file
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await fileUpload.CopyToAsync(fileStream);
-                    }
-
-                    // Optionally, add a message or logic after successfully saving the file
-                    // ...
-                    return Page(); // Or redirect to another page as needed
-                }
-                else if (fileExtension == ".docx")
-                {
-                    // Handle DOCX file specific to collabID
-                }
-                else
-                {
-                    // Handle unsupported file types or set an error message
-                    ModelState.AddModelError("", "Unsupported file type.");
-                    return Page();
-                }
-
-                // Optionally save the file or process it as needed
-                // Make sure to associate it with collabID in your storage or database
-            }
-            else
-            {
-                // Handle the case where no file was uploaded
                 ModelState.AddModelError("", "Please select a file to upload.");
                 return Page();
             }
 
-            return RedirectToPage("CollaborationLanding");
-        }
-
-
-
-        private async Task<IActionResult> CsvHandlerAsync(string fileName, IFormFile fileUpload)
-        {
-            var filePath = Directory.GetCurrentDirectory() + @"\wwwroot\fileupload\" + fileName;
-
-            string queryName = Path.GetFileNameWithoutExtension(fileName);
-
-
-            string sqlQuery = @"SELECT COUNT(*) FROM DataSets WHERE dataSetName = '" + queryName + "';";
-
-
-            using (var reader = DBClass.GeneralReaderQuery(sqlQuery))
+            // Retrieve CollaborationID from session
+            int? collabID = HttpContext.Session.GetInt32("collaborationID");
+            if (collabID == null)
             {
-
-                if (reader.Read() && (int)reader[0] > 0)
-                {
-
-                    ViewData["DatasetError"] = "This Dataset already exists. Please upload a new one";
-                    return Page();
-
-                }
-                else
-                {
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        _ = fileUpload.CopyToAsync(stream);
-                    }
-
-                    return RedirectToPage("FileHandling", new { filePath = filePath });
-                }
-
-
+                ModelState.AddModelError("", "Collaboration ID is missing. Please select a collaboration first.");
+                return Page();
             }
 
+            var fileName = Path.GetFileName(fileUpload.FileName);
+            var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            // Handle CSV files separately
+            if (fileExtension == ".csv")
+            {
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fileupload", fileName);
+                string queryName = Path.GetFileNameWithoutExtension(fileName);
+
+                string sqlQuery = $"SELECT COUNT(*) FROM DataSets WHERE dataSetName = '{queryName}';";
+                using (var reader = DBClass.GeneralReaderQuery(sqlQuery))
+                {
+                    if (reader.Read() && (int)reader[0] > 0)
+                    {
+                        ViewData["DatasetError"] = "This Dataset already exists. Please upload a new one";
+                        return Page();
+                    }
+                    else
+                    {
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await fileUpload.CopyToAsync(stream);
+                        }
+
+                        return RedirectToPage("FileHandling", new { filePath = filePath });
+                    }
+                }
+            }
+            // Handle PDF, DOCX, PNG files
+            else if (fileExtension == ".pdf" || fileExtension == ".docx" || fileExtension == ".png")
+            {
+                var folders = new Dictionary<int, string>
+                {
+                    { 3, "Admin" },
+                    { 1, "Budgeting" },
+                    { 5, "Economic" },
+                    { 4, "Management" },
+                    { 2, "Revenue" }
+                };
+
+                string folderName = folders[collabID.Value]; // Assuming collabID is always valid here
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents", folderName, fileName);
+
+                var directory = Path.GetDirectoryName(filePath);
+                Directory.CreateDirectory(directory); // CreateDirectory is a no-op if the directory already exists
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await fileUpload.CopyToAsync(fileStream);
+                }
+                //Area to add SUCCESS Message!!
+               
+                return Page(); // Or redirect to another page as needed
+            }
+            else
+            {
+                // Handle unsupported file types
+                ModelState.AddModelError("", "Unsupported file type. Only .csv, .pdf, .docx, and .png files are supported.");
+                return Page();
+            }
         }
+
+
+
+
+        
 
 
 
@@ -288,22 +218,14 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
         {
             return RedirectToPage("../Home");
         }
-        public IActionResult OnPostAddPlan()
-        {
-            return RedirectToPage("AddCollabPlan");
-        }
+        
         public IActionResult OnPostAddUsers()
         {
 
             return RedirectToPage("AddEditUsers");
         }
         
-        public IActionResult OnPostPlan()
-        {
-            HttpContext.Session.SetInt32("planID", PlanID);
-            return RedirectToPage("ViewCollabPlan");
-
-        }
+        
         
         public IActionResult OnPostDatasets()
         {
@@ -318,12 +240,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Collaboration
         {
             PlanID = 0;
             return Page();
-        }
-        public IActionResult OnPostAsync(int planID)
-        {
-            HttpContext.Session.SetInt32("planID", PlanID);
-            return RedirectToPage("ViewCollabPlan");
-
         }
         
     }

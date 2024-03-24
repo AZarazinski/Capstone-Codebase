@@ -1,4 +1,6 @@
-﻿namespace _488Labs.Pages.DataClasses
+﻿using MadisonCountyCollaborationApplication.Pages.DataClasses;
+
+namespace MadisonCountyCollaborationApplication.Pages.DataClasses
 {
     public class Constant: Distribution
     {

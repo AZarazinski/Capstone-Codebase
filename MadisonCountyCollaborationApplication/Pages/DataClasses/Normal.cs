@@ -1,4 +1,4 @@
-﻿namespace _488Labs.Pages.DataClasses
+﻿namespace MadisonCountyCollaborationApplication.Pages.DataClasses
 {
     public class Normal : Distribution
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace _488Labs.Pages.DataClasses
+namespace MadisonCountyCollaborationApplication.Pages.DataClasses
 {
     public class Parameters
     {
