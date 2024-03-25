@@ -18,35 +18,34 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @if (Context.Session.GetString("username") != null)
-                    {
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Home">Collaborations</a>
-                            </li>
+                    <ul class="navbar-nav flex-grow-1">
+                        @if (Context.Session.GetString("username") != null)
+                        {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Documents/DocumentCenter">Document Center</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Dataset/DatasetLanding">Data Center</a>
                             </li>
-                        </ul>
-                    }
-                    <ul class="navbar-right">
-
-                        <li></li>
-                        <!-- Check if user is logged in -->
+                        }
+                    </ul>
+                    <ul class="navbar-right" style="list-style-type: none;">
+                        <!-- Remove list item bullets -->
                         @if (Context.Session.GetString("username") == null)
                         {
-                            <a id="Login" class="btn-secondary rounded-pill" asp-area="" asp-page="/User/Login">Log In</a>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/User/Login">Log In</a>
+                            </li>
                         }
                         else
                         {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/User/Logout">Log Out</a>
+                            </li>
                             var LocalUser = Context.Session.GetString("username");
-                            <div class="user-info">
-                                <p id="username"> @LocalUser</p>
-                                <a id="Logout" class="btn-secondary rounded-pill" asp-area="" asp-page="/User/Logout">Log Out</a>
-                            </div>
+                            <li class="nav-item">
+                                <p class="nav-link text-dark">Welcome, @LocalUser</p>
+                            </li>
                         }
                     </ul>
                 </div>

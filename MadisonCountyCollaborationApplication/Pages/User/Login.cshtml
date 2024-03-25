@@ -1,57 +1,96 @@
-﻿@page 
+﻿@page
 @model MadisonCountyCollaborationApplication.Pages.Users.LoginModel
 @{
 }
 
-<div class="text-center">
-    <h1 class="display-4">Login Page</h1>
-</div>
-<form asp-page="Login" asp-page-handler="LoginHandler">
-    <input placeholder="UserName:" asp-for="Username" class="form-control" id="Username" />
-    <span asp-validation-for="Username" class="text-danger"></span>
-    <br />
-    <input placeholder="Password: " asp-for="Password" class="form-control" type="password" id="Password" />
-    <span asp-validation-for="Password" class="text-danger"></span>
-    <br />
-    <div class="d-grid gap-2">
-        <input type="submit" value="Log In" class="btn btn-primary" />
+<!-- Include Bootstrap Icons CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
 
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card bg-light p-4 rounded shadow-lg mb-4">
+                <h1 class="text-primary text-center mb-4">Madison County</h1>
+                <form asp-page="Login" asp-page-handler="LoginHandler">
+                    <div class="mb-3">
+                        <input placeholder="Username" asp-for="Username" class="form-control" id="Username" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3 position-relative">
+                        <input placeholder="Password" asp-for="Password" class="form-control" type="password" id="Password" />
+                        <span class="password-toggle-icon" id="togglePassword" onclick="togglePasswordVisibility()">
+                            <i class="bi bi-eye"></i>
+                        </span>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary btn-block">Log In</button>
+                    </div>
+                </form>
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-secondary btn-block" onclick="populateFields()">Populate</button>
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="btn btn-secondary btn-block" onclick="clearFields()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+                @if (HttpContext.Session.GetString("username") != null)
+                {
+                    <p class="text-success text-center">@ViewData["LoginMessage"]</p>
+                }
+                else
+                {
+                    <p class="text-danger text-center">@ViewData["LoginMessage"]</p>
+                }
+            </div>
+        </div>
     </div>
-</form>
-<br />
-@* adding user *@
-<form asp-page="Login" asp-page-handler="AddUser">
-    <input type="submit" value="Add New User" class="btn btn-primary" />
-</form>
+</div>
 
-<br />
-<form method="post" asp-page-handler="Populate">
-    <button type="button" class="btn btn-secondary" onclick="populateFields()">Populate</button>
-</form>
-<br />
+@section Scripts {
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById('Password');
+            var toggleIcon = document.querySelector('.password-toggle-icon i');
 
-<form method="post" asp-page-handler="Clear">
-    <button type="button" class="btn btn-secondary" onclick="clearFields()">Clear</button>
-</form>
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            }
+        }
 
-@{
-    if (HttpContext.Session.GetString("username") != null)
-    {
-        <p class="text-success">@ViewData["LoginMessage"]</p>
-    }
-    else
-    {
-        <p class="text-danger">@ViewData["LoginMessage"]</p>
-    }
+        function populateFields() {
+            document.getElementById('Username').value = 'demoUser';
+            document.getElementById('Password').value = 'demoPW';
+        }
+
+        function clearFields() {
+            document.getElementById('Username').value = '';
+            document.getElementById('Password').value = '';
+        }
+    </script>
+
+    <style>
+        .password-toggle-icon {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+            .password-toggle-icon i {
+                font-size: 18px;
+                line-height: 1;
+            }
+    </style>
 }
-
-<script>
-    function populateFields() {
-        document.getElementById('Username').value = 'demoUser';
-        document.getElementById('Password').value = 'demoPW';
-    }
-    function clearFields() {
-        document.getElementById('Username').value = '';
-        document.getElementById('Password').value = '';
-    }
-</script>
