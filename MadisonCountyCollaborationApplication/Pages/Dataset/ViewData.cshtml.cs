@@ -25,13 +25,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         [BindProperty]
         public string Dependent { get; set; }
         public List<Attributes> AttributeList { get; set; }
-
-       
-        [BindProperty(SupportsGet = true)]
+        
+        [BindProperty]
         public int DatasetID { get; set; }
-
-    }
-    [BindProperty]
+        [BindProperty]
         public string DatasetName { get; set; }
 
         public DataTable Data { get; private set; }
@@ -58,7 +55,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 HttpContext.Session.SetInt32("datasetID", DatasetID);
                 DatasetName = DBClass.ExtractDatasetName(DatasetID);
                 DBClass.MainDBconnection.Close();
-                Data = DBClass.FetchDataForTable(DatasetName + DatasetID.ToString());
+                Data = DBClass.FetchDataForTable(DatasetName);
                 DBClass.MainDBconnection.Close();
 
                 //Populate dropdown menu for adding to collaboration
