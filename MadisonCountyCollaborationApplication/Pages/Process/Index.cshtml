@@ -87,6 +87,8 @@
                         <td>Dataset</td>
                         <td>Owner Name</td> <!-- This should also be retrieved from the database -->
                         <td>Today</td> <!-- Replace 'Today' with the actual upload date from the database, if available -->
+                        <td> <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">View Dataset</a> </td>
+
                     </tr>
                 }
 

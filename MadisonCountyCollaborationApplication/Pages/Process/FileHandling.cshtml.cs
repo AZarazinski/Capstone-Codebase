@@ -28,6 +28,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         // Method to handle GET requests for processing a CSV file
         public async Task<IActionResult> OnGetAsync(string filePath)
         {
+            int collabID = (int)HttpContext.Session.GetInt32("collaborationID");
+
             if (string.IsNullOrWhiteSpace(filePath))
             {
                 ModelState.AddModelError("", "File path is not provided.");
@@ -52,7 +54,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
             // Redirect to a success page and optionally pass the table name for confirmation.
             TempData["TableName"] = Path.GetFileNameWithoutExtension(filePath);
-            return RedirectToPage("Index");
+            return RedirectToPage("./Index", new { collabID = collabID });
         }
         // Method to process a CSV file asynchronously
         private async Task ProcessCsvFile(string filePath)

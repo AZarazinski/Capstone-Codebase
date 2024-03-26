@@ -95,7 +95,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                     if (reader.Read() && (int)reader[0] > 0)
                     {
                         ViewData["DatasetError"] = "This Dataset already exists. Please upload a new one";
-                        return Page();
+                        return RedirectToPage("Index",  new { collabID = collabID});
                     }
                     else
                     {
