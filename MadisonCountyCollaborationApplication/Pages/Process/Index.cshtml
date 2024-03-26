@@ -2,11 +2,9 @@
 @using System.Data.SqlClient;
 @using MadisonCountyCollaborationApplication.Pages.DB;
 @using System.IO;
-@model MadisonCountyCollaborationApplication.Pages.Collaboration.CollaborationLandingModel
+@model MadisonCountyCollaborationApplication.Pages.Process.IndexModel
 @{
     var documentsFolderPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents");
-    Console.WriteLine(documentsFolderPath);
-
     var collabFolderMap = new Dictionary<int, string>
     {
         { 3, "Admin" },
@@ -16,14 +14,16 @@
         { 2, "Revenue" }
     };
 
-    string currentCollabFolderName = "Budgeting";
-    // collabFolderMap.TryGetValue(Model.collabID, out currentCollabFolderName);
-    var currentCollabFolderPath = System.IO.Path.Combine(documentsFolderPath, currentCollabFolderName);
+    string currentCollabFolderName;
+    collabFolderMap.TryGetValue(Model.collabID, out currentCollabFolderName);
+    Console.WriteLine(currentCollabFolderName);
+    var currentCollabFolderPath = documentsFolderPath + "\\" + currentCollabFolderName;
+    Console.WriteLine(Model.collabID);
+    Console.WriteLine(currentCollabFolderName);
+    Console.WriteLine(currentCollabFolderPath);
+
 }
 
-C:\Users\prkrs\source\repos\Capstone-Codebase\Repo\Capstone-Codebase\MadisonCountyCollaborationApplication\wwwroot\Documents\
-
-C:\Users\prkrs\source\repos\Capstone-Codebase\Repo\Capstone-Codebase\MadisonCountyCollaborationApplication\wwwroot\Documents\Budgeting\
 <head>
     <style>
         .upload {
@@ -136,20 +136,20 @@ C:\Users\prkrs\source\repos\Capstone-Codebase\Repo\Capstone-Codebase\MadisonCoun
             // Grab the tables by their IDs
             var allItemsTable = document.getElementById('DatasetTable');
             var documentsTable = document.getElementById('DocumentTable');
-            
+
             // Check the value of the selected radio button
             var selectedValue = document.querySelector('input[name="toggle-btn"]:checked').id;
-            
+
             // Show/hide tables based on selected radio button
             allItemsTable.style.display = (selectedValue === 'btncheck1') ? 'block' : 'none';
             documentsTable.style.display = (selectedValue === 'btncheck2') ? 'block' : 'none';
         }
-        
+
         // Event listener for changes on radio buttons
         document.querySelectorAll('input[name="toggle-btn"]').forEach((radio) => {
             radio.addEventListener('change', toggleTables);
         });
-        
+
         // Initial call to set the correct table display on page load
         toggleTables();
     </script>

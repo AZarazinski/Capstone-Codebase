@@ -28,7 +28,7 @@ namespace MadisonCountyCollaborationApplication.Pages
                 {
                     HttpContext.Session.SetInt32("collaborationID", CollaborationID);
                     DBClass.MainDBconnection.Close();
-                    return RedirectToPage("/Collaboration/CollaborationLanding");
+                    return RedirectToPage("/Process/Index");
 
                 }
                 else
