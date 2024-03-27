@@ -86,9 +86,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Item Type</th>
-                <th>Owner</th>
+                <th>Name</th
                 <th>Date Uploaded</th>
             </tr>
         </thead>
@@ -96,6 +94,7 @@
             @{
                 string sqlQuery = $"SELECT Datasets.datasetID, Datasets.dataSetName FROM Datasets INNER JOIN DataAssists ON DataAssists.datasetID = Datasets.datasetID WHERE DataAssists.CollabID = {Model.collabID};";
                 SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
+
 
                 while (DatasetReader.Read())
                 {
@@ -106,10 +105,8 @@
                                 @DatasetReader["dataSetName"].ToString()
                             </a>
                         </td>
-                        <td>Dataset</td>
-                        <td>Owner Name</td>
                         <td>Upload Date</td>
-                        <td><a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">View</a></td>
+                        
                     </tr>
                 }
                 DatasetReader.Close(); // Always close the SqlDataReader when done.
