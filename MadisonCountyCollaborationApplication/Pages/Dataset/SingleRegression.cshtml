@@ -27,41 +27,46 @@
 }
 
 
-<div class="text-center">
-    <h1 class="display-4">Data</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-12 text-center">
+            <h1 class="display-4">Data</h1>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <form id="dataForm" asp-page-handler="CreateGraph" class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label" for="IndependentVariable">Independent Variable</label>
+                <select class="form-select" name="Independent" id="Independent" aria-label="Independent Variable">
+                    @foreach (DataColumn column in Model.Data.Columns)
+                    {
+                        <option value="@column.ColumnName">@column.ColumnName.Replace("_", " ").TrimStart('_')</option>
+                    }
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="DependentVariable">Dependent Variable</label>
+                <select class="form-select" name="Dependent" id="Dependent" aria-label="Dependent Variable">
+                    @foreach (DataColumn column in Model.Data.Columns)
+                    {
+                        <option value="@column.ColumnName">@column.ColumnName.Replace("_", " ").TrimStart('_')</option>
+                    }
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+        <div id="jsonResponse" class="col-md-6" style="white-space: pre-wrap;"></div>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+        <div id="plotlyChart" class="col-md-12"></div>
+    </div>
 </div>
 
-<form id="dataForm" method="post">
-    <div class="input-group mb-3">
-        <label class="input-group-text" for="IndependentVariable">Independent Variable</label>
-        <select class="form-select" name="Independent" id="Independent" aria-label="Independent Variable">
-            @foreach (DataColumn column in Model.Data.Columns)
-            {
-                <option value="@column.ColumnName">@column.ColumnName</option>
-            }
-        </select>
-    </div>
-    <br />
-    <div class="input-group mb-3">
-        <label class="input-group-text" for="DependentVariable">Dependent Variable</label>
-        <select class="form-select" name="Dependent" id="Dependent" aria-label="Dependent Variable">
-            @foreach (DataColumn column in Model.Data.Columns)
-            {
-                <option value="@column.ColumnName">@column.ColumnName</option>
-            }
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-<br />
-<div id="jsonResponse" style="white-space: pre-wrap;"></div> @*For Reading JSON to check for errors/format*@
-@*Chart Display*@
-<div id="plotlyChart"></div>
-<br />
-<form id="saveGraph" method="post" asp-page-handler="SaveGraph">
-
-<button type ="submit" class="btn btn-secondary" id="saveGraph">Save Graph</button>
-</form>
 
 @section Scripts {
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
@@ -84,11 +89,13 @@
                         // document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
 
                         var xValues = data.Data.Fields[0];
+                        var yValues = data.Data.Fields[1];
                         var xMin = Math.min(...xValues);
+                        var yMin = Math.min(...yValues);
                         var xMax = Math.max(...xValues);
                         // Extend the x-range significantly
-                        var xExtension = (xMax - xMin) * 0.5; // Extend by 10% of the range on both sides
-                        var extendedXMin = 0;
+                        var xExtension = (xMax - xMin) * 0.5; // Extend by 50% of the range on both sides
+                        var extendedXMin = xMin - (xMin < 0 ? Math.abs(xMin * 0.5) : 0); // Adjust extendedXMin if xMin is less than 0
                         var extendedXMax = xMax + xExtension;
 
                         // Generate points for the regression line using the extended range

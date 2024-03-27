@@ -52,17 +52,30 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 return RedirectToPage("/Login");
             }
         }
-        public async Task<IActionResult> OnPostAsync(string Independent, string Dependent)
+        public IActionResult OnPostCreateGraph(string Independent, string Dependent)
         {
             IndependentVariable = Independent;
             DependentVariable = Dependent;
             LoadData();
-            string dataSet = datasetName + datasetID.ToString();
+            string dataSet = datasetName;
             // Assume Datasets_DBClass.AttributeReader<T> is adjusted to return List<string> for validation
             List<string> dependentDataAsString = Datasets_DBClass.AttributeReader<string>(Dependent, dataSet);
             Datasets_DBClass.MainDBconnection.Close();
             List<string> independentDataAsString = Datasets_DBClass.AttributeReader<string>(Independent, dataSet);
             Datasets_DBClass.MainDBconnection.Close();
+
+            for(int i = 0; i<dependentDataAsString.Count(); i++)
+            {
+                dependentDataAsString[i] = dependentDataAsString[i].Replace("$", "").Replace("(", "-").Replace(")", "").Replace(",", "");
+            }
+            for (int i = 0; i < dependentDataAsString.Count(); i++)
+            {
+                independentDataAsString[i] = independentDataAsString[i].Replace("$", "").Replace("(", "-").Replace(")", "").Replace(",", "");
+            }
+            Console.WriteLine("==============================");
+            Console.WriteLine(dependentDataAsString.ToString());
+            Console.WriteLine(independentDataAsString.ToString());
+            Console.WriteLine("==============================");
 
             // Validation: Check if all values are numeric
             bool isDependentNumeric = dependentDataAsString.All(str => double.TryParse(str, out _));
@@ -101,6 +114,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             ChartConfigJson = chartJson;
 
             var regressionEquation = $"y = {m:F3}x + {b:F3}";
+            Console.WriteLine(regressionEquation.ToString());
 
             // Prepare the response object, now including the regression equation
             var response = new
@@ -117,70 +131,17 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 TypeNameHandling = TypeNameHandling.None,
                 Formatting = Formatting.None
             });
+            Console.WriteLine(jsonResponse.ToString());
             return Content(jsonResponse, "application/json");
         }
 
-        //public async Task<IActionResult> OnPostAsync(string Independent, string Dependent)
-        //{
-        //    IndependentVariable = Independent;
-        //    DependentVariable = Dependent;
-        //    LoadData();
-        //    string dataSet = datasetName + datasetID.ToString();
-        //    // Get x and y data Lists from table using dataSet
-        //    List<double> dependentDataList = Datasets_DBClass.AttributeReader<double>(Dependent, dataSet);
-        //    Datasets_DBClass.MainDBconnection.Close();
-        //    List<double> independentDataList = Datasets_DBClass.AttributeReader<double>(Independent, dataSet);
-        //    Datasets_DBClass.MainDBconnection.Close();
-        //    // Perform Simple Linear Regression
-        //    Console.WriteLine(CalculateLinearRegression(independentDataList, dependentDataList));
-        //    var (m, b, rSquared) = CalculateLinearRegression(independentDataList, dependentDataList);
-
-        //    // Creating Chart Output 
-        //    var chart = Chart.Point<double, double, string>(
-        //        x: independentDataList.ToArray(),
-        //        y: dependentDataList.ToArray()
-        //    )
-        //    .WithTraceInfo("Data Points", ShowLegend: true)
-        //    .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Independent Variable"))
-        //    .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Dependent Variable"));
-
-        //    var settings = new JsonSerializerSettings
-        //    {
-        //        ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // Ignore circular references
-        //        TypeNameHandling = TypeNameHandling.None, // Additional setting to avoid $type insertion
-        //        Formatting = Formatting.None // Use None for smaller payload; use Indented for readable JSON
-        //    };
-
-        //    var chartJson = JsonConvert.SerializeObject(chart, settings);
-        //    ChartConfigJson = chartJson;
-
-        //    var regressionEquation = $"y = {m:F3}x + {b:F3}";
-
-        //    // Prepare the response object, now including the regression equation
-        //    var response = new
-        //    {
-        //        Data = new { Fields = new[] { independentDataList, dependentDataList } }, // This is your existing data structure
-        //        RegressionEquation = regressionEquation,
-        //        RegressionLine = new { M = m, B = b } // Include regression line details for plotting
-        //    };
-
-        //    // Convert to JSON and return
-        //    var jsonResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings
-        //    {
-        //        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-        //        TypeNameHandling = TypeNameHandling.None,
-        //        Formatting = Formatting.None
-        //    });
-        //    return Content(jsonResponse, "application/json");
-        //    // return Content(ChartConfigJson, "application/json");
-        //}
         private void LoadData()
         {
             // Initialization logic for Data property
             datasetID = (int)HttpContext.Session.GetInt32("datasetID"); // Provide a default value to avoid null issues
             datasetName = DBClass.ExtractDatasetName(datasetID);
             DBClass.MainDBconnection.Close();
-            Data = DBClass.FetchDataForTable(datasetName + datasetID.ToString());
+            Data = DBClass.FetchDataForTable(datasetName);
             DBClass.MainDBconnection.Close();
         }
 

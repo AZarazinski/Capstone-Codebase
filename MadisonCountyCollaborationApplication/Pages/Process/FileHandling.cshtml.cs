@@ -70,18 +70,20 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 csv.Read();
                 csv.ReadHeader();
                 var headers = csv.Context.Reader.HeaderRecord;
+                var noSpacesHeaders = headers.Select(header => "_" + header.Replace(" ", "_")).ToArray();
 
                 while (csv.Read())
                 {
                     var record = new ExpandoObject() as IDictionary<string, object>;
-                    foreach (string header in headers)
+                    foreach (string columnHeader in headers)
                     {
-                        record[header] = csv.GetField(header);
+                        string modifiedHeader = "_" + columnHeader.Replace(" ", "_");
+                        record[modifiedHeader] = csv.GetField(columnHeader);
                     }
                     records.Add(record);
                 }
 
-                await CreateTableFromCsv(fullTableName, headers, records);
+                await CreateTableFromCsv(fullTableName, noSpacesHeaders, records);
                 await AddFileToDataSet(fullTableName); // Assume this inserts the dataset name into DataSets
             }
 
@@ -150,6 +152,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         // Method to generate SQL for creating table
         private string GenerateTableCreationSql(string tableName, string[] headers)
         {
+
             var columnDefinitions = headers.Select(header => $"[{header}] NVARCHAR(MAX)");
             string sql = $@"IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'{tableName}')
                             BEGIN
@@ -164,6 +167,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             {
                 foreach (var record in records)
                 {
+                    
                     var columns = string.Join(", ", record.Keys.Select(key => $"[{key}]"));
                     var values = string.Join(", ", record.Values.Select(value => value == null ? "NULL" : $"'{value.ToString().Replace("'", "''")}'"));
                     var insertSql = $"INSERT INTO [{tableName}] ({columns}) VALUES ({values});";

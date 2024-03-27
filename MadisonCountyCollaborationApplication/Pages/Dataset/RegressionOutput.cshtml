@@ -1,0 +1,73 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Dataset.RegressionOutputModel
+@{
+    Layout = null; // Assuming you want a full-width layout without a sidebar.
+}
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .custom-curved-box {
+        border-radius: 15px;
+    }
+
+    .results-section, .regression-equation {
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        background-color: #f8f9fa;
+    }
+
+    .card-title {
+        font-weight: bold;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="regression-equation mb-4">
+        <h3>Regression Equation</h3>
+        @if (!string.IsNullOrEmpty(Model.DependentVariable) && Model.Intercept.HasValue && Model.Slopes != null && Model.IndependentVariables != null)
+        {
+            <p>@Model.DependentVariable.Replace("_", " ").TrimStart('_') = @Model.Intercept @(String.Join(" ", Model.Slopes.Select((s, index) => $"{(s >= 0 ? "+" : "-")} {Math.Abs(s)} * ({Model.IndependentVariables[index].Replace("_", " ").TrimStart('_')})")))</p>
+        }
+        else
+        {
+            <p>Regression equation data is not available.</p>
+        }
+    </div>
+
+    <div class="results-section mb-4">
+        <h3>Regression Results</h3>
+        <p><strong>Intercept:</strong> @Model.Intercept</p>
+        <h4>Slopes:</h4>
+        <ul>
+            @for (int i = 0; i < Model.IndependentVariables.Count; i++)
+            {
+                <li>@Model.IndependentVariables[i].Replace("_", " ").TrimStart('_'): @Model.Slopes[i]</li>
+            }
+        </ul>
+    </div>
+
+    <div class="card bg-primary text-white custom-curved-box mb-3">
+        <div class="card-body">
+            <h4 class="card-title">What-If Scenario Analysis</h4>
+            <form id="whatIfForm" method="post">
+                @foreach (var variable in Model.IndependentVariables)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">@variable.Replace("_", " ").TrimStart('_'):</label>
+                        <input type="number" class="form-control" name="@($"WhatIfInputs[{variable.Replace("_", " ").TrimStart('_')}]")" />
+                        <small class="form-text text-muted">Enter a value for @variable.Replace("_", " ").TrimStart('_').</small>
+                    </div>
+                }
+                <button class="btn btn-light" type="submit">Calculate What-If Scenario</button>
+            </form>
+            <div id="whatIfResult">
+                @if (Model.ShowResults)
+                {
+                    <p><strong>Expected Outcome:</strong> @Model.ExpectedOutcome</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
