@@ -1,5 +1,7 @@
 using MadisonCountyCollaborationApplication.Pages.DB;
+using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.Distributions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
@@ -31,7 +33,14 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public bool ShowResults { get; set; } = false;
         public double? CalculatedIntercept { get; set; }
         public List<(string Variable, double Slope)> CalculatedSlopes { get; set; } = new List<(string Variable, double Slope)>();
-        public double expectedOutcome { get; set; }
+        [BindProperty]
+        public double ConfidenceLevel { get; set; } = 95; // Default to 95%
+        public double StandardError { get; set; }
+        public double ConfidenceIntervalLower { get; set; }
+        public double ConfidenceIntervalUpper { get; set; }
+        public List<double> PValues { get; set; } = new List<double>();
+
+
 
         public class VariableSlopePair
         {
@@ -58,7 +67,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         }
         public async Task<IActionResult> OnPostAsync()
         {
-            Console.WriteLine("Starting OnPost");
             // Ensure data is loaded (this might already be handled in OnGet or another place)
             LoadData();
 
@@ -69,53 +77,16 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 return Page(); // Make sure this is the intended behavior
             }
 
-            // Print Independent Variables
-            Console.WriteLine("Independent Variables:");
-            foreach (var variable in IndependentVariables)
-            {
-                Console.WriteLine(variable);
-            }
-
-            // Print Dependent Variable
-            Console.WriteLine($"Dependent Variable: {DependentVariable}");
-
             // Assuming PopulateDataListsFromDataTable method correctly populates the lists
             PopulateDataListsFromDataTable();
-
-            // Print data lists
-            Console.WriteLine("Independent Variables Data Lists:");
-            foreach (var list in independentDataLists)
-            {
-                Console.WriteLine($"[{string.Join(", ", list)}]");
-            }
-
-            Console.WriteLine("Dependent Data List:");
-            Console.WriteLine($"[{string.Join(", ", dependentDataList)}]");
-
             // Perform Regression
             CalculateAndSetMultipleRegression();
-
-            // Print Regression Results
-            Console.WriteLine($"Intercept: {Intercept}");
-            Console.WriteLine("Slopes:");
-            foreach (var slope in Slopes)
-            {
-                Console.WriteLine(slope);
-            }
 
             var result = new
             {
                 Intercept = Intercept,
                 Slopes = Slopes.Select((slope, index) => new { Variable = IndependentVariables[index], Slope = slope }).ToList()
             };
-
-            // Return the results as JSON
-            //return new ContentResult
-            //{
-            //    Content = JsonSerializer.Serialize(result),
-            //    ContentType = "application/json",
-            //    StatusCode = 200
-            //};
 
             // Instead of returning JSON, add results to ViewData or a property of the model
             CalculatedIntercept = Intercept;
@@ -142,13 +113,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             var variablesJson = JsonSerializer.Serialize(IndependentVariables);
             var dependentVariableJson = JsonSerializer.Serialize(DependentVariable);
 
-            Console.WriteLine("=======================");
-            Console.WriteLine(interceptJson);
-            Console.WriteLine(slopesJson);
-            Console.WriteLine(variablesJson);
-            Console.WriteLine(dependentVariableJson);
-            Console.WriteLine("=======================");
-
             // Store data in session
             HttpContext.Session.SetString("Intercept", interceptJson);
             HttpContext.Session.SetString("Slopes", slopesJson);
@@ -157,7 +121,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 
             // Redirect to the receiving page
             return RedirectToPage("RegressionOutput");
-
         }
 
         private void LoadData()
@@ -168,14 +131,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             DBClass.MainDBconnection.Close();
             Data = DBClass.FetchDataForTable(datasetName);
             DBClass.MainDBconnection.Close();
-            Console.WriteLine($"Data Loaded for Dataset: {datasetName}{datasetID}");
         }
         public static MultiRegressionModel CalculateMultipleRegression(List<double> yVals, List<List<double>> xVals)
         {
             var interceptColumn = Enumerable.Repeat(1.0, yVals.Count).ToList();
             xVals.Insert(0, interceptColumn);
 
-            Console.WriteLine("Performing Multiple Regression Calculation...");
 
             var xMatrix = Matrix<double>.Build.DenseOfColumns(xVals);
             var yVector = Vector<double>.Build.DenseOfEnumerable(yVals);
@@ -188,7 +149,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 slopes.Add(coefficients[i]);
             }
 
-            Console.WriteLine($"Regression Calculation Complete. Intercept: {intercept}, Slopes: [{string.Join(", ", slopes)}]");
 
             return new MultiRegressionModel { Intercept = intercept, Slopes = slopes };
         }
@@ -196,55 +156,40 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         {
             Console.WriteLine("Preparing to Calculate Multiple Regression...");
             PopulateDataListsFromDataTable();
-            var result = CalculateMultipleRegression(dependentDataList, independentDataLists);
-            Intercept = result.Intercept;
-            Slopes = result.Slopes;
-            Console.WriteLine($"Regression Results: Intercept = {Intercept}, Slopes = [{string.Join(", ", Slopes)}]");
-        }
-        public void OnPostCreateWhatIf()
-        {
-            Console.WriteLine("Creating What-If Scenario Result");
-            var interceptString = HttpContext.Session.GetString("Intercept");
-            var slopesString = HttpContext.Session.GetString("Slopes");
 
-            Console.WriteLine(interceptString.ToString());
-            Console.WriteLine(slopesString.ToString());
+            var xMatrix = BuildXMatrix(independentDataLists);
+            var yVector = Vector<double>.Build.DenseOfEnumerable(dependentDataList);
 
-            double expectedOutcome = 0;
+            var coefficients = CalculateMultipleRegression(dependentDataList, xMatrix);
 
-            if (interceptString != null && slopesString != null)
+            Intercept = coefficients[0];
+            Slopes = coefficients.SubVector(1, coefficients.Count - 1).ToList();
+
+            var standardErrors = CalculateStandardErrors(dependentDataList, xMatrix, coefficients);
+            var pValues = CalculatePValues(coefficients, standardErrors, dependentDataList.Count);
+
+            double alpha = (1.0 - (ConfidenceLevel / 100.0));
+            double degreesOfFreedom = dependentDataList.Count - coefficients.Count;
+            double criticalValue = StudentT.InvCDF(0, 1, degreesOfFreedom, 1 - alpha / 2.0);
+
+            ConfidenceIntervalLower = Intercept.Value - criticalValue * standardErrors[0];
+            ConfidenceIntervalUpper = Intercept.Value + criticalValue * standardErrors[0];
+
+            // Store the calculated values in the session for use on subsequent pages
+            HttpContext.Session.SetString("StandardError", JsonSerializer.Serialize(standardErrors));
+            HttpContext.Session.SetString("PValues", JsonSerializer.Serialize(pValues));
+            HttpContext.Session.SetString("ConfidenceLevel", ConfidenceLevel.ToString());
+            HttpContext.Session.SetString("ConfidenceIntervalLower", ConfidenceIntervalLower.ToString());
+            HttpContext.Session.SetString("ConfidenceIntervalUpper", ConfidenceIntervalUpper.ToString());
+
+            Console.WriteLine($"Intercept p-value: {pValues[0]:G4}"); // Using general format specifier with precision
+            for (int i = 0; i < Slopes.Count; i++)
             {
-                var intercept = JsonSerializer.Deserialize<double>(interceptString);
-                var slopesDictionary = JsonSerializer.Deserialize<Dictionary<string, double>>(slopesString);
-
-                expectedOutcome += intercept; // Start with the intercept
-
-                foreach (var slope in slopesDictionary)
-                {
-                    // Retrieve the user input value for each variable
-                    string inputFieldName = $"WhatIfInputs[{slope.Key}]";
-                    if (HttpContext.Request.Form.TryGetValue(inputFieldName, out var inputValue) && double.TryParse(inputValue, out double variableValue))
-                    {
-                        // Apply the regression equation component for this variable
-                        expectedOutcome += slope.Value * variableValue;
-                    }
-                }
-                Console.WriteLine(expectedOutcome.ToString());
-
-                // Store or display the expected outcome as needed
-                // For example, adding it to ViewData to display in the Razor view\
-
-                ViewData["ExpectedY"] = expectedOutcome;
-                ShowResults = true;
-            }
-            else
-            {
-                // Handle the case where the model components are not found in the session
-                ViewData["Error"] = "Regression model components not found.";
-                ShowResults = false;
-
+                Console.WriteLine($"{IndependentVariables[i]} p-value: {pValues[i + 1]:G4}");
             }
         }
+
+
 
         private void PopulateDataListsFromDataTable()
         {
@@ -261,8 +206,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             // Populating dependent variable list
             foreach (DataRow row in Data.Rows)
             {
-                //valueToProcess = row[DependentVariable]?.ToString();
-                //valueToProcess = valueToProcess.Replace("$", "").Replace("(", "-").Replace(")", "").Replace(",","");
                 // Here, ensure that the column exists to avoid the ArgumentNullException
                 if (Data.Columns.Contains(DependentVariable) && double.TryParse(row[DependentVariable]?.ToString().Replace("$", "").Replace("(", "-").Replace(")", "").Replace(",", ""), out double dependentValue))
                 {
@@ -290,13 +233,63 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 independentDataLists.Add(tempList); // Add the list for the current independent variable
             }
         }
-
-        // Helper class to deserialize JSON from session
-        public class RegressionModel
+        public List<double> CalculateStandardErrors(List<double> yVals, Matrix<double> xMatrix, Vector<double> coefficients)
         {
-            public double Intercept { get; set; }
-            public List<VariableSlopePair> Slopes { get; set; }
+            // Reconstruct yVector from yVals within the scope
+            var yVector = Vector<double>.Build.DenseOfEnumerable(yVals);
+
+            var predictions = xMatrix * coefficients;
+            var residuals = yVector - predictions;
+            var rss = residuals.DotProduct(residuals);
+            var mse = rss / (yVals.Count - coefficients.Count);
+            var seList = new List<double>();
+
+            var xTxInv = (xMatrix.TransposeThisAndMultiply(xMatrix)).Inverse();
+            for (int i = 0; i < coefficients.Count; i++)
+            {
+                var variance = xTxInv[i, i] * mse;
+                seList.Add(Math.Sqrt(variance));
+            }
+
+            return seList;
         }
 
+        public List<double> CalculatePValues(Vector<double> coefficients, List<double> standardErrors, int sampleSize)
+        {
+            var pValues = new List<double>();
+            int degreesOfFreedom = sampleSize - coefficients.Count; // Assuming one intercept + multiple slopes
+
+            for (int i = 0; i < coefficients.Count; i++)
+            {
+                double tStatistic = coefficients[i] / standardErrors[i];
+                // Two-tailed p-value
+                double pValue = 2.0 * (1.0 - StudentT.CDF(0, 1, degreesOfFreedom, Math.Abs(tStatistic)));
+                pValues.Add(pValue);
+            }
+
+            return pValues;
+        }
+        private Matrix<double> BuildXMatrix(List<List<double>> xVals)
+        {
+            var rowCount = xVals.First().Count;
+            var columnCount = xVals.Count + 1; // Adding 1 for the intercept column
+            var xMatrix = Matrix<double>.Build.Dense(rowCount, columnCount, 1.0); // Initialize with 1s for intercept
+
+            for (int col = 1; col < columnCount; col++) // Start from 1 to skip intercept column
+            {
+                for (int row = 0; row < rowCount; row++)
+                {
+                    xMatrix[row, col] = xVals[col - 1][row]; // Adjusted indexing for xVals
+                }
+            }
+
+            return xMatrix;
+        }
+        public Vector<double> CalculateMultipleRegression(List<double> yVals, Matrix<double> xMatrix)
+        {
+            var yVector = Vector<double>.Build.DenseOfEnumerable(yVals);
+            var coefficients = xMatrix.TransposeThisAndMultiply(xMatrix).Inverse().Multiply(xMatrix.TransposeThisAndMultiply(yVector));
+            return coefficients;
+        }
     }
 }

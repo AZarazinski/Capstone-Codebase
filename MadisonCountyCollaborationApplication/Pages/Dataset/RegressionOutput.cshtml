@@ -20,14 +20,21 @@
     .card-title {
         font-weight: bold;
     }
-</style>
 
+    .significant {
+        color: #28a745; /* Success color for significant values */
+    }
+
+    .not-significant {
+        color: #dc3545; /* Danger color for non-significant values */
+    }
+</style>
 <div class="container mt-4">
     <div class="regression-equation mb-4">
         <h3>Regression Equation</h3>
         @if (!string.IsNullOrEmpty(Model.DependentVariable) && Model.Intercept.HasValue && Model.Slopes != null && Model.IndependentVariables != null)
         {
-            <p>@Model.DependentVariable.Replace("_", " ").TrimStart('_') = @Model.Intercept @(String.Join(" ", Model.Slopes.Select((s, index) => $"{(s >= 0 ? "+" : "-")} {Math.Abs(s)} * ({Model.IndependentVariables[index].Replace("_", " ").TrimStart('_')})")))</p>
+            <p>@Model.DependentVariable.TrimStart('_').Replace("_", " ") = @string.Format("{0:#,0.000}", Model.Intercept) @(String.Join(" ", Model.Slopes.Select((s, index) => $"{(s >= 0 ? "+" : "-")} {Math.Abs(s):#,0.0000} * ({Model.IndependentVariables[index].TrimStart('_').Replace("_", " ")})")))</p>
         }
         else
         {
@@ -37,15 +44,58 @@
 
     <div class="results-section mb-4">
         <h3>Regression Results</h3>
-        <p><strong>Intercept:</strong> @Model.Intercept</p>
-        <h4>Slopes:</h4>
         <ul>
+            <li>
+                <strong>Intercept:</strong> @string.Format("{0:#,0.000}", Model.Intercept)
+                <ul>
+                    <li>
+                        Standard Error: @string.Format("{0:#,0.000}", Model.StandardErrors[0])
+                    </li>
+                    <li>
+                        P-value:  @{
+                            if (Model.PValues[0] <= Model.Aplha)
+                            {
+                                <text><span class="significant">@string.Format("{0:#,0.000}", Model.PValues[0]) </span><strong class="significant">Significant</strong></text>
+                            }
+                            else
+                            {
+                                <text><span class="not-significant">@string.Format("{0:#,0.000}", Model.PValues[0]) </span><strong class="not-significant">Not Significant</strong></text>
+
+                            }
+                        }
+                    </li>
+                </ul>
+            </li>
             @for (int i = 0; i < Model.IndependentVariables.Count; i++)
             {
-                <li>@Model.IndependentVariables[i].Replace("_", " ").TrimStart('_'): @Model.Slopes[i]</li>
+                <li>
+                    <strong>@Model.IndependentVariables[i].Replace("_", " ").TrimStart('_'):</strong>
+                    <ul>
+                        <li>
+                            <strong>Slope:</strong> @string.Format("{0:#,0.0000}", Model.Slopes[i])
+                        </li>
+                        <li>
+                            Standard Error: @string.Format("{0:#,0.000}", Model.StandardErrors[i + 1]) <!-- Intercept is at index 0 -->
+                        </li>
+                        <li>
+                            P-value:  @{
+                                if (Model.PValues[i+1] <= Model.Aplha)
+                                {
+                                    <text><span class="significant">@string.Format("{0:#,0.000}", Model.PValues[i+1]) </span><strong class="significant">Significant</strong></text>
+                                }
+                                else
+                                {
+                                    <text><span class="not-significant">@string.Format("{0:#,0.000}", Model.PValues[i+1]) </span><strong class="not-significant">Not Significant</strong></text>
+
+                                }
+                            } 
+                        </li>
+                    </ul>
+                </li>
             }
         </ul>
     </div>
+
 
     <!-- What-If Scenario Analysis -->
     <div class="card bg-primary text-white custom-curved-box mb-3">
@@ -60,12 +110,12 @@
                 @for (int i = 0; i < Model.IndependentVariables.Count; i++)
                 {
                     <div class="mb-3">
-                        <label class="form-label">@Model.IndependentVariables[i].Replace("_", " ").TrimStart('_'):</label>
-                        <input type="number" class="form-control" name="WhatIfInputs[@i]" />
-                        <small class="form-text text-muted">Enter a value for @Model.IndependentVariables[i].Replace("_", " ").TrimStart('_').</small>
+                        <label class="form-label">@Model.IndependentVariables[i].TrimStart('_').Replace("_", " "):</label>
+                        <input type="number" class="form-control" placeholder="Enter a value for @Model.IndependentVariables[i].TrimStart('_').Replace("_", " ")." name="WhatIfInputs[@i]" />
+                        @* <small class="form-text text-dark">Enter a value for @Model.IndependentVariables[i].Replace("_", " ").TrimStart('_').</small> *@
                     </div>
                 }
-                <button type="submit" class="btn btn-primary">Calculate What-If Scenario</button>
+                <button type="submit" class="btn btn-outline-primary rounded shadow-sm text-dark bg-white">Calculate What-If Scenario</button>
             </form>
 
 
@@ -80,3 +130,5 @@
         </div>
     </div>
 </div>
+<br />
+<br />

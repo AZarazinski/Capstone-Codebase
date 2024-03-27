@@ -25,6 +25,15 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public bool ShowResults { get; set; } = false;
         [BindProperty]
         public double ExpectedOutcome { get; set; } = double.NaN;
+        [BindProperty]
+        public List<double> StandardErrors { get; set; } = new List<double>();
+        [BindProperty]
+        public List<double> PValues { get; set; } = new List<double>();
+        [BindProperty]
+        public double ConfidenceLevel {  get; set; } = .05;
+        [BindProperty]
+        public double Aplha {  get; set; } = .05;
+
 
 
         public IActionResult OnGet()
@@ -38,12 +47,31 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 var slopesJson = HttpContext.Session.GetString("Slopes");
                 var variablesJson = HttpContext.Session.GetString("Variables");
                 var dependentVariableJson = HttpContext.Session.GetString("DependentVariable");
+                var standardErrorsJson = HttpContext.Session.GetString("StandardError");
+                var pValuesJson = HttpContext.Session.GetString("PValues");
+                var confidenceLevelJson = HttpContext.Session.GetString("ConfidenceLevel");
 
                 // Deserialize data
                 Intercept = JsonSerializer.Deserialize<double>(interceptJson);
                 Slopes = JsonSerializer.Deserialize<List<double>>(slopesJson);
                 IndependentVariables = JsonSerializer.Deserialize<List<string>>(variablesJson);
                 DependentVariable = JsonSerializer.Deserialize<string>(dependentVariableJson);
+
+                if (!string.IsNullOrWhiteSpace(confidenceLevelJson)) 
+                { 
+                    ConfidenceLevel = JsonSerializer.Deserialize<double>(confidenceLevelJson);
+                }
+                if (!string.IsNullOrWhiteSpace(standardErrorsJson))
+                {
+                    StandardErrors = JsonSerializer.Deserialize<List<double>>(standardErrorsJson);
+                }
+
+                if (!string.IsNullOrWhiteSpace(pValuesJson))
+                {
+                    PValues = JsonSerializer.Deserialize<List<double>>(pValuesJson);
+                }
+                double Alpha = (1.0 - (ConfidenceLevel / 100.0));
+                Console.WriteLine(Alpha.ToString());
 
                 // Optionally, you can call other methods here to perform additional initialization or processing
 

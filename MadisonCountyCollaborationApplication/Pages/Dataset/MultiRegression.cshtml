@@ -5,10 +5,22 @@
     ViewData["Title"] = "Multiple Regression Analysis";
 }
 
+<style>
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+</style>
+
+<h2>@ViewData["Title"]</h2>
+
 <form id="dataForm" asp-page-handler="OnPost">
-    <div class="mb-3">
-        <label for="DependentVariable" class="form-label">Dependent Variable</label>
-        <select class="form-select" name="DependentVariable" id="DependentVariable">
+    <div class="form-group">
+        <label for="DependentVariable">Select Dependent Variable</label>
+        <select class="form-control" name="DependentVariable" id="DependentVariable">
             @if (Model.Data.Columns != null)
             {
                 foreach (DataColumn column in Model.Data.Columns)
@@ -19,9 +31,9 @@
         </select>
     </div>
 
-    <div class="mb-3">
-        <label for="IndependentVariables" class="form-label">Independent Variables</label>
-        <select class="form-select" name="IndependentVariables" id="IndependentVariables" multiple="multiple">
+    <div class="form-group">
+        <label for="IndependentVariables">Select Independent Variables</label>
+        <select class="form-control" name="IndependentVariables" id="IndependentVariables" multiple="multiple">
             @if (Model.Data.Columns != null)
             {
                 foreach (DataColumn column in Model.Data.Columns)
@@ -32,6 +44,15 @@
         </select>
         <small class="form-text text-muted">
             Hold CTRL (Windows) or CMD (Mac) to select multiple options.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="confidenceLevel">Confidence Level (%)</label>
+        <input type="number" class="form-control" id="confidenceLevel" name="ConfidenceLevel" min="80" max="99" value="95" step="1">
+        <small class="form-text text-muted">
+            The confidence level indicates the probability (in percentage) that the calculated confidence interval will contain the true population parameter.
+            For example, a confidence level of 95% means that if the experiment were repeated numerous times, the calculated confidence interval would contain the true population parameter in approximately 95% of the intervals.
         </small>
     </div>
 
