@@ -1,7 +1,6 @@
 ﻿@page
 @model MadisonCountyCollaborationApplication.Pages.Dataset.RegressionOutputModel
 @{
-    Layout = null; // Assuming you want a full-width layout without a sidebar.
 }
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -48,15 +47,16 @@
         </ul>
     </div>
 
+    <!-- What-If Scenario Analysis -->
     <div class="card bg-primary text-white custom-curved-box mb-3">
         <div class="card-body">
             <h4 class="card-title">What-If Scenario Analysis</h4>
-            <form id="whatIfForm" method="post">
+            <form id="whatIfForm" asp-page-handler="CalculateWhatIfScenario">
                 @foreach (var variable in Model.IndependentVariables)
                 {
                     <div class="mb-3">
                         <label class="form-label">@variable.Replace("_", " ").TrimStart('_'):</label>
-                        <input type="number" class="form-control" name="@($"WhatIfInputs[{variable.Replace("_", " ").TrimStart('_')}]")" />
+                        <input type="number" class="form-control" id="@($"input_{variable.Replace("_", "").TrimStart('_')}")" name="@($"WhatIfInputs[{variable.Replace("_", "").TrimStart('_')}]")" />
                         <small class="form-text text-muted">Enter a value for @variable.Replace("_", " ").TrimStart('_').</small>
                     </div>
                 }

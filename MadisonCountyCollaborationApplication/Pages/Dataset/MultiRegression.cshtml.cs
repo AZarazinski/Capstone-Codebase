@@ -156,17 +156,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             HttpContext.Session.SetString("DependentVariable", dependentVariableJson);
 
             // Redirect to the receiving page
-            // return RedirectToPage("RegressionOutput");
-            return RedirectToPage("RegressionOutput", new
-            {
-                IndependentVariables = IndependentVariables,
-                DependentVariable = DependentVariable,
-                datasetID = datasetID,
-                datasetName = datasetName,
-                Intercept = Intercept,
-                Slopes = Slopes,
-                ShowResults = ShowResults,
-            });
+            return RedirectToPage("RegressionOutput");
 
         }
 

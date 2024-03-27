@@ -2,27 +2,50 @@
 @model MadisonCountyCollaborationApplication.Pages.HomeModel
 @{
 }
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    .box-table {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px; /* Adds space between cards */
+        justify-content: center; /* Centers cards in the container */
+    }
+
+    .card {
+        flex: 1 1 calc(20% - 20px); /* Makes cards more flexible */
+        margin-bottom: 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Adds shadow for depth */
+        transition: transform 0.2s; /* Smooth transition for scaling */
+        padding: 15px;
+        border-radius: 5px; /* Rounds corners of the cards */
+    }
+
+    .card:hover {
+        transform: scale(1.05); /* Scales card on hover */
+        cursor: pointer;
+    }
+
+    .card-header, .card-body {
+        padding: 15px;
+    }
+
+    @@media (max-width: 768px) {
+        .card {
+            flex-basis: calc(50% - 20px); /* Adjusts to 2 cards per row on smaller screens */
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .card {
+            flex-basis: 100%; /* Stacks cards vertically on very small screens */
+        }
+    }
+</style>
 
 <form asp-page="Home" asp-page-handler="Create">
     <input type="submit" value="Create New Collaboration" class="btn btn-primary" />
 </form>
-<br /> 
-
-        <style>
-    .box-table {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between; /* This will distribute the cards evenly */
-    }
-
-    .card {
-        width: calc(20% - 10px); /* Adjust the width for 5 cards across */
-        margin-bottom: 20px;
-        /* You can add additional styling here */
-    }
-
-    /* Add any additional styling as per your requirement */
-</style>
+<br />
 
 <form asp-page-handler="Select" method="post" id="collabForm">
     <input type="hidden" name="CollaborationID" id="collabIdInput" value="" />
@@ -30,7 +53,7 @@
         @{
             foreach (var prod in Model.CollaborationList)
             {
-                <div class="card" data-collab-id="@prod.collabID" onclick="selectCollaboration(@prod.collabID)">
+                <div class="card" tabindex="0" role="button" data-collab-id="@prod.collabID" onclick="selectCollaboration(@prod.collabID)" onkeypress="selectCollaborationKeyPress(event, @prod.collabID)">
                     <div class="card-header">
                         @prod.collabName
                     </div>
@@ -46,12 +69,15 @@
 @section Scripts {
     <script>
         function selectCollaboration(collabId) {
-            // Set the value of the hidden input to the collaboration ID
             document.getElementById('collabIdInput').value = collabId;
-            // Submit the form
             document.getElementById('collabForm').submit();
+        }
+
+        function selectCollaborationKeyPress(event, collabId) {
+            // Check if Enter key is pressed
+            if (event.key === "Enter") {
+                selectCollaboration(collabId);
+            }
         }
     </script>
 }
-
-<br />

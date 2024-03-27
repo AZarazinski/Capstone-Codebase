@@ -1,69 +1,64 @@
 ﻿@page
-@using System.Data
-@using System.Data.SqlClient
 @model MadisonCountyCollaborationApplication.Pages.Dataset.ViewDataModel
+@using System.Data
 @{
+    ViewData["Title"] = "View Dataset";
 }
 
+<h2 class="mb-3">@Model.DatasetName</h2>
 
-<h2>@Model.DatasetName</h2>
-
-<div class="CollabAdd">
-
+<div class="mb-4">
+    <form method="post" asp-page-handler="RedirectToAnalysis">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="analysisSelect">Select Analysis</label>
+            </div>
+            <select class="form-select" id="analysisSelect" name="analysisType">
+                <option value="SingleRegression">Single Regression</option>
+                <option value="MultiRegression">Multi Regression</option>
+                <option value="Simulation">Monte Carlo Simulation</option>
+            </select>
+            <button type="submit" class="btn btn-primary ml-2">Submit</button>
+        </div>
+    </form>
 </div>
 
-
-<form method="post" asp-page-handler="RedirectToAnalysis">
-    <div class="input-group mb-2">
-        <label class="input-group-text" for="analysisSelect">Select Analysis</label>
-        <select class="form-select" id="analysisSelect" name="analysisType" aria-label="Select Analysis">
-            <option value="SingleRegression">Single Regression</option>
-            <option value="MultiRegression">Multi Regression</option>
-            <option value="Simulation">Monte Carlo Simulation</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-<br />
-
-<!-- Table to display the dataset's data -->
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <!-- Loop through each column in the dataset and display column names -->
-            @foreach (DataColumn column in Model.Data.Columns)
-            {
-                <th>@column.ColumnName</th>
-            }
-
-            
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Loop through each row in the dataset and display row data -->
-        @foreach (DataRow row in Model.Data.Rows)
-        {
+<!-- Dataset Display Table -->
+<div class="table-responsive">
+    <table class="table table-bordered table-hover" id="datasetTable">
+        <thead class="thead-light">
             <tr>
                 @foreach (DataColumn column in Model.Data.Columns)
                 {
-                    <td>@row[column.ColumnName]</td>
+                    <th>@column.ColumnName.Replace("_", " ").TrimStart('_')</th>
                 }
             </tr>
-        }
+        </thead>
+        <tbody>
+            @{
+                var rowCount = 0;
+                foreach (DataRow row in Model.Data.Rows)
+                {
+                    if (rowCount++ >= 5) break; // Display only the first 5 rows, similar to .head() in Python
+                    <tr>
+                        @foreach (DataColumn column in Model.Data.Columns)
+                        {
+                            <td>@row[column.ColumnName]</td>
+                        }
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <button class="btn btn-secondary mt-2" id="showMore">Show More...</button>
+</div>
 
-    </tbody>
-</table>
-@* adding data to collab *@
-<form asp-page-handler="AddCollabData">
-    <input type="submit" value="Add to Collaboration" class="btn btn-secondary" />
-</form>
-
-
-<form method="post" asp-page-handler="AddCollabData">
-    <div class="form-group">
-        <label for="collabDropdown">Select Collaboration</label>
-        <select asp-for="SelectedCollabID" asp-items="Model.CollaborationOptions" class="form-control" id="collabDropdown"></select>
-    </div>
-    <button type="submit" class="btn btn-secondary">Add to Collaboration</button>
-</form>
-
+@section Scripts {
+    <script>
+        document.getElementById('showMore').addEventListener('click', function () {
+            // Logic to dynamically load more rows or redirect to a full view page
+            // For simplicity, this could redirect to another page or expand the table
+            alert('Implement logic to show more rows or expand the dataset.');
+        });
+    </script>
+}
