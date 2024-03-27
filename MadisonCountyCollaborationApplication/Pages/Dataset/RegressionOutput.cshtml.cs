@@ -16,11 +16,14 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public int datasetID { get; set; }
         [BindProperty]
         public string datasetName { get; set; }
+        [BindProperty]
         public double? Intercept { get; set; }
+        [BindProperty]
         public List<double> Slopes { get; set; }
-        public Dictionary<string, double> WhatIfInputs { get; set; } = new Dictionary<string, double>();
+        [BindProperty]
+        public List<double> WhatIfInputs { get; set; } = new List<double>();
         public bool ShowResults { get; set; } = false;
-        public double? CalculatedIntercept { get; set; }
+        [BindProperty]
         public double ExpectedOutcome { get; set; } = double.NaN;
 
 
@@ -53,41 +56,38 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             }
         }
 
-        public IActionResult OnPostCalculateWhatIfScenarioAsync()
+        public IActionResult OnPostCalculateWhatIfScenario()
         {
             Console.WriteLine("Creating What-If Scenario Result");
-
-            // Calculate expected outcome
-            double expectedOutcome = CalculateExpectedOutcome();
+            Console.WriteLine($"Input count: {WhatIfInputs.Count}");
+            foreach (var input in WhatIfInputs)
+            {
+                Console.WriteLine($"Input: {input}");
+            }
+            // Prepare the inputs dictionary from the form submission
+            double expectedOutcome = CalculateExpectedOutcome(WhatIfInputs, Slopes, Intercept);
+            // Calculate expected outcome using the new method
 
             // Store the expected outcome in the session
             HttpContext.Session.SetString("ExpectedOutcome", expectedOutcome.ToString());
-
+            Console.WriteLine($"Expected Outcome: {expectedOutcome}");
             // Redirect to the WhatIfOutput page with expectedOutcome query parameter
-            return RedirectToPage("WhatIfOutput", new { expectedOutcome = expectedOutcome });
+            return RedirectToPage("WhatIfOutput", new { ExpectedOutcome = expectedOutcome });
         }
 
-        private double CalculateExpectedOutcome()
+        private double CalculateExpectedOutcome(List<double> variableInputs, List<double> Slopes, double? Intercept)
         {
-            // Calculate expected outcome based on the model properties
             double expectedOutcome = Intercept ?? 0;
-
-            if (Slopes != null)
+            if (Slopes != null && variableInputs != null)
             {
-                for (int i = 0; i < IndependentVariables.Count; i++)
+                for (int i = 0; i < variableInputs.Count && i < Slopes.Count; i++)
                 {
-                    string variable = IndependentVariables[i];
-                    string inputFieldName = $"WhatIfInputs[{variable}]";
-
-                    if (HttpContext.Request.Form.TryGetValue(inputFieldName, out var inputValue) && double.TryParse(inputValue, out double variableValue))
-                    {
-                        double slope = Slopes[i];
-                        expectedOutcome += slope * variableValue;
-                    }
+                    expectedOutcome += Slopes[i] * variableInputs[i];
+                    Console.WriteLine($"{Slopes[i]} * {variableInputs[i]}");
                 }
             }
-
             return expectedOutcome;
         }
+
     }
 }
