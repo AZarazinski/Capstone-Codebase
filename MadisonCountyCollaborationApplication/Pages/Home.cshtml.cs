@@ -45,10 +45,10 @@ namespace MadisonCountyCollaborationApplication.Pages
                 return OnGet();
             }
         }
-       
 
-        
-        
+
+
+
 
         public List<DataClasses.Collaboration> CollaborationList { get; set; }
 
@@ -65,8 +65,19 @@ namespace MadisonCountyCollaborationApplication.Pages
                     + HttpContext.Session.GetString("username")
                     + " successful!";
 
+                string username = (HttpContext.Session.GetString("username"));
+
+
+                var userID = DBClass.UserNameIDConverter(username);
+
+                string sqlQuery = @"
+                    SELECT Collaboration.collabID, collabName, notesAndInfo
+                    FROM Collaboration
+                    INNER JOIN Contributes ON Contributes.collabID = Collaboration.collabID
+                    WHERE Contributes.userID =" + userID + ";";
+
                 //collab table
-                SqlDataReader CollaborationReader = DBClass.CollaborationReader();
+                SqlDataReader CollaborationReader = DBClass.GeneralReaderQuery(sqlQuery);
                 while (CollaborationReader.Read())
                 {
                     CollaborationList.Add(new DataClasses.Collaboration
@@ -74,7 +85,6 @@ namespace MadisonCountyCollaborationApplication.Pages
                         collabID = Int32.Parse(CollaborationReader["collabID"].ToString()),
                         collabName = CollaborationReader["collabName"].ToString(),
                         notesAndInfo = CollaborationReader["notesAndInfo"].ToString(),
-                        collabType = CollaborationReader["collabType"].ToString()
                     });
                 }
 
@@ -89,5 +99,6 @@ namespace MadisonCountyCollaborationApplication.Pages
                 return RedirectToPage("/User/Login");
             }
         }
+
     }
 }

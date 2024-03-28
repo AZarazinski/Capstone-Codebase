@@ -42,6 +42,32 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             }
         }
 
+        //Coonverts session UserName to a UserID to display processes that only a user is in
+        public static int UserNameIDConverter(string username)
+        {
+            int userID = 0; // Default value indicating not found or invalid
+            string userQuery = "SELECT userID FROM Users WHERE userName = @username;";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var command = new SqlCommand(userQuery, connection))
+                {
+                    // Use parameterized query to prevent SQL injection
+                    command.Parameters.AddWithValue("@username", username);
+
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            userID = reader.GetInt32(0); // Assuming userID is the first column
+                        }
+                    }
+                }
+            }
+            return userID;
+        }
+
         public static List<CollaborationOption> FetchCollaborations()
         {
             var collaborations = new List<CollaborationOption>();

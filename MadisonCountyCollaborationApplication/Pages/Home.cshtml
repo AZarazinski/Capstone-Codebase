@@ -7,6 +7,7 @@
 
     .header{
         float: right;
+        padding: 5%;
     }
 
     .box-table {
@@ -48,11 +49,13 @@
 </style>
 
 
-<div class="header">
-    <h1 style="font-size: 1.5em; margin-top: 10px; margin-right: 20px;">My Processes</h1>
+@* <div class="header">
+    <h1>My Processes</h1>
 </div>
 
-<br />
+<br /> *@
+
+<h2>My Processes</h2> <!-- Add your "My Processes" heading here -->
 
 <form asp-page-handler="Select" method="post" id="collabForm">
     <input type="hidden" name="CollaborationID" id="collabIdInput" value="" />

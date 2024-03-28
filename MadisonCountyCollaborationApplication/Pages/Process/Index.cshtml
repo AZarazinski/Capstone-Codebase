@@ -92,40 +92,39 @@
 </div>
 
 <!-- Container for Dataset Table -->
-<div class="tab-content" id="DatasetTableContainer" style="display: none;">
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th
-                <th>Date Uploaded</th>
-            </tr>
-        </thead>
-        <tbody>
-            @{
-                string sqlQuery = $"SELECT Datasets.datasetID, Datasets.dataSetName FROM Datasets INNER JOIN DataAssists ON DataAssists.datasetID = Datasets.datasetID WHERE DataAssists.CollabID = {Model.collabID};";
-                SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
+    <div class="tab-content" id="DatasetTableContainer" style="display: none;">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th> <!-- Corrected: Added missing closing ">" -->
+                    <th>Date Uploaded</th> <!-- Ensure this is correctly typed -->
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    string sqlQuery = $"SELECT Datasets.datasetID, Datasets.dataSetName FROM Datasets INNER JOIN DataAssists ON DataAssists.datasetID = Datasets.datasetID WHERE DataAssists.CollabID = {Model.collabID};";
+                    SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
 
-
-                while (DatasetReader.Read())
-                {
-                    <tr>
-                        <td>@DatasetReader["datasetID"].ToString()</td>
-                        <td>
-                            <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
-                                @DatasetReader["dataSetName"].ToString()
-                            </a>
-                        </td>
-                        <td>Upload Date</td>
-                        
-                    </tr>
+                    while (DatasetReader.Read())
+                    {
+                        <tr>
+                            <td>@DatasetReader["datasetID"].ToString()</td>
+                            <td>
+                                <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
+                                    @DatasetReader["dataSetName"].ToString()
+                                </a>
+                            </td>
+                            <td>Upload Date </td> <!-- This is where you'll format the date -->
+                        </tr>
+                    }
+                    DatasetReader.Close(); // Always close the SqlDataReader when done.
                 }
-                DatasetReader.Close(); // Always close the SqlDataReader when done.
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>
-</div>
+
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
