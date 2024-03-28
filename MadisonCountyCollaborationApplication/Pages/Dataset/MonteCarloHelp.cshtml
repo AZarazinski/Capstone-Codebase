@@ -1,0 +1,52 @@
+﻿@page
+@model _488Labs.Pages.MonteCarloHelpModel
+@{
+}
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<style>
+    .indented-text {
+        padding-left: 20px; /* Adjust the value as needed */
+    }
+</style>
+
+<div class="text-center">
+    <h1 class="display-4">Monte Carlo Help</h1>
+</div>
+<p><b>Iterations:</b> the number of outcomes to simulate</p>
+<p><b>Years:</b> the the number of years in the future you would like to forecast (may be blank if all parameters are no growth)</p>
+<p><b>Significance Level: Choosing the certainty you would like for the true value</b></p>
+<p><b>Initial Value:</b> The value at t=0 for the parameter (May be blank if using no growth)</p>
+<p><b>Distribution:</b> the distribution the variable will follow</p>
+<div class="indented-text">
+    <p><b>Uniform:</b> a distribution which requires two parameters, a min (<em>a</em>) and a max (<em>b</em>), in which every value between them is equally likely</p>
+    <div>$$U(a,b)$$</div>
+    <div>$$f(x) = \frac{1}{b-a} \text{ for } a \leq x \leq b$$</div>
+    <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Uniform Distribution">
+
+    <p><b>Triangular:</b> a distribution which requires three parameters, a min (<em>a</em>), a max (<em>b</em>), and a most likely value (<em>c</em>), in which all values between values from <em>a</em> to <em>c</em> increase linearly, and from <em>c</em> to <em>b</em> decrease linearly</p>
+    <div>$$f(x) = \frac{2(x-a)}{(b-a)(c-a)} \text{ for } a \leq x \lt c $$</div>
+    <div>$$f(x) = \frac{2}{(b-a)} \text{ for } x=c $$</div>
+    <div>$$f(x) = \frac{2(b-x)}{(b-a)(b-c)} \text{ for } c \lt x \leq b $$</div>
+    <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Triangular Distribution">
+
+    <p><b>Normal:</b> a bell curve distribution with mean &mu; and variance &sigma;<sup>2</sup></p>
+    <div>$$N(\mu,\sigma^2)$$</div>
+    <div>$$f(x)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$</div>
+    <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Normal Distribution">
+
+    <p><b>Lognormal:</b> a continuous distribution whose logarithm is normally distributed with mean &mu; and variance &sigma;<sup>2</sup></p>
+    <div>$$Lognormal(\mu,\sigma^2)$$</div>
+    <div>$$f(x)=\frac{1}{x\sigma\sqrt{2\pi}}e^{-\frac{\left(\ln x - \mu \right)^2}{2\sigma^2}}$$</div>
+    <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Lognormal Distribution">
+
+
+    <p><b>Constant:</b> a value which does not change</p>
+</div>
+
+<p><b>Growth:</b> How this value will compound over each year</p>
+<div class="indented-text">
+    <p><b>No Growth:</b> This value will not grow over the years, each distribution parameter would be for the final value of the variable, an initial value does not need to be supplied</p>
+    <p><b>Constant Growth:</b>This value will grow the initial value at a constant rate following the distribution over the years, each distribution parameter would be for the growth rate's distribution</p>
+    <p><b>Nonconstant Growth:</b>This value will grow the initial value at varying rates over the years with the growth rates following the distribution, each distribution parameter would be for the growth rate's distribution</p>
+</div>

@@ -1,14 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.CommandLine.IO;
 using System.Data;
 using System.Text.Json;
 
+
 namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
-    public class RegressionOutputModel : PageModel
+    public class MonteCarloRegressionModel : PageModel
     {
         [BindProperty]
-        public List<string> IndependentVariables { get; set; } = new List<string>();
+        public List<string> IndependentVariables { get; set; }
         [BindProperty]
         public string DependentVariable { get; set; }
         public DataTable Data { get; private set; } = new DataTable();
@@ -30,12 +33,16 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         [BindProperty]
         public List<double> PValues { get; set; } = new List<double>();
         [BindProperty]
-        public double ConfidenceLevel {  get; set; } = .05;
+        public double ConfidenceLevel { get; set; } = .05;
         [BindProperty]
-        public double Aplha {  get; set; } = .05;
-
-
-
+        public double Aplha { get; set; } = .05;
+        [BindProperty]
+        public int iterations { get; set; }
+        [BindProperty]
+        public int years { get; set; }
+        [BindProperty]
+        public double confidenceInterval { get; set; }
+        public string ChartConfigJson { get; private set; }
         public IActionResult OnGet()
         {
             if (HttpContext.Session.GetString("username") != null)
@@ -50,15 +57,22 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 var standardErrorsJson = HttpContext.Session.GetString("StandardError");
                 var pValuesJson = HttpContext.Session.GetString("PValues");
                 var confidenceLevelJson = HttpContext.Session.GetString("ConfidenceLevel");
-
+                Console.WriteLine("variables: " + variablesJson);
                 // Deserialize data
                 Intercept = JsonSerializer.Deserialize<double>(interceptJson);
                 Slopes = JsonSerializer.Deserialize<List<double>>(slopesJson);
                 IndependentVariables = JsonSerializer.Deserialize<List<string>>(variablesJson);
                 DependentVariable = JsonSerializer.Deserialize<string>(dependentVariableJson);
+                Console.WriteLine("----------------------------------------");
+                foreach (string variable in IndependentVariables)
+                {
+                    Console.WriteLine(variable);
+                }
 
-                if (!string.IsNullOrWhiteSpace(confidenceLevelJson)) 
-                { 
+                Console.WriteLine("count: "+ IndependentVariables.Count);
+
+                if (!string.IsNullOrWhiteSpace(confidenceLevelJson))
+                {
                     ConfidenceLevel = JsonSerializer.Deserialize<double>(confidenceLevelJson);
                 }
                 if (!string.IsNullOrWhiteSpace(standardErrorsJson))
@@ -83,42 +97,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 return RedirectToPage("/Login");
             }
         }
-
-        public IActionResult OnPostCalculateWhatIfScenario()
+        public IActionResult OnPostHelp()
         {
-            Console.WriteLine("Creating What-If Scenario Result");
-            Console.WriteLine($"Input count: {WhatIfInputs.Count}");
-            foreach (var input in WhatIfInputs)
-            {
-                Console.WriteLine($"Input: {input}");
-            }
-            // Prepare the inputs dictionary from the form submission
-            double expectedOutcome = CalculateExpectedOutcome(WhatIfInputs, Slopes, Intercept);
-            // Calculate expected outcome using the new method
-
-            // Store the expected outcome in the session
-            HttpContext.Session.SetString("ExpectedOutcome", expectedOutcome.ToString());
-            Console.WriteLine($"Expected Outcome: {expectedOutcome}");
-            // Redirect to the WhatIfOutput page with expectedOutcome query parameter
-            return RedirectToPage("WhatIfOutput", new { ExpectedOutcome = expectedOutcome });
-        }
-
-        private double CalculateExpectedOutcome(List<double> variableInputs, List<double> Slopes, double? Intercept)
-        {
-            double expectedOutcome = Intercept ?? 0;
-            if (Slopes != null && variableInputs != null)
-            {
-                for (int i = 0; i < variableInputs.Count && i < Slopes.Count; i++)
-                {
-                    expectedOutcome += Slopes[i] * variableInputs[i];
-                    Console.WriteLine($"{Slopes[i]} * {variableInputs[i]}");
-                }
-            }
-            return expectedOutcome;
-        }
-        public IActionResult OnPostSimulate()
-        {
-            return RedirectToPage("MonteCarloRegression");
+            return RedirectToPage("MonteCarloHelp");
         }
     }
 }
+

@@ -79,16 +79,16 @@
                         </li>
                         <li>
                             P-value:  @{
-                                if (Model.PValues[i+1] <= Model.Aplha)
+                                if (Model.PValues[i + 1] <= Model.Aplha)
                                 {
-                                    <text><span class="significant">@string.Format("{0:#,0.000}", Model.PValues[i+1]) </span><strong class="significant">Significant</strong></text>
+                                    <text><span class="significant">@string.Format("{0:#,0.000}", Model.PValues[i + 1]) </span><strong class="significant">Significant</strong></text>
                                 }
                                 else
                                 {
-                                    <text><span class="not-significant">@string.Format("{0:#,0.000}", Model.PValues[i+1]) </span><strong class="not-significant">Not Significant</strong></text>
+                                    <text><span class="not-significant">@string.Format("{0:#,0.000}", Model.PValues[i + 1]) </span><strong class="not-significant">Not Significant</strong></text>
 
                                 }
-                            } 
+                            }
                         </li>
                     </ul>
                 </li>
@@ -130,5 +130,11 @@
         </div>
     </div>
 </div>
+<br />
+<form asp-page-handler="Simulate" method="post">
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary" type="submit">Regression Simulation</button>
+    </div>
+</form>
 <br />
 <br />

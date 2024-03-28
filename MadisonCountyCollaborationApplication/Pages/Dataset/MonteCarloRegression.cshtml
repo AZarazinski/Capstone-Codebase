@@ -1,0 +1,164 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.Dataset.MonteCarloRegressionModel
+@{
+}
+<div class="text-center">
+    <h1 class="display-4">Regression Simulation</h1>
+</div>
+<form asp-page-handler="Help" method="post">
+    <div class="d-grid gap-2">
+          <button class="btn btn-primary" type="submit">Help</button>
+    </div> 
+</form>
+<form method="post">
+    <div class="row">
+        <div class="col-md-4">
+            Number of iterations:
+            <input type="number" class="form-control" placeholder="Iterations" aria-label="Iterations" asp-for="iterations">
+        </div>
+        <div class="col-md-4">
+            Number of Years:
+            <input type="number" class="form-control" placeholder="Years" aria-label="Years" asp-for="years">
+        </div>
+        <div class="col-md-4">
+            <label class="input-group-text" for="confidence">Significance Level</label>
+            <div class="input-group">
+                <select class="form-select" id="confidence" aria-label="Select distribution" asp-for="confidenceInterval">
+                    <option selected value=90>90</option>
+                    <option value="95">95</option>
+                    <option value="99">99</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <br />
+    
+    @for (int i = 0; i < @Model.IndependentVariables.Count; i++)
+    {
+        if (@Model.IndependentVariables[i] != null)
+        {
+            <h4>@Model.IndependentVariables[i].TrimStart('_').Replace("_", " ")</h4>
+            <div class="row">
+                <div class="col-md-2">
+                    Initial Value:
+                    <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" >
+                </div>
+
+                <div class="col-md-2">
+                    <label class="input-group-text" for="Taxes_dist">Distribution</label>
+                    <div class="input-group">
+                        <select class="form-select" id="Taxes_dist" aria-label="Select distribution">
+                            <option selected value="Constant">Constant</option>
+                            <option value="Uniform">Uniform</option>
+                            <option value="Triangular">Triangular</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Lognormal">Lognormal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="input-group-text" for="Taxes_growth">Growth Type</label>
+                    <div class="input-group">
+                        <select class="form-select" id="Taxes_growth" aria-label="Select Growth" >
+                            <option selected value="Constant">Constant Growth</option>
+                            <option value="Nonconstant">Nonconstant Growth</option>
+                            <option value="None">No Growth</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" >
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" >
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" >
+                </div>
+            </div>
+            <br />
+        }
+    }
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary" type="submit">Run Simulation</button>
+    </div>
+</form>
+@section Scripts {
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('dataForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the form from submitting traditionally
+
+                var formData = new FormData(this);
+                var independentVariableName = "Revenue";
+                var dependentVariableName = "Frequency";
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Added to print JSON data to check formatting
+                        // document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
+
+                        var xValues = data.Data.Fields[0];
+                        var xMin = Math.min(...xValues);
+                        var xMax = Math.max(...xValues);
+                        // Extend the x-range significantly
+                        var xExtension = (xMax - xMin) * 0.5; // Extend by 10% of the range on both sides
+                        var extendedXMin = 0;
+                        var extendedXMax = xMax + xExtension;
+
+                        // Generate points for the regression line using the extended range
+
+                        var plotData = [{
+                            x: xValues,
+                            type: 'histogram',
+                            name: 'Data Points'
+                        }];
+
+                        var layout = {
+                            title: "Simulated Revenue Frequencies",
+                            xaxis: { title: independentVariableName },
+                            yaxis: { title: dependentVariableName },
+                            annotations: [{
+                                x: 0.5,
+                                y: 1.13,
+                                xref: 'paper',
+                                yref: 'paper',
+                                showarrow: false,
+                                font: { size: 16 }
+                            }]
+                        };
+
+                        Plotly.newPlot('plotlyChart', plotData, layout);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('jsonResponse').textContent = 'Error fetching data: ' + error.toString();
+                    });
+            });
+        });
+        document.getElementById('saveGraph').addEventListener('click', function () {
+            Plotly.toImage('plotlyChart', { format: 'png' }).then(function (dataUrl) {
+                // Send this dataUrl to the server
+                fetch('/YourController/SaveGraph', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ imageData: dataUrl })
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data); // Handle the server response, e.g., showing a success message
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+
+    </script>
+}
+

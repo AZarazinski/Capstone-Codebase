@@ -17,7 +17,7 @@ namespace MadisonCountyCollaborationApplication.Pages
         [BindProperty]
         public Parameters Property { get; set; }
         [BindProperty]
-        public Parameters Local {  get; set; }
+        public Parameters Local { get; set; }
         [BindProperty]
         public Parameters Permits { get; set; }
         [BindProperty]
@@ -32,6 +32,7 @@ namespace MadisonCountyCollaborationApplication.Pages
         public Parameters Commonwealth { get; set; }
         [BindProperty]
         public Parameters Federal { get; set; }
+        public double confidenceInterval;
         public string ChartConfigJson { get; private set; }
 
 
@@ -55,7 +56,7 @@ namespace MadisonCountyCollaborationApplication.Pages
         public IActionResult OnPost()
         {
 
-            double[] results = RevenueComplex(iterations, years, Services, Permits, Property, Local, Miscellaneous, Fines, 
+            double[] results = RevenueComplex(iterations, years, Services, Permits, Property, Local, Miscellaneous, Fines,
                 UseOfMoney, Commonwealth, Federal);
             var chart = Chart.Histogram<double, double, string>(X: results)
                 .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
@@ -89,11 +90,15 @@ namespace MadisonCountyCollaborationApplication.Pages
         }
         public IActionResult OnPostRevSimple()
         {
-            return RedirectToPage("/MonteCarlo");
+            return RedirectToPage("MonteCarlo");
         }
         public IActionResult OnPostExpense()
         {
-            return RedirectToPage("/MonteCarloExpense");
+            return RedirectToPage("MonteCarloExpense");
+        }
+        public IActionResult OnPostHelp()
+        {
+            return RedirectToPage("MonteCarloHelp");
         }
         public double[] RevenueComplex(int iterations, int years, Parameters serviceParameters, Parameters permitParameters, Parameters propertyParameters,
             Parameters localParameters, Parameters miscellaneousParameters, Parameters fineParameters, Parameters useOfMoneyParameters, Parameters commonwealthParameters, Parameters federalParameters)
@@ -135,7 +140,7 @@ namespace MadisonCountyCollaborationApplication.Pages
                 federal = sim.GenerateResult(dist9, Convert.ToDouble(federalParameters.initial), federalParameters.growth, years);
                 revenues[i] = service + permit + property + local + misc + fine + money + commonwealth + federal;
             }
-            double[] CI = sim.ConfidenceInterval(revenues);
+            double[] CI = sim.ConfidenceInterval(revenues, confidenceInterval);
             return revenues;
 
         }

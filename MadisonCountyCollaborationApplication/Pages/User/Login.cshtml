@@ -12,17 +12,21 @@
             <div class="card bg-light p-4 rounded shadow-lg mb-4">
                 <h1 class="text-primary text-center mb-4">Madison County</h1>
                 <form asp-page="Login" asp-page-handler="LoginHandler">
-                    <div class="mb-3">
-                        <input placeholder="Username" asp-for="Username" class="form-control" id="Username" />
-                        <span asp-validation-for="Username" class="text-danger"></span>
-                    </div>
-                    <div class="mb-3 position-relative">
-                        <input placeholder="Password" asp-for="Password" class="form-control" type="password" id="Password" />
-                        <span class="password-toggle-icon" id="togglePassword" onclick="togglePasswordVisibility()">
-                            <i class="bi bi-eye"></i>
-                        </span>
-                        <span asp-validation-for="Password" class="text-danger"></span>
-                    </div>
+                    
+                <div class="form-floating mb-3">
+                    <input placeholder="Username" asp-for="Username" class="form-control" id="Username" />
+                    <label for="Username">Username</label>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input placeholder="Password" asp-for="Password" class="form-control" type="password" id="Password" />
+                    <label for="Password">Password</label>
+                    <span class="password-toggle-icon" id="togglePassword" onclick="togglePasswordVisibility()">
+                        <i class="bi bi-eye"></i>
+                    </span>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary btn-block">Log In</button>
                     </div>

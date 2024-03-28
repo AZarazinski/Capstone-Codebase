@@ -68,14 +68,29 @@
                 return dist.GenerateRandom();
             }
         }
-        public double[] ConfidenceInterval(double[] Results)
+        public double[] ConfidenceInterval(double[] Results, double significance)
         {
             double average = Results.Average();
             double sumOfSquaredDeviations = Results.Select(val => Math.Pow(val - average, 2)).Sum();
             double standardDeviation = Math.Sqrt(sumOfSquaredDeviations / (Results.Length - 1));
             double[] CI = new double[2];
-            CI[0] = average - 1.96 * standardDeviation / Math.Sqrt(Results.Length);
-            CI[1] = average + 1.96 * standardDeviation / Math.Sqrt(Results.Length);
+            if (significance == 95)
+            {
+                CI[0] = average - 1.959964 * standardDeviation / Math.Sqrt(Results.Length);
+                CI[1] = average + 1.959964 * standardDeviation / Math.Sqrt(Results.Length);
+            }
+            else if (significance == 90)
+            {
+                
+                CI[0] = average - 1.644854 * standardDeviation / Math.Sqrt(Results.Length);
+                CI[1] = average + 1.644854 * standardDeviation / Math.Sqrt(Results.Length);
+            }
+            else
+            {
+
+                CI[0] = average - 2.575829 * standardDeviation / Math.Sqrt(Results.Length);
+                CI[1] = average + 2.575829 * standardDeviation / Math.Sqrt(Results.Length);
+            }
             return CI;
         }
     }

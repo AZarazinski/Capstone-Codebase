@@ -14,7 +14,7 @@ namespace MadisonCountyCollaborationApplication.Pages
         public int years { get; set; }
 
         [BindProperty]
-        public Parameters Admin {  get; set; } 
+        public Parameters Admin { get; set; }
 
         [BindProperty]
         public Parameters Judicial { get; set; }
@@ -39,6 +39,7 @@ namespace MadisonCountyCollaborationApplication.Pages
         [BindProperty]
         public Parameters Principal { get; set; }
         public Parameters Interest { get; set; }
+        public double confidenceInterval { get; set; }
 
         public string ChartConfigJson { get; private set; }
 
@@ -97,11 +98,15 @@ namespace MadisonCountyCollaborationApplication.Pages
         }
         public IActionResult OnPostRevComp()
         {
-            return RedirectToPage("/MonteCarloRevComp");
+            return RedirectToPage("MonteCarloRevComp");
         }
         public IActionResult OnPostRevSimple()
         {
-            return RedirectToPage("/MonteCarlo");
+            return RedirectToPage("MonteCarlo");
+        }
+        public IActionResult OnPostHelp()
+        {
+            return RedirectToPage("MonteCarloHelp");
         }
         public double[] ExpenseComplex(int iterations, int years, Parameters administrationParameters,
             Parameters judicialParameters, Parameters safetyParameters, Parameters worksParameters, Parameters healthParameters,
@@ -156,8 +161,9 @@ namespace MadisonCountyCollaborationApplication.Pages
                 revenues[i] = admin + judicial + safety + work + health + education + parks + community + nondepartmental + capital +
                         principal + interest;
             }
-            double[] CI = sim.ConfidenceInterval(revenues);
+            double[] CI = sim.ConfidenceInterval(revenues, confidenceInterval);
             return revenues;
         }
     }
 }
+

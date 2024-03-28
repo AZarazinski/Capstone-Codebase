@@ -7,14 +7,21 @@
 </div>
 <br />
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <form asp-page-handler="RevComp" method="post">
             <div class="d-grid gap-2">
                 <button class="btn btn-primary" type="submit">Complicated Revenue</button>
             </div>
         </form>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
+        <form asp-page-handler="Help" method="post">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="submit">Help</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
         <form asp-page-handler="RevSimple" method="post">
             <div class="d-grid gap-2">
                 <button class="btn btn-primary" type="submit">Simple Revenue</button>
@@ -25,15 +32,24 @@
 
 <form method="post">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             Number of iterations:
             <input type="number" class="form-control" placeholder="Iterations" aria-label="Iterations" asp-for="iterations">
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             Number of Years:
             <input type="number" class="form-control" placeholder="Years" aria-label="years" asp-for="iterations">
         </div>
-
+        <div class="col-md-4">
+            <label class="input-group-text" for="confidence">Significance Level</label>
+            <div class="input-group">
+                <select class="form-select" id="confidence" aria-label="Select distribution" asp-for="confidenceInterval">
+                    <option selected value=90>90</option>
+                    <option value="95">95</option>
+                    <option value="99">99</option>
+                </select>
+            </div>
+        </div>
     </div>
 
 
@@ -449,11 +465,11 @@
         <div class="col-md-2">
             <label class="input-group-text" for="capitalGrowth">Growth Type</label>
             <div class="input-group">
-            <select class="form-select" id="capitalGrowth" aria-label="Select Growth" asp-for="Capital.growth">
-                <option selected value="Constant">Constant Growth</option>
-                <option value="Nonconstant">Nonconstant Growth</option>
-                <option value="None">No Growth</option>
-            </select>
+                <select class="form-select" id="capitalGrowth" aria-label="Select Growth" asp-for="Capital.growth">
+                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Nonconstant">Nonconstant Growth</option>
+                    <option value="None">No Growth</option>
+                </select>
             </div>
         </div>
         <div class="col-md-2">
@@ -480,23 +496,23 @@
         <div class="col-md-2">
             <label class="input-group-text" for="principalDist">Distribution</label>
             <div class="input-group">
-            <select class="form-select" id="principalDist"  aria-label="Select distribution" asp-for="Principal.dist">
-                <option selected value="Constant">Constant</option>
-                <option value="Uniform">Uniform</option>
-                <option value="Triangular">Triangular</option>
-                <option value="Normal">Normal</option>
-                <option value="Lognormal">Lognormal</option>
-            </select>
+                <select class="form-select" id="principalDist" aria-label="Select distribution" asp-for="Principal.dist">
+                    <option selected value="Constant">Constant</option>
+                    <option value="Uniform">Uniform</option>
+                    <option value="Triangular">Triangular</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Lognormal">Lognormal</option>
+                </select>
             </div>
         </div>
         <div class="col-md-2">
             <label class="input-group-text" for="principalGrowth">Growth Type</label>
             <div class="input-group">
-            <select class="form-select" id="principalGrowth"  aria-label="Select Growth" asp-for="Principal.growth">
-                <option selected value="Constant">Constant Growth</option>
-                <option value="Nonconstant">Nonconstant Growth</option>
-                <option value="None">No Growth</option>
-            </select>
+                <select class="form-select" id="principalGrowth" aria-label="Select Growth" asp-for="Principal.growth">
+                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Nonconstant">Nonconstant Growth</option>
+                    <option value="None">No Growth</option>
+                </select>
             </div>
         </div>
         <div class="col-md-2">
@@ -523,23 +539,23 @@
         <div class="col-md-2">
             <label class="input-group-text" for="interestDist">Distribution</label>
             <div class="input-group">
-            <select class="form-select" id="interestGrowth"  aria-label="Select distribution" asp-for="Interest.dist">
-                <option selected value="Constant">Constant</option>
-                <option value="Uniform">Uniform</option>
-                <option value="Triangular">Triangular</option>
-                <option value="Normal">Normal</option>
-                <option value="Lognormal">Lognormal</option>
-            </select>
+                <select class="form-select" id="interestGrowth" aria-label="Select distribution" asp-for="Interest.dist">
+                    <option selected value="Constant">Constant</option>
+                    <option value="Uniform">Uniform</option>
+                    <option value="Triangular">Triangular</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Lognormal">Lognormal</option>
+                </select>
             </div>
         </div>
         <div class="col-md-2">
             <label class="input-group-text" for="intGrowth">Growth Type</label>
             <div class="input-group">
-            <select class="form-select" id="intGrowth" aria-label="Select Growth" asp-for="Interest.growth">
-                <option selected value="Constant">Constant Growth</option>
-                <option value="Nonconstant">Nonconstant Growth</option>
-                <option value="None">No Growth</option>
-            </select>
+                <select class="form-select" id="intGrowth" aria-label="Select Growth" asp-for="Interest.growth">
+                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Nonconstant">Nonconstant Growth</option>
+                    <option value="None">No Growth</option>
+                </select>
             </div>
         </div>
         <div class="col-md-2">
@@ -557,3 +573,83 @@
         <button class="btn btn-primary" type="submit">Run Simulation</button>
     </div>
 </form>
+
+
+@section Scripts {
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('dataForm').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the form from submitting traditionally
+
+                var formData = new FormData(this);
+                var independentVariableName = "Revenue";
+                var dependentVariableName = "Frequency";
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Added to print JSON data to check formatting
+                        // document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
+
+                        var xValues = data.Data.Fields[0];
+                        var xMin = Math.min(...xValues);
+                        var xMax = Math.max(...xValues);
+                        // Extend the x-range significantly
+                        var xExtension = (xMax - xMin) * 0.5; // Extend by 10% of the range on both sides
+                        var extendedXMin = 0;
+                        var extendedXMax = xMax + xExtension;
+
+                        // Generate points for the regression line using the extended range
+
+                        var plotData = [{
+                            x: xValues,
+                            type: 'histogram',
+                            name: 'Data Points'
+                        }];
+
+                        var layout = {
+                            title: "Simulated Revenue Frequencies",
+                            xaxis: { title: independentVariableName },
+                            yaxis: { title: dependentVariableName },
+                            annotations: [{
+                                x: 0.5,
+                                y: 1.13,
+                                xref: 'paper',
+                                yref: 'paper',
+                                showarrow: false,
+                                font: { size: 16 }
+                            }]
+                        };
+
+                        Plotly.newPlot('plotlyChart', plotData, layout);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('jsonResponse').textContent = 'Error fetching data: ' + error.toString();
+                    });
+            });
+        });
+        document.getElementById('saveGraph').addEventListener('click', function () {
+            Plotly.toImage('plotlyChart', { format: 'png' }).then(function (dataUrl) {
+                // Send this dataUrl to the server
+                fetch('/YourController/SaveGraph', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ imageData: dataUrl })
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data); // Handle the server response, e.g., showing a success message
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+
+    </script>
+}

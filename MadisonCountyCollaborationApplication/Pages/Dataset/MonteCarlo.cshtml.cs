@@ -20,6 +20,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public Parameters Gov { get; set; }
         [BindProperty]
         public Parameters Other { get; set; }
+        [BindProperty]
+        public double confidenceInterval { get; set; }
         public string ChartConfigJson { get; private set; }
 
 
@@ -74,14 +76,18 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         }
         public IActionResult OnPostRevComp()
         {
-            return RedirectToPage("/MonteCarloRevComp");
+            return RedirectToPage("MonteCarloRevComp");
         }
         public IActionResult OnPostExpense()
         {
-            return RedirectToPage("/MonteCarloExpense");
+            return RedirectToPage("MonteCarloExpense");
+        }
+        public IActionResult OnPostHelp()
+        {
+            return RedirectToPage("MonteCarloHelp");
         }
         //parameters follow: (current value, distribution name, statistical parameters)
-        
+
         public double[] RevenueSimple(int iterations, int years, Parameters taxParameters,
             Parameters intergovernmentalParameters, Parameters otherParameters)
         {
@@ -106,13 +112,13 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 other = sim.GenerateResult(dist3, Convert.ToDouble(otherParameters.initial), otherParameters.growth, years);
                 revenues[i] = tax + gov + other;
             }
-            double[] CI = sim.ConfidenceInterval(revenues);
+            double[] CI = sim.ConfidenceInterval(revenues, confidenceInterval);
             foreach (double number in CI)
             {
                 Console.WriteLine(number);
             }
             return revenues;
         }
-        
+
     }
 }

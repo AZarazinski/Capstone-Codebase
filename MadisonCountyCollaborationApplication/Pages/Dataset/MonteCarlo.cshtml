@@ -7,14 +7,21 @@
 </div>
 <br />
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <form asp-page-handler="RevComp" method="post">
             <div class="d-grid gap-2">
                 <button class="btn btn-primary" type="submit">Complicated Revenue</button>
             </div>
         </form>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
+        <form asp-page-handler="Help" method="post">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="submit">Help</button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
         <form asp-page-handler="Expense" method="post">
             <div class="d-grid gap-2">
                 <button class="btn btn-primary" type="submit">Expenses</button>
@@ -25,17 +32,25 @@
 <br />
 <form method="post">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             Number of iterations:
             <input type="number" class="form-control" placeholder="Iterations" aria-label="Iterations" asp-for="iterations">
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             Number of Years:
-            <input type="number" class="form-control" placeholder="Years" aria-label="Years"asp-for="years">
+            <input type="number" class="form-control" placeholder="Years" aria-label="Years" asp-for="years">
         </div>
-
+        <div class="col-md-4">
+            <label class="input-group-text" for="confidence">Significance Level</label>
+            <div class="input-group">
+                <select class="form-select" id="confidence" aria-label="Select distribution" asp-for="confidenceInterval">
+                    <option selected value=90>90</option>
+                    <option value="95">95</option>
+                    <option value="99">99</option>
+                </select>
+            </div>
+        </div>
     </div>
-
     <br />
 
     <h4 class="display-4">Taxes: </h4>
@@ -101,11 +116,11 @@
         <div class="col-md-2">
             <label class="input-group-text" for="Gov_growth">Growth Type</label>
             <div class="input-group">
-            <select class="form-select" id="Gov_growth" aria-label="Select Growth" asp-for="Gov.growth">
-                <option selected value="Constant">Constant Growth</option>
-                <option value="Nonconstant">Nonconstant Growth</option>
-                <option value="None">No Growth</option>
-            </select>
+                <select class="form-select" id="Gov_growth" aria-label="Select Growth" asp-for="Gov.growth">
+                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Nonconstant">Nonconstant Growth</option>
+                    <option value="None">No Growth</option>
+                </select>
             </div>
         </div>
         <div class="col-md-2">
@@ -130,23 +145,23 @@
         <div class="col-md-2">
             <label class="input-group-text" for="Other_dist">Distribution</label>
             <div class="input-group">
-            <select class="form-select" id="Other_dist" aria-label="Select distribution" asp-for="Other.dist">
-                <option selected value="Constant">Constant</option>
-                <option value="Uniform">Uniform</option>
-                <option value="Triangular">Triangular</option>
-                <option value="Normal">Normal</option>
-                <option value="Lognormal">Lognormal</option>
-            </select>
+                <select class="form-select" id="Other_dist" aria-label="Select distribution" asp-for="Other.dist">
+                    <option selected value="Constant">Constant</option>
+                    <option value="Uniform">Uniform</option>
+                    <option value="Triangular">Triangular</option>
+                    <option value="Normal">Normal</option>
+                    <option value="Lognormal">Lognormal</option>
+                </select>
             </div>
         </div>
         <div class="col-md-2">
             <label class="input-group-text" for="Other_growth">Growth Type</label>
             <div class="input-group">
-            <select class="form-select" id="Other_growth" aria-label="Select Growth" asp-for="Other.growth">
-                <option selected value="Constant">Constant Growth</option>
-                <option value="Nonconstant">Nonconstant Growth</option>
-                <option value="None">No Growth</option>
-            </select>
+                <select class="form-select" id="Other_growth" aria-label="Select Growth" asp-for="Other.growth">
+                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Nonconstant">Nonconstant Growth</option>
+                    <option value="None">No Growth</option>
+                </select>
             </div>
         </div>
         <div class="col-md-2">

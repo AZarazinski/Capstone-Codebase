@@ -4,6 +4,11 @@
 }
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <style>
+
+    .header{
+        float: right;
+    }
+
     .box-table {
         display: flex;
         flex-wrap: wrap;
@@ -42,9 +47,11 @@
     }
 </style>
 
-<form asp-page="Home" asp-page-handler="Create">
-    <input type="submit" value="Create New Collaboration" class="btn btn-primary" />
-</form>
+
+<div class="header">
+    <h1 style="font-size: 1.5em; margin-top: 10px; margin-right: 20px;">My Processes</h1>
+</div>
+
 <br />
 
 <form asp-page-handler="Select" method="post" id="collabForm">
