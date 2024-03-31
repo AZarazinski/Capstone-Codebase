@@ -9,88 +9,76 @@ namespace MadisonCountyCollaborationApplication.Pages
     public class HomeModel : PageModel
     {
         [BindProperty]
-        [Required()]
-        public int CollaborationID { get; set; }
+        [Required]
+        public int ProcessID { get; set; }
 
         public IActionResult OnPostHome()
         {
             return RedirectToPage("/HomePage");
         }
+
         public IActionResult OnPostCreate()
         {
-            return RedirectToPage("/Collaboration/CreateCollaboration");
+            return RedirectToPage("/Process/CreateProcess");
         }
+
         public IActionResult OnPostSelect()
         {
-            if (CollaborationID != null && CollaborationID > 0)
+            if (ProcessID > 0)
             {
-                if (DBClass.CollaborationExist(CollaborationID))
+                if (DBClass.ProcessExist(ProcessID))
                 {
-                    HttpContext.Session.SetInt32("collaborationID", CollaborationID);
+                    HttpContext.Session.SetInt32("processID", ProcessID);
                     DBClass.MainDBconnection.Close();
                     return RedirectToPage("/Process/Index");
-
                 }
                 else
                 {
                     DBClass.MainDBconnection.Close();
-                    ViewData["CollabNotExistMessage"] = "That collaboration does not exist.";
+                    ViewData["ProcessNotExistMessage"] = "That process does not exist.";
                     return OnGet();
                 }
-
             }
             else
             {
-                ViewData["CollabNotExistMessage"] = "That collaboration does not exist.";
+                ViewData["ProcessNotExistMessage"] = "That process does not exist.";
                 return OnGet();
             }
         }
 
-
-
-
-
-        public List<DataClasses.Collaboration> CollaborationList { get; set; }
+        public List<DataClasses.Process> ProcessList { get; set; }
 
         public HomeModel()
         {
-            CollaborationList = new List<DataClasses.Collaboration>();
+            ProcessList = new List<DataClasses.Process>();
         }
 
         public IActionResult OnGet()
         {
             if (HttpContext.Session.GetString("username") != null)
             {
-                ViewData["LoginMessage"] = "Login for "
-                    + HttpContext.Session.GetString("username")
-                    + " successful!";
-
-                string username = (HttpContext.Session.GetString("username"));
-
-
+                ViewData["LoginMessage"] = "Login for " + HttpContext.Session.GetString("username") + " successful!";
+                string username = HttpContext.Session.GetString("username");
                 var userID = DBClass.UserNameIDConverter(username);
 
-                string sqlQuery = @"
-                    SELECT Collaboration.collabID, collabName, notesAndInfo
-                    FROM Collaboration
-                    INNER JOIN Contributes ON Contributes.collabID = Collaboration.collabID
-                    WHERE Contributes.userID =" + userID + ";";
+                string sqlQuery = $@"
+                    SELECT Process.ProcessID, processName, notesAndInfo
+                    FROM Process
+                    INNER JOIN UserProcess ON UserProcess.ProcessID = Process.ProcessID
+                    WHERE UserProcess.userID = {userID};";
 
-                //collab table
-                SqlDataReader CollaborationReader = DBClass.GeneralReaderQuery(sqlQuery);
-                while (CollaborationReader.Read())
+                SqlDataReader processReader = DBClass.GeneralReaderQuery(sqlQuery);
+                while (processReader.Read())
                 {
-                    CollaborationList.Add(new DataClasses.Collaboration
+                    ProcessList.Add(new DataClasses.Process
                     {
-                        collabID = Int32.Parse(CollaborationReader["collabID"].ToString()),
-                        collabName = CollaborationReader["collabName"].ToString(),
-                        notesAndInfo = CollaborationReader["notesAndInfo"].ToString(),
+                        ProcessID = processReader.GetInt32(processReader.GetOrdinal("processID")),
+                        ProcessName = processReader.GetString(processReader.GetOrdinal("processName")),
+                        
                     });
                 }
 
-                // Close your connection in DBClass
                 DBClass.MainDBconnection.Close();
-
                 return Page();
             }
             else
@@ -99,6 +87,5 @@ namespace MadisonCountyCollaborationApplication.Pages
                 return RedirectToPage("/User/Login");
             }
         }
-
     }
 }

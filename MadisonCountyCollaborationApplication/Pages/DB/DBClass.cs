@@ -14,11 +14,10 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
         // Connection String - How to find and connect to DB
         private static readonly String? MainDBconnString =
-            "Server=Localhost;Database=Lab4;Trusted_Connection=True";
+            "Server=Localhost;Database=MainDB;Trusted_Connection=True";
         // Connection String for AUTH database for Hashed Credentials
         private static readonly String? AuthConnString =
             "Server=Localhost;Database=AUTH;Trusted_Connection=True";
-
 
 
         //GENERAL READER STATEMENT -- PARKER T. SHORT
@@ -42,57 +41,102 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             }
         }
 
-        //Coonverts session UserName to a UserID to display processes that only a user is in
-        public static int UserNameIDConverter(string username)
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //PROCESS SECTION           
+
+        //Functions for displaying tables
+        public static SqlDataReader ProcessReader()
         {
-            int userID = 0; // Default value indicating not found or invalid
-            string userQuery = "SELECT userID FROM Users WHERE userName = @username;";
+            SqlCommand cmdProcessRead = new SqlCommand();
+            cmdProcessRead.Connection = MainDBconnection;
+            cmdProcessRead.Connection.ConnectionString = MainDBconnString;
+            cmdProcessRead.CommandText = "SELECT * FROM Process";
+            cmdProcessRead.Connection.Open();
 
-            using (var connection = new SqlConnection(MainDBconnString))
-            {
-                using (var command = new SqlCommand(userQuery, connection))
-                {
-                    // Use parameterized query to prevent SQL injection
-                    command.Parameters.AddWithValue("@username", username);
+            SqlDataReader tempReader = cmdProcessRead.ExecuteReader();
 
-                    connection.Open();
-                    using (var reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            userID = reader.GetInt32(0); // Assuming userID is the first column
-                        }
-                    }
-                }
-            }
-            return userID;
+            return tempReader;
         }
 
-        public static List<CollaborationOption> FetchCollaborations()
-        {
-            var collaborations = new List<CollaborationOption>();
-            string sqlQuery = "SELECT collabID, collabName FROM Collaboration";
 
-            using (var connection = new SqlConnection(MainDBconnString))
-            {
-                using (var command = new SqlCommand(sqlQuery, connection))
-                {
-                    connection.Open();
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            collaborations.Add(new CollaborationOption
-                            {
-                                CollabID = reader.GetInt32(reader.GetOrdinal("collabID")),
-                                Name = reader.GetString(reader.GetOrdinal("collabName"))
-                            });
-                        }
-                    }
-                }
-            }
-            return collaborations;
+        public static SqlDataReader ProcessGetName(int ProcessID)
+        {
+            SqlCommand cmdContentRead = new SqlCommand();
+            cmdContentRead.Connection = MainDBconnection;
+            cmdContentRead.Connection.ConnectionString = MainDBconnString;
+            cmdContentRead.CommandText = "SELECT processName FROM Process WHERE ProcessID = @ProcessID";
+            cmdContentRead.Parameters.AddWithValue("@ProcessID", ProcessID);
+            cmdContentRead.Connection.Open(); // Open connection here, close in Model!
+
+            SqlDataReader tempReader = cmdContentRead.ExecuteReader();
+
+            return tempReader;
         }
+
+        public static bool ProcessExist(int ProcessID)
+        {
+            SqlCommand cmdProductRead = new SqlCommand();
+            cmdProductRead.Connection = MainDBconnection;
+            cmdProductRead.Connection.ConnectionString = MainDBconnString;
+            cmdProductRead.CommandType = System.Data.CommandType.StoredProcedure;
+            cmdProductRead.Parameters.AddWithValue("@ProcessID", ProcessID);
+            cmdProductRead.CommandText = "sp_processExist";
+            cmdProductRead.Connection.Open();
+            if (((int)cmdProductRead.ExecuteScalar()) > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void CreateProcess(MadisonCountyCollaborationApplication.Pages.DataClasses.Process process)
+        {
+            // SQL query now only includes processName and notesAndInfo fields
+            String sqlQuery = "INSERT INTO Process (processName, notesAndInfo) VALUES(@ProcessName, @NotesAndInfo);";
+
+            using (SqlCommand cmdProductRead = new SqlCommand(sqlQuery, MainDBconnection))
+            {
+                // Adding parameters to prevent SQL injection
+                cmdProductRead.Parameters.AddWithValue("@ProcessName", process.ProcessName);
+                cmdProductRead.Parameters.AddWithValue("@NotesAndInfo", process.NotesAndInfo ?? string.Empty); // Handling potential nulls
+
+                MainDBconnection.ConnectionString = MainDBconnString;
+                if (MainDBconnection.State != System.Data.ConnectionState.Open)
+                {
+                    MainDBconnection.Open();
+                }
+
+                cmdProductRead.ExecuteNonQuery();
+            }
+        }
+
+
+
+        public static SqlDataReader ProcessDatasetReader(int ProcessID)
+        {
+            SqlCommand cmdContentRead = new SqlCommand();
+            cmdContentRead.Connection = MainDBconnection;
+            cmdContentRead.Connection.ConnectionString = MainDBconnString;
+            cmdContentRead.CommandText = "SELECT DataAssists.datasetID, DataSets.dataSetName FROM DataAssists " +
+                "LEFT JOIN DataSets ON DataAssists.datasetID = DataSets.datasetID" +
+                " WHERE ProcessID = @ProcessID";
+            cmdContentRead.Parameters.AddWithValue("@ProcessID", ProcessID);
+            cmdContentRead.Connection.Open();
+
+            SqlDataReader tempReader = cmdContentRead.ExecuteReader();
+
+            return tempReader;
+        }
+
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //DATASET SECTION
 
         public static void InsertIntoDataAssists(int selectedCollabID, int datasetID)
         {
@@ -111,52 +155,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             }
         }
 
-
-
-        //Functions for displaying tables
-        public static SqlDataReader CollaborationReader()
-        {
-            SqlCommand cmdCollaborationRead = new SqlCommand();
-            cmdCollaborationRead.Connection = MainDBconnection;
-            cmdCollaborationRead.Connection.ConnectionString = MainDBconnString;
-            cmdCollaborationRead.CommandText = "SELECT * FROM Collaboration";
-            cmdCollaborationRead.Connection.Open(); // Open connection here, close in Model!
-
-            SqlDataReader tempReader = cmdCollaborationRead.ExecuteReader();
-
-            return tempReader;
-        }
-        public static SqlDataReader CollaborationGetName(int collabID)
-        {
-            SqlCommand cmdContentRead = new SqlCommand();
-            cmdContentRead.Connection = MainDBconnection;
-            cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT collabName FROM Collaboration WHERE collabID = @collabID";
-            cmdContentRead.Parameters.AddWithValue("@collabID", collabID);
-            cmdContentRead.Connection.Open(); // Open connection here, close in Model!
-
-            SqlDataReader tempReader = cmdContentRead.ExecuteReader();
-
-            return tempReader;
-        }
-
-        public static bool CollaborationExist(int collabID)
-        {
-
-            SqlCommand cmdProductRead = new SqlCommand();
-            cmdProductRead.Connection = MainDBconnection;
-            cmdProductRead.Connection.ConnectionString = MainDBconnString;
-            cmdProductRead.CommandType = System.Data.CommandType.StoredProcedure;
-            cmdProductRead.Parameters.AddWithValue("@collabID", collabID);
-            cmdProductRead.CommandText = "sp_collabExist";
-            cmdProductRead.Connection.Open();
-            if (((int)cmdProductRead.ExecuteScalar()) > 0)
-            {
-                return true;
-            }
-
-            return false;
-        }
+      
         public static bool DatasetExist(int dataID)
         {
 
@@ -189,49 +188,9 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             return tempReader;
         }
 
-       
-        public static SqlDataReader PlansReader(int CollabID)
-        {
-            SqlCommand cmdPlanRead = new SqlCommand();
-            cmdPlanRead.Connection = MainDBconnection;
-            cmdPlanRead.Connection.ConnectionString = MainDBconnString;
-            cmdPlanRead.CommandText = "SELECT * FROM Plans WHERE collabID = @CollabID";
-            cmdPlanRead.Parameters.AddWithValue("@CollabID", CollabID);
-            cmdPlanRead.Connection.Open(); // Open connection here, close in Model!
 
-            SqlDataReader tempReader = cmdPlanRead.ExecuteReader();
-
-            return tempReader;
-        }
-        public static SqlDataReader ContentsReader(int PlanID)
-        {
-            SqlCommand cmdContentRead = new SqlCommand();
-            cmdContentRead.Connection = MainDBconnection;
-            cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT * FROM PlanContents WHERE planID = @PlanID";
-            cmdContentRead.Parameters.AddWithValue("@PlanID", PlanID);
-            cmdContentRead.Connection.Open(); // Open connection here, close in Model!
-
-            SqlDataReader tempReader = cmdContentRead.ExecuteReader();
-
-            return tempReader;
-        }
         
-        public static SqlDataReader CollabDatasetReader(int CollabID)
-        {
-            SqlCommand cmdContentRead = new SqlCommand();
-            cmdContentRead.Connection = MainDBconnection;
-            cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT DataAssists.datasetID, DataSets.dataSetName FROM DataAssists " +
-                "LEFT JOIN DataSets ON DataAssists.datasetID = DataSets.datasetID" +
-                " WHERE collabID = @CollabID";
-            cmdContentRead.Parameters.AddWithValue("@CollabID", CollabID);
-            cmdContentRead.Connection.Open(); // Open connection here, close in Model!
-
-            SqlDataReader tempReader = cmdContentRead.ExecuteReader();
-
-            return tempReader;
-        }
+        
         
         
         public static int ExtractDatasetID()
@@ -300,51 +259,9 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             cmdProductRead.Connection.Open();
             cmdProductRead.ExecuteNonQuery();
         }
-        public static void CreatePlanContents(MadisonCountyCollaborationApplication.Pages.DataClasses.Contents Con)
-        {
-            String sqlQuery = "INSERT INTO PlanContents (contents, step, sequenceNumber, planID) VALUES('";
-            sqlQuery += Con.planContents + "','";
-            sqlQuery += Con.planStep + "','";
-            sqlQuery += Con.sequenceNumber + "','";
-            sqlQuery += Con.planID + "')";
-
-            SqlCommand cmdProductRead = new SqlCommand();
-            cmdProductRead.Connection = MainDBconnection;
-            cmdProductRead.Connection.ConnectionString = MainDBconnString;
-            cmdProductRead.CommandText = sqlQuery;
-            cmdProductRead.Connection.Open();
-            cmdProductRead.ExecuteNonQuery();
-        }
-        public static void CreatePlan(MadisonCountyCollaborationApplication.Pages.DataClasses.Plans Plan)
-        {
-            String sqlQuery = "INSERT INTO Plans (planName, planDesc, dateCreated, collabID) VALUES('";
-            sqlQuery += Plan.planName + "','";
-            sqlQuery += Plan.planDesc + "','";
-            sqlQuery += Plan.dateCreated + "','";
-            sqlQuery += Plan.collabID + "')";
-
-            SqlCommand cmdProductRead = new SqlCommand();
-            cmdProductRead.Connection = MainDBconnection;
-            cmdProductRead.Connection.ConnectionString = MainDBconnString;
-            cmdProductRead.CommandText = sqlQuery;
-            cmdProductRead.Connection.Open();
-            cmdProductRead.ExecuteNonQuery();
-        }
-        public static void CreateCollab(MadisonCountyCollaborationApplication.Pages.DataClasses.Collaboration Collab)
-        {
-            String sqlQuery = "INSERT INTO Collaboration (collabName, notesAndInfo, dateCreated, CollabType) VALUES('";
-            sqlQuery += Collab.collabName + "','";
-            sqlQuery += Collab.notesAndInfo + "','";
-            sqlQuery += Collab.dateCreated + "','";
-            sqlQuery += Collab.collabType + "')";
-
-            SqlCommand cmdProductRead = new SqlCommand();
-            cmdProductRead.Connection = MainDBconnection;
-            cmdProductRead.Connection.ConnectionString = MainDBconnString;
-            cmdProductRead.CommandText = sqlQuery;
-            cmdProductRead.Connection.Open();
-            cmdProductRead.ExecuteNonQuery();
-        }
+        
+        
+        
         
         
         public static void CreateDataAssist(MadisonCountyCollaborationApplication.Pages.DataClasses.DatasetAssist Assist)
@@ -360,7 +277,14 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             cmdProductRead.Connection.Open();
             cmdProductRead.ExecuteNonQuery();
         }
-        
+
+
+
+
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //USERS SECTION
+
         public static SqlDataReader AddUsersReader()
         {
             SqlCommand cmdPlanRead = new SqlCommand();
@@ -378,6 +302,34 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
             return tempReader;
         }
+
+        //Coonverts session UserName to a UserID to display processes that only a user is in
+        public static int UserNameIDConverter(string username)
+        {
+            int userID = 0; // Default value indicating not found or invalid
+            string userQuery = "SELECT userID FROM Users WHERE userName = @username;";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var command = new SqlCommand(userQuery, connection))
+                {
+                    // Use parameterized query to prevent SQL injection
+                    command.Parameters.AddWithValue("@username", username);
+
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            userID = reader.GetInt32(0); // Assuming userID is the first column
+                        }
+                    }
+                }
+            }
+            return userID;
+        }
+
+
         public static int GetUserIDFromUserNameOrEmail(string input)
         {
             SqlCommand cmdUserRead = new SqlCommand();

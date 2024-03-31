@@ -4,28 +4,22 @@
 @using System.IO;
 @model MadisonCountyCollaborationApplication.Pages.Process.IndexModel
 
-@{
-    var documentsFolderPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents");
-    var collabFolderMap = new Dictionary<int, string>
-    {
-        { 3, "Admin" },
-        { 1, "Budgeting" },
-        { 5, "Economic" },
-        { 4, "Management" },
-        { 2, "Revenue" }
-    };
-
-    collabFolderMap.TryGetValue(Model.collabID, out string currentCollabFolderName);
-    var currentCollabFolderPath = System.IO.Path.Combine(documentsFolderPath, currentCollabFolderName);
-}
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Madison County - @Model.ProcessName Process</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .upload {
             position: relative;
             float: right;
         }
-        #download{text-align: center;}
+
+        #download {
+            text-align: center;
+        }
 
         #upload-card {
             position: relative;
@@ -33,128 +27,150 @@
         }
     </style>
 </head>
-<div class="card" id="upload-card">
-    <div class="upload">
-        <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
-            <label for="fileUpload">Choose a file:</label>
-            <input type="file" id="fileUpload" name="fileUpload" />
-            <button type="submit" class="btn btn-primary">Upload</button>
-        </form>
+<body>
+
+    @{
+        var documentsFolderPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents");
+        var ProcessFolderMap = new Dictionary<int, string>
+    {
+    { 3, "Admin" },
+    { 1, "Budgeting" },
+    { 5, "Economic" },
+    { 4, "Management" },
+    { 2, "Revenue" }
+    };
+
+        ProcessFolderMap.TryGetValue(Model.ProcessID, out string currentProcessFolderName);
+
+        if (string.IsNullOrEmpty(currentProcessFolderName))
+        {
+            // Optionally, handle the case where there's no matching folder for the ProcessID
+            currentProcessFolderName = "Default"; // Setting a default folder name or handle it as needed
+        }
+
+        var currentProcessFolderPath = System.IO.Path.Combine(documentsFolderPath, currentProcessFolderName);
+    }
+
+    <div class="card" id="upload-card">
+        <div class="upload">
+            <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+                <label for="fileUpload">Choose a file:</label>
+                <input type="file" id="fileUpload" name="fileUpload">
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </form>
+        </div>
     </div>
-</div>
 
-<h1>@Model.CollabName</h1>
+    <h1>@Model.ProcessName</h1>
 
-<!-- Bootstrap Nav Tabs for toggling views -->
-<ul class="nav nav-tabs" id="contentTabs">
-    <li class="nav-item">
-        <a class="nav-link active" id="documents-tab" data-bs-toggle="tab" href="#DocumentTableContainer">Documents</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" id="datasets-tab" data-bs-toggle="tab" href="#DatasetTableContainer">Datasets</a>
-    </li>
-</ul>
-<div class="card">
-<!-- Container for Documents Table -->
-<div class="tab-content" id="DocumentTableContainer">
-    @if (!string.IsNullOrEmpty(currentCollabFolderName) && Directory.Exists(currentCollabFolderPath))
-    {
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Document Name</th>
-                    <th>Type</th>
-                    <th>File Size (KB)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var filePath in Directory.GetFiles(currentCollabFolderPath))
-                {
-                    FileInfo fileInfo = new FileInfo(filePath);
-                    string fileName = System.IO.Path.GetFileName(filePath);
-                    <tr>
-                        <td><a href="@($"/Documents/{currentCollabFolderName}/{fileName}")" target="_blank">@fileName</a></td>
-                        <td>@System.IO.Path.GetExtension(filePath).TrimStart('.').ToUpperInvariant()</td>
-                        <td>@(fileInfo.Length / 1024)</td>
-                        <td id="download"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-download" viewBox="0 0 16 16">
-                            <path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383"/>
-                            <path d="M7.646 15.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 14.293V5.5a.5.5 0 0 0-1 0v8.793l-2.146-2.147a.5.5 0 0 0-.708.708z"/>
-                            </svg></td> <!--This is the download file button-->
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>No documents found for this collaboration.</p>
-    }
-</div>
+    <ul class="nav nav-tabs" id="contentTabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="documents-tab" data-bs-toggle="tab" href="#DocumentTableContainer">Documents</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="datasets-tab" data-bs-toggle="tab" href="#DatasetTableContainer">Datasets</a>
+        </li>
+    </ul>
 
-<!-- Container for Dataset Table -->
-    <div class="tab-content" id="DatasetTableContainer" style="display: none;">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th> <!-- Corrected: Added missing closing ">" -->
-                    <th>Date Uploaded</th> <!-- Ensure this is correctly typed -->
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    string sqlQuery = $"SELECT Datasets.datasetID, Datasets.dataSetName FROM Datasets INNER JOIN DataAssists ON DataAssists.datasetID = Datasets.datasetID WHERE DataAssists.CollabID = {Model.collabID};";
-                    SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
-
-                    while (DatasetReader.Read())
-                    {
+    <div class="card">
+        <div class="tab-content" id="DocumentTableContainer">
+            @if (!string.IsNullOrEmpty(currentProcessFolderName) && Directory.Exists(currentProcessFolderPath))
+            {
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td>@DatasetReader["datasetID"].ToString()</td>
-                            <td>
-                                <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
-                                    @DatasetReader["dataSetName"].ToString()
-                                </a>
-                            </td>
-                            <td>Upload Date </td> <!-- This is where you'll format the date -->
+                            <th>Document Name</th>
+                            <th>Type</th>
+                            <th>File Size (KB)</th>
                         </tr>
-                    }
-                    DatasetReader.Close(); // Always close the SqlDataReader when done.
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Setup tab switching functionality
-            const tabs = document.querySelectorAll('#contentTabs .nav-link');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    tabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    const target = this.getAttribute('href');
-                    // Hide all tab-content divs
-                    document.querySelectorAll('.tab-content').forEach((content) => {
-                        content.style.display = 'none';
-                    });
-                    // Show the selected tab content
-                    document.querySelector(target).style.display = 'block';
-                });
-            });
-
-            // Initially hide dataset container, show documents
-            document.getElementById('DatasetTableContainer').style.display = 'none';
-            document.getElementById('DocumentTableContainer').style.display = 'block';
-
-            // Adjust initial tab state if needed
-            const initialTab = document.getElementById('documents-tab');
-            if (initialTab) {
-                initialTab.click();
+                    </thead>
+                    <tbody>
+                        @foreach (var filePath in Directory.GetFiles(currentProcessFolderPath))
+                        {
+                            FileInfo fileInfo = new FileInfo(filePath);
+                            string fileName = System.IO.Path.GetFileName(filePath);
+                            <tr>
+                                <td><a href="@($"/Documents/{currentProcessFolderName}/{fileName}")" target="_blank">@fileName</a></td>
+                                <td>@System.IO.Path.GetExtension(filePath).TrimStart('.').ToUpperInvariant()</td>
+                                <td>@(fileInfo.Length / 1024)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
-        });
-    </script>
-}
+            else
+            {
+                <p>No documents found for this process.</p>
+            }
+        </div>
 
+        <div class="tab-content" id="DatasetTableContainer" style="display: none;">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Date Uploaded</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        string sqlQuery = $"SELECT Datasets.datasetID, Datasets.dataSetName FROM Datasets INNER JOIN DatasetProcess ON DatasetProcess.datasetID = Datasets.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
+                        SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
+
+                        while (DatasetReader.Read())
+                        {
+                            <tr>
+                                <td>@DatasetReader["datasetID"].ToString()</td>
+                                <td>
+                                    <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
+                                        @DatasetReader["dataSetName"].ToString()
+                                    </a>
+                                </td>
+                                <td>Upload Date</td> <!-- Placeholder for Upload Date, adjust as necessary -->
+                            </tr>
+                        }
+                        DatasetReader.Close(); // Always close the SqlDataReader when done.
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    </div>
+
+    @section Scripts {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Setup tab switching functionality
+                const tabs = document.querySelectorAll('#contentTabs .nav-link');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        tabs.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        const target = this.getAttribute('href');
+                        // Hide all tab-content divs
+                        document.querySelectorAll('.tab-content').forEach((content) => {
+                            content.style.display = 'none';
+                        });
+                        // Show the selected tab content
+                        document.querySelector(target).style.display = 'block';
+                    });
+                });
+
+                // Initially hide dataset container, show documents
+                document.getElementById('DatasetTableContainer').style.display = 'none';
+                document.getElementById('DocumentTableContainer').style.display = 'block';
+
+                // Adjust initial tab state if needed
+                const initialTab = document.getElementById('documents-tab');
+                if (initialTab) {
+                    initialTab.click();
+                }
+            });
+        </script>
+    }
+
+</body>
+</html>

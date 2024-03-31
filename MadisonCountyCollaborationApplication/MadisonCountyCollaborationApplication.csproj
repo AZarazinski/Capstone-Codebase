@@ -36,10 +36,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Documents\Budgeting\" />
     <Folder Include="wwwroot\Documents\Admin\" />
-    <Folder Include="wwwroot\Documents\Management\" />
+    <Folder Include="wwwroot\Documents\Budgeting\" />
     <Folder Include="wwwroot\Documents\Economic\" />
+    <Folder Include="wwwroot\Documents\Management\" />
     <Folder Include="wwwroot\Documents\Revenue\" />
     <Folder Include="wwwroot\FileUpload\" />
   </ItemGroup>

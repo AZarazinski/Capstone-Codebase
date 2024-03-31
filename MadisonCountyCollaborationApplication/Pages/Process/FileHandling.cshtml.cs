@@ -9,9 +9,10 @@ using System.Data.SqlClient;
 
 namespace MadisonCountyCollaborationApplication.Pages.Process
 {
+
     public class FileHandlingModel : PageModel
     {
-        private static readonly string MainDBconnString = "server=Localhost;Database=Lab4;Trusted_Connection=True";
+        private static readonly string MainDBconnString = "server=Localhost;Database=MainDB;Trusted_Connection=True";
         // Method to check session before accessing the page
         public IActionResult OnGetSessionCheck()
         {
@@ -28,7 +29,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         // Method to handle GET requests for processing a CSV file
         public async Task<IActionResult> OnGetAsync(string filePath)
         {
-            int collabID = (int)HttpContext.Session.GetInt32("collaborationID");
+            int ProcessID = (int)HttpContext.Session.GetInt32("processID");
 
             if (string.IsNullOrWhiteSpace(filePath))
             {
@@ -48,13 +49,13 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", $"Error processing file: {ex.Message}"); // error message if their is an error processing file
+                ModelState.AddModelError("", $"Error processing file: {ex.Message}"); // error message if there is an error processing file
                 return Page();
             }
 
             // Redirect to a success page and optionally pass the table name for confirmation.
             TempData["TableName"] = Path.GetFileNameWithoutExtension(filePath);
-            return RedirectToPage("./Index", new { collabID = collabID });
+            return RedirectToPage("./Index", new { ProcessID = ProcessID });
         }
         // Method to process a CSV file asynchronously
         private async Task ProcessCsvFile(string filePath)
@@ -89,9 +90,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
             // After CSV processing and dataset insertion
             int datasetID = await GetDatasetID(fullTableName); // Retrieve the newly inserted dataset ID. Implement this method based on prior instructions.
-            int collabID = (int)HttpContext.Session.GetInt32("collaborationID"); // Retrieve CollabID from session
+            int ProcessID = (int)HttpContext.Session.GetInt32("processID"); // Retrieve ProcessID from session
 
-            await InsertIntoDataAssist(collabID, datasetID); // Insert the association into DataAssist. Implement this method based on prior instructions.
+            await InsertIntoDatasetProcess(ProcessID, datasetID); // Insert the association into DataAssist. Implement this method based on prior instructions.
         }
 
 
@@ -119,20 +120,21 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
         }
 
-        private async Task InsertIntoDataAssist(int collabID, int datasetID)
+        private async Task InsertIntoDatasetProcess(int ProcessID, int datasetID)
         {
-            string sqlQuery = @"INSERT INTO DataAssists (collabID, datasetID) VALUES (@CollabID, @DatasetID);";
+            string sqlQuery = @"INSERT INTO DatasetProcess (processID, datasetID) VALUES (@ProcessID, @DatasetID);";
             using (var connection = new SqlConnection(MainDBconnString))
             {
                 await connection.OpenAsync();
                 using (var command = new SqlCommand(sqlQuery, connection))
                 {
-                    command.Parameters.AddWithValue("@CollabID", collabID);
+                    command.Parameters.AddWithValue("@ProcessID", ProcessID);
                     command.Parameters.AddWithValue("@DatasetID", datasetID);
                     await command.ExecuteNonQueryAsync();
                 }
             }
         }
+
 
 
         // Method to create table from CSV data
@@ -167,7 +169,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             {
                 foreach (var record in records)
                 {
-                    
+
                     var columns = string.Join(", ", record.Keys.Select(key => $"[{key}]"));
                     var values = string.Join(", ", record.Values.Select(value => value == null ? "NULL" : $"'{value.ToString().Replace("'", "''")}'"));
                     var insertSql = $"INSERT INTO [{tableName}] ({columns}) VALUES ({values});";

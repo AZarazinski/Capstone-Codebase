@@ -1,11 +1,13 @@
 ﻿@page
 @model MadisonCountyCollaborationApplication.Pages.HomeModel
+
 @{
+    ViewData["Title"] = "My Processes";
 }
+
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <style>
-
-    .header{
+    .header {
         float: right;
         padding: 5%;
     }
@@ -35,59 +37,40 @@
         padding: 15px;
     }
 
-    @@media (max-width: 768px) {
-        .card {
-            flex-basis: calc(50% - 20px); /* Adjusts to 2 cards per row on smaller screens */
-        }
-    }
 
-    @@media (max-width: 480px) {
-        .card {
-            flex-basis: 100%; /* Stacks cards vertically on very small screens */
-        }
-    }
 </style>
 
+<h2>My Processes</h2>
 
-@* <div class="header">
-    <h1>My Processes</h1>
-</div>
-
-<br /> *@
-
-<h2>My Processes</h2> <!-- Add your "My Processes" heading here -->
-
-<form asp-page-handler="Select" method="post" id="collabForm">
-    <input type="hidden" name="CollaborationID" id="collabIdInput" value="" />
-    <div class="box-table">
-        @{
-            foreach (var prod in Model.CollaborationList)
+@if (Model.ProcessList.Any())
+{
+    <form asp-page-handler="Select" method="post" id="processForm">
+        <div class="box-table">
+            @foreach (var process in Model.ProcessList)
             {
-                <div class="card" tabindex="0" role="button" data-collab-id="@prod.collabID" onclick="selectCollaboration(@prod.collabID)" onkeypress="selectCollaborationKeyPress(event, @prod.collabID)">
+                <div class="card" tabindex="0" role="button" onclick="selectProcess(@process.ProcessID)">
                     <div class="card-header">
-                        @prod.collabName
+                        @process.ProcessName
                     </div>
                     <div class="card-body">
-                        @prod.notesAndInfo
+                        @process.NotesAndInfo
                     </div>
                 </div>
             }
-        }
-    </div>
-</form>
+        </div>
+        <input type="hidden" name="ProcessID" id="processIdInput" value="" />
+    </form>
+}
+else
+{
+    <p>No processes found. Please create a new process.</p>
+}
 
 @section Scripts {
     <script>
-        function selectCollaboration(collabId) {
-            document.getElementById('collabIdInput').value = collabId;
-            document.getElementById('collabForm').submit();
-        }
-
-        function selectCollaborationKeyPress(event, collabId) {
-            // Check if Enter key is pressed
-            if (event.key === "Enter") {
-                selectCollaboration(collabId);
-            }
+        function selectProcess(processId) {
+            document.getElementById('processIdInput').value = processId;
+            document.getElementById('processForm').submit();
         }
     </script>
 }

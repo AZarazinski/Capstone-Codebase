@@ -8,20 +8,20 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 {
     public class IndexModel : PageModel
     {
-      
-        public string CollabName { get; set; }
+
+        public string ProcessName { get; set; }
         [BindProperty]
-        public int collabID { get; set; }
+        public int ProcessID { get; set; }
 
-        public string? currentCollabFolderName { get; set; }
+        public string? currentProcessFolderName { get; set; }
 
-        
+
 
         public IActionResult OnGet()
         {
             // Attempt to get collabID from the session.
-            collabID = HttpContext.Session.GetInt32("collaborationID") ?? 0;
-            if (collabID <= 0)
+            ProcessID = HttpContext.Session.GetInt32("processID") ?? 0;
+            if (ProcessID <= 0)
             {
                 // Handle the case where collabID is not found or invalid.
                 ViewData["ErrorMessage"] = "Invalid Collaboration ID. Please select a collaboration.";
@@ -40,15 +40,15 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             try
             {
                 // Fetch the collaboration name
-                SqlDataReader CollaborationGetName = DBClass.CollaborationGetName(collabID);
-                if (CollaborationGetName.Read())
+                SqlDataReader ProcessGetName = DBClass.ProcessGetName(ProcessID);
+                if (ProcessGetName.Read())
                 {
-                    CollabName = CollaborationGetName["collabName"].ToString();
+                    ProcessName = ProcessGetName["processName"].ToString();
                 }
-                CollaborationGetName.Close(); // Ensure you close the reader to free up resources
+                ProcessGetName.Close(); // Ensure you close the reader to free up resources
 
-                
-                
+
+
 
             }
             finally
@@ -56,7 +56,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 DBClass.MainDBconnection.Close(); // Ensure the database connection is closed after operation
             }
 
-            
+
 
 
             return Page();
@@ -73,8 +73,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
 
             // Retrieve CollaborationID from session
-            int? collabID = HttpContext.Session.GetInt32("collaborationID");
-            if (collabID == null)
+            int? processID = HttpContext.Session.GetInt32("processID");
+            if (processID == null)
             {
                 ModelState.AddModelError("", "Collaboration ID is missing. Please select a collaboration first.");
                 return Page();
@@ -95,7 +95,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                     if (reader.Read() && (int)reader[0] > 0)
                     {
                         ViewData["DatasetError"] = "This Dataset already exists. Please upload a new one";
-                        return RedirectToPage("Index",  new { collabID = collabID});
+                        return RedirectToPage("Index", new { processID = processID });
                     }
                     else
                     {
@@ -120,7 +120,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                     { 2, "Revenue" }
                 };
 
-                string folderName = folders[collabID.Value]; // Assuming collabID is always valid here
+                string folderName = folders[processID.Value]; // Assuming collabID is always valid here
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents", folderName, fileName);
 
                 var directory = Path.GetDirectoryName(filePath);
@@ -132,7 +132,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 }
                 //Area to add SUCCESS Message!!
 
-                return RedirectToPage("./Index", new { collabID = collabID.Value });
+                return RedirectToPage("./Index", new { processID = processID.Value });
             }
             else
             {
@@ -142,40 +142,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
         }
 
-
-
-
-
-
-
-
-        public IActionResult OnPostHome()
-        {
-            return RedirectToPage("../Home");
-        }
-
-        public IActionResult OnPostAddUsers()
-        {
-
-            return RedirectToPage("AddEditUsers");
-        }
-
-
-
-        public IActionResult OnPostDatasets()
-        {
-            return RedirectToPage("ViewCollabData");
-        }
-        //public IActionResult OnPostAutoPopulateValues()
-        //{
-        //    PlanID = 1;
-        //    return Page();
-        //}
-        //public IActionResult OnPostClearInputs()
-        //{
-        //    PlanID = 0;
-        //    return Page();
-        //}
 
     }
 }
