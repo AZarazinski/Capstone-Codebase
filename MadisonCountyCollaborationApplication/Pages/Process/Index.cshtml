@@ -61,6 +61,13 @@
         </div>
     </div>
 
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.ProcessName</li>
+        </ol>
+    </nav>
+
     <h1>@Model.ProcessName</h1>
 
     <ul class="nav nav-tabs" id="contentTabs">

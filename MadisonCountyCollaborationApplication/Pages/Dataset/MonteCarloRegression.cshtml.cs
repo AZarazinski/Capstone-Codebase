@@ -10,6 +10,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
     public class MonteCarloRegressionModel : PageModel
     {
+
+        [BindProperty]
+        public string ProcessName { get; set; }
+        [BindProperty]
+        public string DatasetName { get; set; }
+
         [BindProperty]
         public List<string> IndependentVariables { get; set; }
         [BindProperty]
@@ -48,6 +54,13 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             if (HttpContext.Session.GetString("username") != null)
             {
                 ViewData["LoginMessage"] = "Login for " + HttpContext.Session.GetString("username") + " successful!";
+
+                //get process name
+                ProcessName = HttpContext.Session.GetString("processName");
+
+                //get dataset name
+                DatasetName = HttpContext.Session.GetString("datasetName");
+
 
                 // Retrieve data from session
                 var interceptJson = HttpContext.Session.GetString("Intercept");

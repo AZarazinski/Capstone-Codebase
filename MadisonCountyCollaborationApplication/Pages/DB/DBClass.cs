@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Reflection.Metadata;
 using static MadisonCountyCollaborationApplication.Pages.Dataset.ViewDataModel;
+using static Plotly.NET.StyleParam.DrawingStyle;
 
 namespace MadisonCountyCollaborationApplication.Pages.DB
 {
@@ -285,25 +286,26 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //USERS SECTION
 
-        public static SqlDataReader AddUsersReader()
+
+        //Is user admin?
+        public static bool CheckAdmin(int userID)
         {
-            SqlCommand cmdPlanRead = new SqlCommand();
-            cmdPlanRead.Connection = MainDBconnection;
-            cmdPlanRead.Connection.ConnectionString = MainDBconnString;
-            cmdPlanRead.CommandText = @"SELECT 
-                                            u.firstName, u.lastName, u.userName, u.email
-                                        FROM 
-                                            Collaboration c, Contributes con, Users u
-                                        WHERE 
-                                            c.collabID = con.collabID AND u.userID = con.userID";
-            cmdPlanRead.Connection.Open(); // Open connection here, close in Model!
+            using (SqlCommand sqlCommand = new SqlCommand())
+            {
+                sqlCommand.Connection = MainDBconnection;
+                sqlCommand.Connection.ConnectionString = MainDBconnString;
+                sqlCommand.CommandText = "SELECT COUNT(*) FROM Users WHERE userID = @userID AND admin = 'admin';";
+                sqlCommand.Parameters.AddWithValue("@userID", userID);
+                sqlCommand.Connection.Open();
+                int count = (int)sqlCommand.ExecuteScalar();
 
-            SqlDataReader tempReader = cmdPlanRead.ExecuteReader();
-
-            return tempReader;
+                return (count > 0);
+            }
         }
 
-        //Coonverts session UserName to a UserID to display processes that only a user is in
+
+ 
+        //Converts session UserName to a UserID to display processes that only a user is in
         public static int UserNameIDConverter(string username)
         {
             int userID = 0; // Default value indicating not found or invalid

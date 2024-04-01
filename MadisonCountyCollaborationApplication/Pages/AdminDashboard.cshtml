@@ -1,0 +1,141 @@
+﻿@page
+@model MadisonCountyCollaborationApplication.Pages.AdminDashboardModel
+@{
+}
+
+
+<h1>Admin Dashboard</h1>
+
+<div class="text-center">
+    <h1 class="display-4">Create New User</h1>
+</div>
+
+<form asp-page="CreateUser" asp-page-handler="Create">
+    @* username *@
+    <input type="text" placeholder="UserName:" asp-for="NewUser.userName" class="form-control" />
+    <span asp-validation-for="NewUser.userName" class="text-danger"></span>
+    <br />
+    @* password *@
+    <input type="text" placeholder="Password: " asp-for="NewUser.userPassword" class="form-control" />
+    <span asp-validation-for="NewUser.userPassword" class="text-danger"></span>
+    <br />
+    <div class="input-group mb-3">
+        @* names *@
+        <input type="text" aria-label="First name" class="form-control" asp-for="NewUser.firstName" placeholder="First Name" />
+        <span asp-validation-for="NewUser.firstName" class="text-danger"></span>
+        <input type="text" aria-label="Last name" class="form-control" asp-for="NewUser.lastName" placeholder="Last Name" />
+        <span asp-validation-for="NewUser.lastName" class="text-danger"></span>
+    </div>
+    <br />
+    <div class="input-group mb-3">
+        @* email and phone *@
+        <input type="text" aria-label="Email" class="form-control" asp-for="NewUser.email" placeholder="Email" />
+        <span asp-validation-for="NewUser.email" class="text-danger"></span>
+        <input type="text" aria-label="Phone Number" class="form-control" asp-for="NewUser.phone" placeholder="Phone Number" />
+        <span asp-validation-for="NewUser.phone" class="text-danger"></span>
+    </div>
+    <br />
+    <div class="input-group">
+        @* user type *@
+        <select class="form-select" id="Type" aria-label="aggregation method" asp-for="NewUser.userType">
+            <option value="">Choose User Type</option>
+            <option value="Admin">Admin</option>
+            <option value="Employee">Employee</option>
+        </select>
+        <span asp-validation-for="NewUser.userType" class="text-danger"></span>
+
+
+    </div>
+    <br />
+    <div class="input-group mb-3">
+        @* street and city *@
+        <input type="text" placeholder="Street" asp-for="NewUser.street" class="form-control" />
+        <span asp-validation-for="NewUser.street" class="text-danger"></span>
+        <input type="text" aria-label="City" class="form-control" asp-for="NewUser.city" placeholder="City" />
+        <span asp-validation-for="NewUser.city" class="text-danger"></span>
+    </div>
+    <div class="input-group">
+        @* state *@
+        <select class="form-select" id="groupbyselect" aria-label="aggregation method" asp-for="NewUser.userState">
+            <option selected>State</option>
+            <option value="AL">AL</option>
+            <option value="AK">AK</option>
+            <option value="AZ">AZ</option>
+            <option value="AR">AR</option>
+            <option value="AS">AS</option>
+            <option value="CA">CA</option>
+            <option value="CO">CO</option>
+            <option value="CT">CT</option>
+            <option value="DE">DE</option>
+            <option value="DC">DC</option>
+            <option value="FL">FL</option>
+            <option value="GA">GA</option>
+            <option value="GU">GU</option>
+            <option value="HI">HI</option>
+            <option value="ID">ID</option>
+            <option value="IL">IL</option>
+            <option value="IN">IN</option>
+            <option value="IA">IA</option>
+            <option value="KS">KS</option>
+            <option value="KY">KY</option>
+            <option value="LA">LA</option>
+            <option value="ME">ME</option>
+            <option value="MD">MD</option>
+            <option value="MA">MA</option>
+            <option value="MI">MI</option>
+            <option value="MN">MN</option>
+            <option value="MS">MS</option>
+            <option value="MO">MO</option>
+            <option value="MT">MT</option>
+            <option value="NE">NE</option>
+            <option value="NV">NV</option>
+            <option value="NH">NH</option>
+            <option value="NJ">NJ</option>
+            <option value="NM">NM</option>
+            <option value="NY">NY</option>
+            <option value="NC">NC</option>
+            <option value="ND">ND</option>
+            <option value="MP">MP</option>
+            <option value="OH">OH</option>
+            <option value="OK">OK</option>
+            <option value="OR">OR</option>
+            <option value="PA">PA</option>
+            <option value="PR">PR</option>
+            <option value="RI">RI</option>
+            <option value="SC">SC</option>
+            <option value="SD">SD</option>
+            <option value="TN">TN</option>
+            <option value="TX">TX</option>
+            <option value="TT">TT</option>
+            <option value="UT">UT</option>
+            <option value="VT">VT</option>
+            <option value="VA">VA</option>
+            <option value="VI">VI</option>
+            <option value="WA">WA</option>
+            <option value="WV">WV</option>
+            <option value="WI">WI</option>
+            <option value="WY">WY</option>
+        </select>
+        <span asp-validation-for="NewUser.city" class="text-danger"></span>
+
+    </div>
+    <br />
+    @* zip *@
+    <input type="text" aria-label="Zip" class="form-control" asp-for="NewUser.zip" placeholder="Zip" />
+    <span asp-validation-for="NewUser.zip" class="text-danger"></span>
+    <br />
+    <div class="d-grid gap-2">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+
+<div class="position-fixed bottom-0 start-0 p-3">
+    <form method="post" asp-page-handler="ClearInputs">
+        <button type="submit" class="btn btn-secondary">Clear Inputs</button>
+    </form>
+
+    <br />
+    <form method="post" asp-page-handler="Populate">
+        <button type="submit" class="btn btn-secondary">Populate</button>
+    </form>
+</div>

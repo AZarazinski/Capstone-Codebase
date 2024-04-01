@@ -60,9 +60,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Users
             Password = string.Empty;
             return Page();
         }
-        public IActionResult OnPostAddUser()
-        {
-            return RedirectToPage("CreateUser");
-        }
+       
     }
 }

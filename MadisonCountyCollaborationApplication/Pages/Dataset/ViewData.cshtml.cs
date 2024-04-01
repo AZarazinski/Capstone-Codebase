@@ -59,6 +59,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 //DatasetID = (int)HttpContext.Session.GetInt32("datasetID");
                 HttpContext.Session.SetInt32("datasetID", DatasetID);
                 DatasetName = DBClass.ExtractDatasetName(DatasetID);
+                HttpContext.Session.SetString("datasetName", DatasetName);
                 DBClass.MainDBconnection.Close();
                 Data = DBClass.FetchDataForTable(DatasetName);
                 DBClass.MainDBconnection.Close();
