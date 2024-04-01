@@ -17,6 +17,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             public string Name { get; set; }
         }
 
+        [BindProperty]
+        public int ProcessID { get; set; }
+
+        [BindProperty]
+        public string ProcessName { get; set; }
 
         [BindProperty]
         public string AnalysisType { get; set; }
@@ -34,8 +39,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public DataTable Data { get; private set; }
 
         [BindProperty]
-        public int SelectedCollabID { get; set; } // Binds the selected collaboration ID
-        public List<SelectListItem> CollaborationOptions { get; set; } // Holds dropdown options
+        public int SelectedProcessID { get; set; } // Binds the selected collaboration ID
+        public List<SelectListItem> ProcessOptions { get; set; } // Holds dropdown options
 
 
         public ViewDataModel()
@@ -58,17 +63,24 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 Data = DBClass.FetchDataForTable(DatasetName);
                 DBClass.MainDBconnection.Close();
 
-                //Populate dropdown menu for adding to collaboration
-                CollaborationOptions = new List<SelectListItem>();
+                //Get processID
+                ProcessID = (int)HttpContext.Session.GetInt32("processID");
 
-                using (var CollabReader = DBClass.GeneralReaderQuery("SELECT * FROM Collaboration"))
+                //Get processName
+                ProcessName = HttpContext.Session.GetString("processName");
+
+
+                //Populate dropdown menu for adding to collaboration
+                ProcessOptions = new List<SelectListItem>();
+
+                using (var processReader = DBClass.GeneralReaderQuery("SELECT * FROM Process"))
                 {
-                    while (CollabReader.Read())
+                    while (processReader.Read())
                     {
-                        CollaborationOptions.Add(new SelectListItem
+                        ProcessOptions.Add(new SelectListItem
                         {
-                            Text = CollabReader["collabName"].ToString(),
-                            Value = CollabReader["collabID"].ToString()
+                            Text = processReader["processName"].ToString(),
+                            Value = processReader["processID"].ToString()
                         });
                     }
                 }
@@ -87,9 +99,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public IActionResult OnPostAddCollabData()
         {
             string sqlQuery = @"
-                INSERT INTO DataAssists
-                (collabID, datasetID)
-                VALUES (" + SelectedCollabID + "," + DatasetID + ");";
+                INSERT INTO DatasetProcess
+                (processID, datasetID)
+                VALUES (" + SelectedProcessID + "," + DatasetID + ");";
 
             DBClass.GeneralInsertQuery(sqlQuery);
             return Page();

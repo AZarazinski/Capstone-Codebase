@@ -209,8 +209,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
         private async Task AddFileToDataSet(string tableName)
         {
+            //Get UserID to put in table
+            string username = HttpContext.Session.GetString("username");
+            var userID = DBClass.UserNameIDConverter(username);
+
             // Assuming the DataSet table has a column named "TableName"
-            string addFileQuery = @"INSERT INTO DataSets (dataSetName) VALUES (@FileName);";
+            string addFileQuery = @"INSERT INTO DataSets (dataSetName, userID) VALUES (@FileName, " + userID + ");";
 
             using (var connection = new SqlConnection(MainDBconnString))
             {

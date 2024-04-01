@@ -44,6 +44,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 if (ProcessGetName.Read())
                 {
                     ProcessName = ProcessGetName["processName"].ToString();
+                    HttpContext.Session.SetString("processName", ProcessName);
                 }
                 ProcessGetName.Close(); // Ensure you close the reader to free up resources
 
