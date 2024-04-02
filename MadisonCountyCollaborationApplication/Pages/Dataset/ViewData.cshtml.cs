@@ -17,11 +17,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             public string Name { get; set; }
         }
 
-        [BindProperty]
-        public int ProcessID { get; set; }
-
-        [BindProperty]
-        public string ProcessName { get; set; }
 
         [BindProperty]
         public string AnalysisType { get; set; }
@@ -39,8 +34,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public DataTable Data { get; private set; }
 
         [BindProperty]
-        public int SelectedProcessID { get; set; } // Binds the selected collaboration ID
-        public List<SelectListItem> ProcessOptions { get; set; } // Holds dropdown options
+        public int SelectedCollabID { get; set; } // Binds the selected collaboration ID
+        public List<SelectListItem> CollaborationOptions { get; set; } // Holds dropdown options
 
 
         public ViewDataModel()
@@ -59,29 +54,21 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 //DatasetID = (int)HttpContext.Session.GetInt32("datasetID");
                 HttpContext.Session.SetInt32("datasetID", DatasetID);
                 DatasetName = DBClass.ExtractDatasetName(DatasetID);
-                HttpContext.Session.SetString("datasetName", DatasetName);
                 DBClass.MainDBconnection.Close();
                 Data = DBClass.FetchDataForTable(DatasetName);
                 DBClass.MainDBconnection.Close();
 
-                //Get processID
-                ProcessID = (int)HttpContext.Session.GetInt32("processID");
-
-                //Get processName
-                ProcessName = HttpContext.Session.GetString("processName");
-
-
                 //Populate dropdown menu for adding to collaboration
-                ProcessOptions = new List<SelectListItem>();
+                CollaborationOptions = new List<SelectListItem>();
 
-                using (var processReader = DBClass.GeneralReaderQuery("SELECT * FROM Process"))
+                using (var CollabReader = DBClass.GeneralReaderQuery("SELECT * FROM Collaboration"))
                 {
-                    while (processReader.Read())
+                    while (CollabReader.Read())
                     {
-                        ProcessOptions.Add(new SelectListItem
+                        CollaborationOptions.Add(new SelectListItem
                         {
-                            Text = processReader["processName"].ToString(),
-                            Value = processReader["processID"].ToString()
+                            Text = CollabReader["collabName"].ToString(),
+                            Value = CollabReader["collabID"].ToString()
                         });
                     }
                 }
@@ -100,9 +87,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public IActionResult OnPostAddCollabData()
         {
             string sqlQuery = @"
-                INSERT INTO DatasetProcess
-                (processID, datasetID)
-                VALUES (" + SelectedProcessID + "," + DatasetID + ");";
+                INSERT INTO DataAssists
+                (collabID, datasetID)
+                VALUES (" + SelectedCollabID + "," + DatasetID + ");";
 
             DBClass.GeneralInsertQuery(sqlQuery);
             return Page();
@@ -123,6 +110,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 case "Simulation":
                     // Redirect to the Multi Regression analysis page
                     return RedirectToPage("MonteCarlo");
+                case "TylerRegression":
+                    return RedirectToPage("TylerRegression");
                 default:
                     // Optional: Handle unknown selection or return to the current page with a message
                     return Page();

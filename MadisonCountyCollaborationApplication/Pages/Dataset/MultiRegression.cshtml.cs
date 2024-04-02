@@ -15,12 +15,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
     public class MultiRegressionModel : PageModel
     {
-
-        [BindProperty]
-        public string ProcessName { get; set; }
-        [BindProperty]
-        public string DatasetName { get; set; }
-
         [BindProperty]
         public List<string> IndependentVariables { get; set; } = new List<string>();
         [BindProperty]
@@ -41,10 +35,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public List<(string Variable, double Slope)> CalculatedSlopes { get; set; } = new List<(string Variable, double Slope)>();
         [BindProperty]
         public double ConfidenceLevel { get; set; } = 95; // Default to 95%
-        public double StandardError { get; set; }
+        public List<double> StandardError { get; set; }
         public double ConfidenceIntervalLower { get; set; }
         public double ConfidenceIntervalUpper { get; set; }
         public List<double> PValues { get; set; } = new List<double>();
+        public int DegreesOfFreedom { get ; set; }
 
 
 
@@ -63,13 +58,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     + " successful!";
 
                 LoadData();
-
-                //get process name
-                ProcessName = HttpContext.Session.GetString("processName");
-
-                //get dataset name
-                DatasetName = HttpContext.Session.GetString("datasetName");
-
                 return Page();
             }
             else
@@ -131,6 +119,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             HttpContext.Session.SetString("Slopes", slopesJson);
             HttpContext.Session.SetString("Variables", variablesJson);
             HttpContext.Session.SetString("DependentVariable", dependentVariableJson);
+            HttpContext.Session.SetString("DegreesOfFreedom", DegreesOfFreedom.ToString());
+
 
             // Redirect to the receiving page
             return RedirectToPage("RegressionOutput");
@@ -169,40 +159,44 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         {
             Console.WriteLine("Preparing to Calculate Multiple Regression...");
             PopulateDataListsFromDataTable();
-
+            // Logic for regression calculation follows here
             var xMatrix = BuildXMatrix(independentDataLists);
             var yVector = Vector<double>.Build.DenseOfEnumerable(dependentDataList);
-
             var coefficients = CalculateMultipleRegression(dependentDataList, xMatrix);
 
             Intercept = coefficients[0];
             Slopes = coefficients.SubVector(1, coefficients.Count - 1).ToList();
 
-            var standardErrors = CalculateStandardErrors(dependentDataList, xMatrix, coefficients);
-            var pValues = CalculatePValues(coefficients, standardErrors, dependentDataList.Count);
+            StandardError = CalculateStandardErrors(dependentDataList, xMatrix, coefficients);
+            var pValues = CalculatePValues(coefficients, StandardError, dependentDataList.Count);
 
             double alpha = (1.0 - (ConfidenceLevel / 100.0));
-            double degreesOfFreedom = dependentDataList.Count - coefficients.Count;
+            int degreesOfFreedom = dependentDataList.Count - coefficients.Count;
+            Console.WriteLine(degreesOfFreedom.ToString());
+            HttpContext.Session.SetInt32("DegreesOfFreedom", degreesOfFreedom);
             double criticalValue = StudentT.InvCDF(0, 1, degreesOfFreedom, 1 - alpha / 2.0);
+            Console.WriteLine(criticalValue.ToString());
+            HttpContext.Session.SetString("CriticalValue", criticalValue.ToString());
 
-            ConfidenceIntervalLower = Intercept.Value - criticalValue * standardErrors[0];
-            ConfidenceIntervalUpper = Intercept.Value + criticalValue * standardErrors[0];
+
+            ConfidenceIntervalLower = Intercept.Value - criticalValue * StandardError[0];
+            ConfidenceIntervalUpper = Intercept.Value + criticalValue * StandardError[0];
 
             // Store the calculated values in the session for use on subsequent pages
-            HttpContext.Session.SetString("StandardError", JsonSerializer.Serialize(standardErrors));
+            HttpContext.Session.SetString("StandardError", JsonSerializer.Serialize(StandardError));
             HttpContext.Session.SetString("PValues", JsonSerializer.Serialize(pValues));
             HttpContext.Session.SetString("ConfidenceLevel", ConfidenceLevel.ToString());
             HttpContext.Session.SetString("ConfidenceIntervalLower", ConfidenceIntervalLower.ToString());
             HttpContext.Session.SetString("ConfidenceIntervalUpper", ConfidenceIntervalUpper.ToString());
-
+            var standardErrorJson = JsonSerializer.Serialize(StandardError);
+            Console.WriteLine(standardErrorJson); // Ensure this isn't empty or "[]"
+            HttpContext.Session.SetString("StandardError", standardErrorJson);
             Console.WriteLine($"Intercept p-value: {pValues[0]:G4}"); // Using general format specifier with precision
             for (int i = 0; i < Slopes.Count; i++)
             {
                 Console.WriteLine($"{IndependentVariables[i]} p-value: {pValues[i + 1]:G4}");
             }
         }
-
-
 
         private void PopulateDataListsFromDataTable()
         {

@@ -2,27 +2,15 @@
 @model MadisonCountyCollaborationApplication.Pages.Dataset.MonteCarloRegressionModel
 @{
 }
-
-@* breadcrum navigation *@
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
-        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Monte Carlo</li>
-    </ol>
-</nav>
-
-
 <div class="text-center">
     <h1 class="display-4">Regression Simulation</h1>
 </div>
 <form asp-page-handler="Help" method="post">
     <div class="d-grid gap-2">
-          <button class="btn btn-primary" type="submit">Help</button>
-    </div> 
+        <button class="btn btn-primary" type="submit">Help</button>
+    </div>
 </form>
-<form method="post">
+<form method="post" id="dataForm">
     <div class="row">
         <div class="col-md-4">
             Number of iterations:
@@ -44,7 +32,7 @@
         </div>
     </div>
     <br />
-    
+
     @for (int i = 0; i < @Model.IndependentVariables.Count; i++)
     {
         if (@Model.IndependentVariables[i] != null)
@@ -53,39 +41,324 @@
             <div class="row">
                 <div class="col-md-2">
                     Initial Value:
-                    <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" >
+                    @switch (i)
+                    {
+                        case 0:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param0.initial>
+                            break;
+                        case 1:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param1.initial>
+                            break;
+                        case 2:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param2.initial>
+                            break;
+                        case 3:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param3.initial>
+                            break;
+                        case 4:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param4.initial>
+                            break;
+                        case 5:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param5.initial>
+                            break;
+                        case 6:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param6.initial>
+                            break;
+                        case 7:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param7.initial>
+                            break;
+                        case 8:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param8.initial>
+                            break;
+                        case 9:
+                            <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for=param9.initial>
+                            break;
+
+                    }
+
                 </div>
 
                 <div class="col-md-2">
                     <label class="input-group-text" for="Taxes_dist">Distribution</label>
                     <div class="input-group">
-                        <select class="form-select" id="Taxes_dist" aria-label="Select distribution">
-                            <option selected value="Constant">Constant</option>
-                            <option value="Uniform">Uniform</option>
-                            <option value="Triangular">Triangular</option>
-                            <option value="Normal">Normal</option>
-                            <option value="Lognormal">Lognormal</option>
-                        </select>
+                        @switch (i)
+                        {
+                            case 0:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param0.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break
+                                ;
+                            case 1:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param1.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                            case 2:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param2.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                            case 3:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param3.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                            case 4:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param4.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                            case 5:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param5.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                            case 6:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param6.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                            case 7:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param7.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                            case 8:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param8.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                            case 9:
+                                <select class="form-select" id="Taxes_dist" aria-label="Select distribution" asp-for="param9.dist">
+                                    <option value="Constant">Constant</option>
+                                    <option value="Uniform">Uniform</option>
+                                    <option value="Triangular">Triangular</option>
+                                    <option value="Normal">Normal</option>
+                                    <option value="Lognormal">Lognormal</option>
+                                </select>
+                                break;
+                        }
                     </div>
                 </div>
                 <div class="col-md-2">
                     <label class="input-group-text" for="Taxes_growth">Growth Type</label>
                     <div class="input-group">
-                        <select class="form-select" id="Taxes_growth" aria-label="Select Growth" >
-                            <option selected value="Constant">Constant Growth</option>
-                            <option value="Nonconstant">Nonconstant Growth</option>
-                            <option value="None">No Growth</option>
-                        </select>
+                        @switch (i)
+                        {
+                            case 0:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param0.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 1:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param1.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 2:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param2.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 3:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param3.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 4:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param4.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 5:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param5.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 6:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param6.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 7:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param7.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 8:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param8.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                            case 9:
+                                <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="param9.growth">
+                                    <option value="Constant">Constant Growth</option>
+                                    <option value="Nonconstant">Nonconstant Growth</option>
+                                    <option selected value="None">No Growth</option>
+                                </select>
+                                break;
+                        }
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" >
+                    @switch (i)
+                    {
+                        case 0:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param0.param1">
+                            break;
+                        case 1:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param1.param1">
+                            break;
+                        case 2:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param2.param1">
+                            break;
+                        case 3:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param3.param1">
+                            break;
+                        case 4:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param4.param1">
+                            break;
+                        case 5:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param5.param1">
+                            break;
+                        case 6:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param6.param1">
+                            break;
+                        case 7:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param7.param1">
+                            break;
+                        case 8:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param8.param1">
+                            break;
+                        case 9:
+                            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="param9.param1">
+                            break;
+                    }
                 </div>
                 <div class="col-md-2">
-                    <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" >
+                    @switch (i)
+                    {
+                        case 0:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param0.param2">
+                            break;
+                        case 1:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param1.param2">
+                            break;
+                        case 2:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param2.param2">
+                            break;
+                        case 3:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param3.param2">
+                            break;
+                        case 4:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param4.param2">
+                            break;
+                        case 5:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param5.param2">
+                            break;
+                        case 6:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param6.param2">
+                            break;
+                        case 7:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param7.param2">
+                            break;
+                        case 8:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param8.param2">
+                            break;
+                        case 9:
+                            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="param9.param2">
+                            break;
+                    }
                 </div>
                 <div class="col-md-2">
-                    <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" >
+                    @switch (i)
+                    {
+                        case 0:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param0.param3">
+                            break;
+                        case 1:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param1.param3">
+                            break;
+                        case 2:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param2.param3">
+                            break;
+                        case 3:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param3.param3">
+                            break;
+                        case 4:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param4.param3">
+                            break;
+                        case 5:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param5.param3">
+                            break;
+                        case 6:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param6.param3">
+                            break;
+                        case 7:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param7.param3">
+                            break;
+                        case 8:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param8.param3">
+                            break;
+                        case 9:
+                            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="param9.param3">
+                            break;
+                    }
                 </div>
             </div>
             <br />
@@ -95,16 +368,25 @@
         <button class="btn btn-primary" type="submit">Run Simulation</button>
     </div>
 </form>
+<br />
+@* <div class="row justify-content-center mt-4">
+    <div id="jsonResponse" class="col-md-6" style="white-space: pre-wrap;"></div>
+</div> *@
+
+<div class="row justify-content-center mt-4">
+    <div id="plotlyChart" class="col-md-12"></div>
+</div>
 @section Scripts {
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('dataForm').addEventListener('submit', function (event) {
+            document.getElementById('dataForm').addEventListener('submit', function (event) 
+            {
                 event.preventDefault(); // Prevent the form from submitting traditionally
 
                 var formData = new FormData(this);
-                var independentVariableName = "Revenue";
-                var dependentVariableName = "Frequency";
+                // var independentVariableName = "Revenue";
+                // var dependentVariableName = "Frequency";
 
                 fetch(this.action, {
                     method: 'POST',
@@ -132,9 +414,9 @@
                         }];
 
                         var layout = {
-                            title: "Simulated Revenue Frequencies",
-                            xaxis: { title: independentVariableName },
-                            yaxis: { title: dependentVariableName },
+                            title: "Simulated Frequencies",
+                            xaxis: { title: "Simulated Value" },
+                            yaxis: { title: "Frequecy" },
                             annotations: [{
                                 x: 0.5,
                                 y: 1.13,

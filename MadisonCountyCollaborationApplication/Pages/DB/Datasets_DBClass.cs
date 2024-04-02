@@ -66,6 +66,17 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             }
             return (independentValues, dependentValues);
         }
+        public static SqlDataReader AttributeReader(string datasetName)
+        {
+            SqlCommand attributeRead = new SqlCommand();
+            attributeRead.Connection = MainDBconnection;
+            attributeRead.Connection.ConnectionString = MainDBconnString;
+            attributeRead.CommandText = $"SELECT _Account FROM {datasetName}";
+            attributeRead.Connection.Open(); // Open connection here, close in Model!
 
+            SqlDataReader tempReader = attributeRead.ExecuteReader();
+
+            return tempReader;
+        }
     }
 }

@@ -1,0 +1,35 @@
+﻿@page
+@model AddCollabDataModel
+@{
+}
+<h4>Add Data to Collaboration: </h4>
+@* collaboration table *@
+<form asp-page-handler="Select" method="post" id="collabForm">
+    <input type="hidden" name="NewD.collabID" id="collabIdInput" value="" />
+    <div class="box-table">
+        @{
+            foreach (var prod in Model.CollaborationList)
+            {
+                <div class="card" data-collab-id="@prod.collabID" onclick="selectCollaboration(@prod.collabID)">
+                    <div class="card-header">
+                        @prod.collabName
+                    </div>
+                    <div class="card-body">
+                        @prod.notesAndInfo
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        function selectCollaboration(collabId) {
+            // Set the value of the hidden input to the collaboration ID
+            document.getElementById('collabIdInput').value = collabId;
+            // Submit the form
+            document.getElementById('collabForm').submit();
+        }
+    </script>
+}

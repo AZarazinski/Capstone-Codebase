@@ -10,24 +10,13 @@
     }
 </style>
 
-@* breadcrum navigation *@
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
-        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
-        <li class="breadcrumb-item"><a asp-page="Monte Carlo">Monte Carlo</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Help</li>
-    </ol>
-</nav>
-
 <div class="text-center">
     <h1 class="display-4">Monte Carlo Help</h1>
 </div>
 <p><b>Iterations:</b> the number of outcomes to simulate</p>
 <p><b>Years:</b> the the number of years in the future you would like to forecast (may be blank if all parameters are no growth)</p>
-<p><b>Significance Level: Choosing the certainty you would like for the true value</b></p>
-<p><b>Initial Value:</b> The value at t=0 for the parameter (May be blank if using no growth)</p>
+<p><b>Significance Level:</b> Choosing the certainty you would like for the true value</p>
+<p><b>Initial Value:</b> The value at t=0 for the category (May be blank if using no growth)</p>
 <p><b>Distribution:</b> the distribution the variable will follow</p>
 <div class="indented-text">
     <p><b>Uniform:</b> a distribution which requires two parameters, a min (<em>a</em>) and a max (<em>b</em>), in which every value between them is equally likely</p>
@@ -57,7 +46,23 @@
 
 <p><b>Growth:</b> How this value will compound over each year</p>
 <div class="indented-text">
-    <p><b>No Growth:</b> This value will not grow over the years, each distribution parameter would be for the final value of the variable, an initial value does not need to be supplied</p>
-    <p><b>Constant Growth:</b>This value will grow the initial value at a constant rate following the distribution over the years, each distribution parameter would be for the growth rate's distribution</p>
-    <p><b>Nonconstant Growth:</b>This value will grow the initial value at varying rates over the years with the growth rates following the distribution, each distribution parameter would be for the growth rate's distribution</p>
+    <p><b>No Growth:</b> This value will not grow over the years, each random variable (<em>X</em>) would be equal to the final output for that category (<em>Y</em>), this would be ideal for an extreme value analysis, an initial value does not need to be supplied.</p>
+    <div>$$X\sim D$$</div>
+    <div>$$Y=X$$</div>
+    <p>Where <em>D</em> is the distribution provided by the user</p>
+    <p><b>Constant Growth:</b>This will grow the initial value at a constant rate following the distribution over the years, each random variable would be for the growth rate's distribution, this would be ideal for a large amount of iterations of a steadily increasing or decreasing value</p>
+    <div>$$X\sim D$$</div>
+    <div>$$Y=v(1+X)^n$$</div>
+    <p>Where <em>v</em> is the initial value, <em>n</em> is the number of years, and <em>D</em> is the distribution provided by the use</p>
+    <p><b>Nonconstant Growth:</b>This value will grow the initial value at varying rates over the years with the growth rates following the distribution, each random variable would be for the growth rate's distribution, this would be ideal for values which does not see the same growth rate every year</p>
+    <div>$$X_i \sim D$$</div>
+    <div>$$Y=v\prod_{i=1}^{n}{(1+X_i)}$$</div>
+    <p>Where <em>v</em> is the initial value, <em>n</em> is the number of years, and <em>D</em> is the distribution provided by the user</p>
 </div>
+<p><b>Ordinary Monte Carlo:</b> Here your simulated value (<em>Z</em>) would be the summation of all the random variables for the categories (<em>Y</em><sub>i</sub>)</p>
+<div>$$Z=\sum_{i=1}^{n}{Y_i}$$</div>
+<p>Where n is the number of simulated categories</p>
+<p><b>Monte Carlo Regression:</b> Here your simulated value (<em>Z</em>) would be the intercept (&Beta;<sub>0</sub>) from the regression plus the linear combination of the slopes (&Beta;<sub>i</sub>) from the regression and the random variables for the categories (<em>Y</em><sub>i</sub>)</p>
+<div>$$Z=\beta_0 + \sum_{i=1}^{n}{\beta _i Y_i}$$</div>
+<p>Where n is the number of simulated categories</p>
+<p><b>Confidence Interval: </b>The range in which the user can be </p>

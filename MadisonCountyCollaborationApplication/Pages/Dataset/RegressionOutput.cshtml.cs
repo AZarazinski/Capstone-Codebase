@@ -1,3 +1,4 @@
+using MathNet.Numerics.Distributions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
@@ -26,14 +27,17 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         [BindProperty]
         public double ExpectedOutcome { get; set; } = double.NaN;
         [BindProperty]
-        public List<double> StandardErrors { get; set; } = new List<double>();
+        public List<double> StandardErrors { get; set; }
         [BindProperty]
         public List<double> PValues { get; set; } = new List<double>();
         [BindProperty]
         public double ConfidenceLevel {  get; set; } = .05;
         [BindProperty]
         public double Aplha {  get; set; } = .05;
-
+        [BindProperty]
+        public double DegreesOfFreedom { get; set; }
+        [BindProperty]
+        public double CriticalValue { get; set; }
 
 
         public IActionResult OnGet()
@@ -47,23 +51,33 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 var slopesJson = HttpContext.Session.GetString("Slopes");
                 var variablesJson = HttpContext.Session.GetString("Variables");
                 var dependentVariableJson = HttpContext.Session.GetString("DependentVariable");
-                var standardErrorsJson = HttpContext.Session.GetString("StandardError");
                 var pValuesJson = HttpContext.Session.GetString("PValues");
                 var confidenceLevelJson = HttpContext.Session.GetString("ConfidenceLevel");
+                var criticalValueJson = HttpContext.Session.GetString("CriticalValue");
+                CriticalValue = JsonSerializer.Deserialize<double>(criticalValueJson);
+
 
                 // Deserialize data
                 Intercept = JsonSerializer.Deserialize<double>(interceptJson);
                 Slopes = JsonSerializer.Deserialize<List<double>>(slopesJson);
                 IndependentVariables = JsonSerializer.Deserialize<List<string>>(variablesJson);
                 DependentVariable = JsonSerializer.Deserialize<string>(dependentVariableJson);
+                var standardErrorsJson = HttpContext.Session.GetString("StandardError");
+                Console.WriteLine(standardErrorsJson); // Debugging purpose
 
-                if (!string.IsNullOrWhiteSpace(confidenceLevelJson)) 
-                { 
-                    ConfidenceLevel = JsonSerializer.Deserialize<double>(confidenceLevelJson);
-                }
                 if (!string.IsNullOrWhiteSpace(standardErrorsJson))
                 {
                     StandardErrors = JsonSerializer.Deserialize<List<double>>(standardErrorsJson);
+                    Console.WriteLine(StandardErrors.Count); // Should now reflect the correct count
+                }
+                else
+                {
+                    Console.WriteLine("StandardErrors session data is null or empty.");
+                }
+                if (!string.IsNullOrWhiteSpace(confidenceLevelJson)) 
+                { 
+                    ConfidenceLevel = JsonSerializer.Deserialize<double>(confidenceLevelJson);
+                    Console.WriteLine(ConfidenceLevel.ToString());
                 }
 
                 if (!string.IsNullOrWhiteSpace(pValuesJson))
@@ -94,13 +108,42 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             }
             // Prepare the inputs dictionary from the form submission
             double expectedOutcome = CalculateExpectedOutcome(WhatIfInputs, Slopes, Intercept);
+            // Calculate confidence intervals (placeholder for actual calculation)
+            var standardErrorsJson = HttpContext.Session.GetString("StandardError");
+
+            if (!string.IsNullOrWhiteSpace(standardErrorsJson))
+            {
+                StandardErrors = JsonSerializer.Deserialize<List<double>>(standardErrorsJson);
+                Console.WriteLine(StandardErrors.Count); // Should now reflect the correct count
+            }
+            double standardErrorOfPrediction = CalculateStandardErrorOfPrediction(WhatIfInputs, Slopes, StandardErrors);
+            
+            var criticalValueJson = HttpContext.Session.GetString("CriticalValue");
+            CriticalValue = JsonSerializer.Deserialize<double>(criticalValueJson);
+
+            //double tValue = GetCriticalTValue(DegreesOfFreedom, ConfidenceLevel);
+            //Console.WriteLine(tValue.ToString());
+            var tValue = CriticalValue;
+            double marginOfError = tValue * standardErrorOfPrediction;
+            double lowerBound = expectedOutcome - marginOfError;
+            double upperBound = expectedOutcome + marginOfError;
+
             // Calculate expected outcome using the new method
 
             // Store the expected outcome in the session
             HttpContext.Session.SetString("ExpectedOutcome", expectedOutcome.ToString());
             Console.WriteLine($"Expected Outcome: {expectedOutcome}");
             // Redirect to the WhatIfOutput page with expectedOutcome query parameter
-            return RedirectToPage("WhatIfOutput", new { ExpectedOutcome = expectedOutcome });
+            //return RedirectToPage("WhatIfOutput", new { ExpectedOutcome = expectedOutcome });
+
+            // Store the results in the session
+            HttpContext.Session.SetString("ExpectedOutcome", expectedOutcome.ToString());
+            HttpContext.Session.SetString("LowerBound", lowerBound.ToString());
+            HttpContext.Session.SetString("UpperBound", upperBound.ToString());
+
+            // Redirect to the WhatIfOutput page
+            return RedirectToPage("WhatIfOutput", new { ExpectedOutcome = expectedOutcome, LowerBound = lowerBound, UpperBound = upperBound });
+        
         }
 
         private double CalculateExpectedOutcome(List<double> variableInputs, List<double> Slopes, double? Intercept)
@@ -120,5 +163,28 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         {
             return RedirectToPage("MonteCarloRegression");
         }
+
+        private double CalculateStandardErrorOfPrediction(List<double> variableInputs, List<double> slopes, List<double> standardErrors)
+        {
+            double sumOfSquaredSE = 0;
+            // Start loop from 1 to skip the intercept's standard error
+            for (int i = 0; i < variableInputs.Count; i++)
+            {
+                // Adjust the index for standardErrors by adding 1, since the first entry is for the intercept
+                sumOfSquaredSE += Math.Pow(standardErrors[i + 1] * variableInputs[i], 2);
+            }
+            double standardErrorOfPrediction = Math.Sqrt(sumOfSquaredSE);
+            return standardErrorOfPrediction;
+        }
+
+        private double GetCriticalTValue(double degreesOfFreedom, double confidenceLevel)
+        {
+            // Convert confidence level to alpha (e.g., 95% confidence -> 0.05 alpha)
+            double alpha = 1 - confidenceLevel;
+            // Get the critical t-value from the t-distribution
+            double tValue = StudentT.InvCDF(0, 1, degreesOfFreedom, 1 - alpha / 2.0);
+            return tValue;
+        }
+
     }
 }

@@ -14,12 +14,14 @@ using PdfSharpCore.Drawing;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Data.SqlClient;
 
 
 namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
-    public class SingleRegressionModel : PageModel
+    public class TylerRegressionModel : PageModel
     {
+
         [BindProperty]
         public string IndependentVariable { get; set; }
         [BindProperty]
@@ -33,6 +35,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public List<double> independentDataList { get; set; } = new List<double>();
         public string PlotImageBase64 { get; set; }
         public string ChartConfigJson { get; private set; }
+        public List<string> AttributeList { get; set; } = new List<string>();
 
         public IActionResult OnGet()
         {
@@ -64,7 +67,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             List<string> independentDataAsString = Datasets_DBClass.AttributeReader<string>(Independent, dataSet);
             Datasets_DBClass.MainDBconnection.Close();
 
-            for(int i = 0; i<dependentDataAsString.Count(); i++)
+            for (int i = 0; i < dependentDataAsString.Count(); i++)
             {
                 dependentDataAsString[i] = dependentDataAsString[i].Replace("$", "").Replace("(", "-").Replace(")", "").Replace(",", "");
             }
@@ -140,8 +143,23 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             // Initialization logic for Data property
             datasetID = (int)HttpContext.Session.GetInt32("datasetID"); // Provide a default value to avoid null issues
             datasetName = DBClass.ExtractDatasetName(datasetID);
+            Console.WriteLine(datasetName);
             DBClass.MainDBconnection.Close();
             Data = DBClass.FetchDataForTable(datasetName);
+            DBClass.MainDBconnection.Close();
+            SqlDataReader DatasetReader = Datasets_DBClass.AttributeReader(datasetName);
+            string department;
+            while (DatasetReader.Read())
+            {
+                department = DatasetReader["_Account"].ToString().Split("-")[1];
+                if (!AttributeList.Contains(department))
+                {
+                    AttributeList.Add(
+                        department
+                        );
+                }
+            }
+            AttributeList.Sort();
             DBClass.MainDBconnection.Close();
         }
 
@@ -164,6 +182,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 
 
             return (m, b, rSquared);
-        }    
+        }
     }
 }
+

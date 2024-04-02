@@ -4,18 +4,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Plotly.NET.CSharp;
 using Newtonsoft.Json;
 using MadisonCountyCollaborationApplication.Pages.DataClasses;
+using MathNet.Numerics.Random;
 
 
 namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
     public class MonteCarloModel : PageModel
     {
-
-        [BindProperty]
-        public string ProcessName { get; set; }
-        [BindProperty]
-        public string DatasetName { get; set; }
-
         [BindProperty]
         public int iterations { get; set; }
         [BindProperty]
@@ -39,13 +34,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 ViewData["LoginMessage"] = "Login for "
                     + HttpContext.Session.GetString("username")
                     + " successful!";
-
-                //get process name
-                ProcessName = HttpContext.Session.GetString("processName");
-
-                //get dataset name
-                DatasetName = HttpContext.Session.GetString("datasetName");
-
                 return Page();
             }
             else
@@ -60,7 +48,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             var chart = Chart.Histogram<double, double, string>(X: results)
                 .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
                 .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Frequency"));
+            
+                double[] CI = new Simulation().ConfidenceInterval(results, confidenceInterval);
 
+                string confidence = "[" + CI[0] + "," + CI[1] + "]";
+            
             //var chart = Chart.Histogram(x:results.ToList());
 
             //.WithTraceInfo("Data Points", ShowLegend: true)
@@ -77,7 +69,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             ChartConfigJson = chartJson;
             var response = new
             {
-                Data = new { Fields = new[] { results } } // This is your existing data structure
+                Data = new { Fields = new[] { results } },
+                Confidence = confidence
+                    // This is your existing data structure
             };
             var jsonResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings
             {
@@ -125,11 +119,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 other = sim.GenerateResult(dist3, Convert.ToDouble(otherParameters.initial), otherParameters.growth, years);
                 revenues[i] = tax + gov + other;
             }
-            double[] CI = sim.ConfidenceInterval(revenues, confidenceInterval);
-            foreach (double number in CI)
-            {
-                Console.WriteLine(number);
-            }
+           
+            
             return revenues;
         }
 

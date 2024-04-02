@@ -1,4 +1,6 @@
-﻿namespace MadisonCountyCollaborationApplication.Pages.DataClasses
+﻿using MathNet.Numerics.Statistics;
+
+namespace MadisonCountyCollaborationApplication.Pages.DataClasses
 {
     public class Simulation
     {
@@ -46,7 +48,7 @@
             }
             else
             {
-                return new DataClasses.Constant(new Random(), Convert.ToDouble(distribution.param3));
+                return new DataClasses.Constant(new Random(), Convert.ToDouble(distribution.param1));
             }
         }
         public double GenerateResult(DataClasses.Distribution dist, double initial, string growth, double years)
@@ -68,29 +70,24 @@
                 return dist.GenerateRandom();
             }
         }
+        //non parametric bootstrap
         public double[] ConfidenceInterval(double[] Results, double significance)
         {
-            double average = Results.Average();
-            double sumOfSquaredDeviations = Results.Select(val => Math.Pow(val - average, 2)).Sum();
-            double standardDeviation = Math.Sqrt(sumOfSquaredDeviations / (Results.Length - 1));
             double[] CI = new double[2];
-            if (significance == 95)
+            double[] bootstrap = new double[200];
+            double[] sample = new double[Results.Length];
+            Random rand = new Random();
+            for (int i = 0; i < 200; i++)
             {
-                CI[0] = average - 1.959964 * standardDeviation / Math.Sqrt(Results.Length);
-                CI[1] = average + 1.959964 * standardDeviation / Math.Sqrt(Results.Length);
+                for (int j = 0; j < sample.Length; j++)
+                {
+                    sample[j] = Results[rand.Next(Results.Length)];
+                }
+                bootstrap[i] = sample.Mean();
             }
-            else if (significance == 90)
-            {
-                
-                CI[0] = average - 1.644854 * standardDeviation / Math.Sqrt(Results.Length);
-                CI[1] = average + 1.644854 * standardDeviation / Math.Sqrt(Results.Length);
-            }
-            else
-            {
-
-                CI[0] = average - 2.575829 * standardDeviation / Math.Sqrt(Results.Length);
-                CI[1] = average + 2.575829 * standardDeviation / Math.Sqrt(Results.Length);
-            }
+            double tau = (1 - significance) / 2;
+            CI[0] = bootstrap.Quantile(tau);
+            CI[1] = bootstrap.Quantile(significance + tau);
             return CI;
         }
     }

@@ -3,19 +3,16 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.CommandLine.IO;
 using System.Data;
-using System.Text.Json;
+using MadisonCountyCollaborationApplication.Pages.DataClasses;
+using Newtonsoft.Json;
+using Plotly.NET.CSharp;
+
 
 
 namespace MadisonCountyCollaborationApplication.Pages.Dataset
 {
     public class MonteCarloRegressionModel : PageModel
     {
-
-        [BindProperty]
-        public string ProcessName { get; set; }
-        [BindProperty]
-        public string DatasetName { get; set; }
-
         [BindProperty]
         public List<string> IndependentVariables { get; set; }
         [BindProperty]
@@ -29,15 +26,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public double? Intercept { get; set; }
         [BindProperty]
         public List<double> Slopes { get; set; }
-        [BindProperty]
-        public List<double> WhatIfInputs { get; set; } = new List<double>();
         public bool ShowResults { get; set; } = false;
-        [BindProperty]
-        public double ExpectedOutcome { get; set; } = double.NaN;
-        [BindProperty]
-        public List<double> StandardErrors { get; set; } = new List<double>();
-        [BindProperty]
-        public List<double> PValues { get; set; } = new List<double>();
         [BindProperty]
         public double ConfidenceLevel { get; set; } = .05;
         [BindProperty]
@@ -48,6 +37,29 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public int years { get; set; }
         [BindProperty]
         public double confidenceInterval { get; set; }
+        [BindProperty]
+        public List<Parameters> parameters { get; set; }
+        [BindProperty]
+        public Parameters param0 { get; set; }
+        [BindProperty]
+        public Parameters param1 { get; set; }
+        [BindProperty]
+        public Parameters param2 { get; set; }
+        [BindProperty]
+        public Parameters param3 { get; set; }
+        [BindProperty]
+        public Parameters param4 { get; set; }
+        [BindProperty]
+        public Parameters param5 { get; set; }
+        [BindProperty]
+        public Parameters param6 { get; set; }
+        [BindProperty]
+        public Parameters param7 { get; set; }
+        [BindProperty]
+        public Parameters param8 { get; set; }
+        [BindProperty]
+        public Parameters param9 { get; set; }
+
         public string ChartConfigJson { get; private set; }
         public IActionResult OnGet()
         {
@@ -55,50 +67,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             {
                 ViewData["LoginMessage"] = "Login for " + HttpContext.Session.GetString("username") + " successful!";
 
-                //get process name
-                ProcessName = HttpContext.Session.GetString("processName");
-
-                //get dataset name
-                DatasetName = HttpContext.Session.GetString("datasetName");
-
-
                 // Retrieve data from session
-                var interceptJson = HttpContext.Session.GetString("Intercept");
-                var slopesJson = HttpContext.Session.GetString("Slopes");
                 var variablesJson = HttpContext.Session.GetString("Variables");
                 var dependentVariableJson = HttpContext.Session.GetString("DependentVariable");
-                var standardErrorsJson = HttpContext.Session.GetString("StandardError");
-                var pValuesJson = HttpContext.Session.GetString("PValues");
-                var confidenceLevelJson = HttpContext.Session.GetString("ConfidenceLevel");
-                Console.WriteLine("variables: " + variablesJson);
                 // Deserialize data
-                Intercept = JsonSerializer.Deserialize<double>(interceptJson);
-                Slopes = JsonSerializer.Deserialize<List<double>>(slopesJson);
-                IndependentVariables = JsonSerializer.Deserialize<List<string>>(variablesJson);
-                DependentVariable = JsonSerializer.Deserialize<string>(dependentVariableJson);
-                Console.WriteLine("----------------------------------------");
-                foreach (string variable in IndependentVariables)
-                {
-                    Console.WriteLine(variable);
-                }
-
-                Console.WriteLine("count: "+ IndependentVariables.Count);
-
-                if (!string.IsNullOrWhiteSpace(confidenceLevelJson))
-                {
-                    ConfidenceLevel = JsonSerializer.Deserialize<double>(confidenceLevelJson);
-                }
-                if (!string.IsNullOrWhiteSpace(standardErrorsJson))
-                {
-                    StandardErrors = JsonSerializer.Deserialize<List<double>>(standardErrorsJson);
-                }
-
-                if (!string.IsNullOrWhiteSpace(pValuesJson))
-                {
-                    PValues = JsonSerializer.Deserialize<List<double>>(pValuesJson);
-                }
-                double Alpha = (1.0 - (ConfidenceLevel / 100.0));
-                Console.WriteLine(Alpha.ToString());
+                IndependentVariables = System.Text.Json.JsonSerializer.Deserialize<List<string>>(variablesJson);
+                DependentVariable = System.Text.Json.JsonSerializer.Deserialize<string>(dependentVariableJson);
 
                 // Optionally, you can call other methods here to perform additional initialization or processing
 
@@ -113,6 +87,126 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public IActionResult OnPostHelp()
         {
             return RedirectToPage("MonteCarloHelp");
+        }
+        public IActionResult OnPost()
+        {
+            var interceptJson = HttpContext.Session.GetString("Intercept");
+            var slopesJson = HttpContext.Session.GetString("Slopes");
+            var variablesJson = HttpContext.Session.GetString("Variables");
+            var dependentVariableJson = HttpContext.Session.GetString("DependentVariable");
+
+            Intercept = System.Text.Json.JsonSerializer.Deserialize<double>(interceptJson);
+            Slopes = System.Text.Json.JsonSerializer.Deserialize<List<double>>(slopesJson);
+            IndependentVariables = System.Text.Json.JsonSerializer.Deserialize<List<string>>(variablesJson);
+            DependentVariable = System.Text.Json.JsonSerializer.Deserialize<string>(dependentVariableJson);
+
+            for (int i = 0; i < IndependentVariables.Count; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        param0.beta = Slopes[i];
+                        parameters.Add(param0);
+                        break;
+                    case 1:
+                        param1.beta = Slopes[i];
+                        parameters.Add(param1);
+                        break;
+                    case 2:
+                        param2.beta = Slopes[i];
+                        parameters.Add(param2);
+                        break;
+                    case 3:
+                        param3.beta = Slopes[i];
+                        parameters.Add(param3);
+                        break;
+                    case 4:
+                        param4.beta = Slopes[i];
+                        parameters.Add(param4);
+                        break;
+                    case 5:
+                        param5.beta = Slopes[i];
+                        parameters.Add(param5);
+                        break;
+                    case 6:
+                        param6.beta = Slopes[i];
+                        parameters.Add(param6);
+                        break;
+                    case 7:
+                        param7.beta = Slopes[i];
+                        parameters.Add(param7);
+                        break;
+                    case 8:
+                        param8.beta = Slopes[i];
+                        parameters.Add(param8);
+                        break;
+                    case 9:
+                        param9.beta = Slopes[i];
+                        parameters.Add(param9);
+                        break;
+                }
+            }
+            
+            double[] results = MCRegression(iterations, years, parameters, (double)Intercept);
+            double[] CI = new Simulation().ConfidenceInterval(results, confidenceInterval);
+            
+            var chart = Chart.Histogram<double, double, string>(X: results)
+                .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
+                .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Frequency"));
+
+            //var chart = Chart.Histogram(x:results.ToList());
+
+            //.WithTraceInfo("Data Points", ShowLegend: true)
+            //.WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Independent Variable"))
+            //.WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Dependent Variable"));
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // Ignore circular references
+                TypeNameHandling = TypeNameHandling.None, // Additional setting to avoid $type insertion
+                Formatting = Formatting.None // Use None for smaller payload; use Indented for readable JSON
+            };
+
+            var chartJson = JsonConvert.SerializeObject(chart, settings);
+            ChartConfigJson = chartJson;
+            var response = new
+            {
+                Data = new { Fields = new[] { results } } // This is your existing data structure
+            };
+            var jsonResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                TypeNameHandling = TypeNameHandling.None,
+                Formatting = Formatting.None
+            });
+            Console.WriteLine(jsonResponse);
+            return Content(jsonResponse, "application/json");
+        }
+
+        public double[] MCRegression(int iterations, int years, List<Parameters> param, double intercept)
+        {
+            double[] revenues = new double[iterations];
+            Simulation sim = new Simulation();
+            //assigning distribution
+            List<Distribution> dist = new List<Distribution>();
+
+            foreach (Parameters p in param)
+            {
+                dist.Add(sim.AssignDistribution(p));
+            }
+
+            //conducting simulation
+            double[] revs = new double[param.Count];
+
+            for (int i = 0; i < iterations; i++)
+            {
+                for (int j = 0; j < param.Count; j++)
+                {
+                    revs[j] = sim.GenerateResult(dist[j], Convert.ToDouble(param[j].initial), param[j].growth, years) * param[j].beta;
+                }
+                revenues[i] = intercept + revs.Sum();
+            }
+            
+            return revenues;
         }
     }
 }

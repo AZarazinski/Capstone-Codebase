@@ -32,7 +32,7 @@
 </div>
 <br />
 
-<form method="post">
+<form method="post" id="dataForm">
     <div class="row">
         <div class="col-md-4">
             Number of iterations:
@@ -66,7 +66,7 @@
             <label class="input-group-text" for="propDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="propDist" aria-label="Select distribution" asp-for="Property.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -78,9 +78,9 @@
             <label class="input-group-text" for="propGrowth">Growth Type</label>
             <div class="input-growth">
                 <select class="form-select" id="propGrowth" aria-label="Select Growth" asp-for="Property.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -108,7 +108,7 @@
             <label class="input-group-text" for="localDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="localDist" aria-label="Select distribution" asp-for="Local.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -120,9 +120,9 @@
             <label class="input-group-text" for="localGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="localGrowth" aria-label="Select Growth" asp-for="Local.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -150,7 +150,7 @@
             <label class="input-group-text" for="permitsDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="permitsDist" aria-label="Select distribution" asp-for="Permits.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -162,9 +162,9 @@
             <label class="input-group-text" for="permitGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="permitGrowth" aria-label="Select Growth" asp-for="Permits.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -190,7 +190,7 @@
             <label class="input-group-text" for="fineDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="fineDist" aria-label="Select distribution" asp-for="Fines.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -202,9 +202,9 @@
             <label class="input-group-text" for="fineGrowth">Growth Type</label>
             <div class="input-growth">
                 <select class="form-select" id="fineGrowth" aria-label="Select Growth" asp-for="Fines.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -232,7 +232,7 @@
             <label class="input-group-text" for="moneyDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="moneyDist" aria-label="Select distribution" asp-for="UseOfMoney.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -244,9 +244,9 @@
             <label class="input-group-text" for="moneyGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="moneyGrowth" aria-label="Select Growth" asp-for="UseOfMoney.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -274,7 +274,7 @@
             <label class="input-group-text" for="serviceDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="serviceDist" aria-label="Select distribution" asp-for="Services.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -286,9 +286,9 @@
             <label class="input-group-text" for="serviceGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="serviceGrowth" aria-label="Select Growth" asp-for="Services.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -316,7 +316,7 @@
             <label class="input-group-text" for="miscDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="miscDist" aria-label="Select distribution" asp-for="Miscellaneous.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -328,9 +328,9 @@
             <label class="input-group-text" for="miscGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="miscGrowth" aria-label="Select Growth" asp-for="Miscellaneous.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -358,7 +358,7 @@
             <label class="input-group-text" for="commonDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="commonDist" aria-label="Select distribution" asp-for="Commonwealth.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -370,9 +370,9 @@
             <label class="input-group-text" for="commonGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="commonGrowth" aria-label="Select Growth" asp-for="Commonwealth.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -400,7 +400,7 @@
             <label class="input-group-text" for="federalDist">Distribution</label>
             <div class="input-group">
                 <select class="form-select" id="federalDist" aria-label="Select distribution" asp-for="Federal.dist">
-                    <option selected value="Constant">Constant</option>
+                    <option value="Constant">Constant</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -412,9 +412,9 @@
             <label class="input-group-text" for="fedGrowth">Growth Type</label>
             <div class="input-growth">
                 <select class="form-select" id="fedGrowth" aria-label="Select Growth" asp-for="Federal.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -434,6 +434,9 @@
     </div>
 </form>
 
+<div class="row justify-content-center mt-4">
+    <div id="plotlyChart" class="col-md-12"></div>
+</div>
 @section Scripts {
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
@@ -442,8 +445,8 @@
                 event.preventDefault(); // Prevent the form from submitting traditionally
 
                 var formData = new FormData(this);
-                var independentVariableName = "Revenue";
-                var dependentVariableName = "Frequency";
+                // var independentVariableName = "Revenue";
+                // var dependentVariableName = "Frequency";
 
                 fetch(this.action, {
                     method: 'POST',
@@ -471,9 +474,9 @@
                         }];
 
                         var layout = {
-                            title: "Simulated Revenue Frequencies",
-                            xaxis: { title: independentVariableName },
-                            yaxis: { title: dependentVariableName },
+                            title: "Simulated Revenues",
+                            xaxis: { title: "Revenue" },
+                            yaxis: { title: "Frequecy" },
                             annotations: [{
                                 x: 0.5,
                                 y: 1.13,

@@ -15,16 +15,6 @@
     }
 </style>
 
-@* breadcrum navigation *@
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
-        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Multi Regression</li>
-    </ol>
-</nav>
-
 <h2>@ViewData["Title"]</h2>
 
 <form id="dataForm" asp-page-handler="OnPost">

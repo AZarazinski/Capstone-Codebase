@@ -2,17 +2,6 @@
 @model MadisonCountyCollaborationApplication.Pages.Dataset.MonteCarloModel
 @{
 }
-
-@* breadcrum navigation *@
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
-        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Monte Carlo</li>
-    </ol>
-</nav>
-
 <div class="text-center">
     <h1 class="display-4">Simple Rev Simulation</h1>
 </div>
@@ -41,7 +30,7 @@
     </div>
 </div>
 <br />
-<form method="post">
+<form method="post" id="dataForm">
     <div class="row">
         <div class="col-md-4">
             Number of iterations:
@@ -87,9 +76,9 @@
             <label class="input-group-text" for="Taxes_growth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="Taxes_growth" aria-label="Select Growth" asp-for="Taxes.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -128,9 +117,9 @@
             <label class="input-group-text" for="Gov_growth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="Gov_growth" aria-label="Select Growth" asp-for="Gov.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -169,9 +158,9 @@
             <label class="input-group-text" for="Other_growth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="Other_growth" aria-label="Select Growth" asp-for="Other.growth">
-                    <option selected value="Constant">Constant Growth</option>
+                    <option value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option value="None">No Growth</option>
+                    <option selected value="None">No Growth</option>
                 </select>
             </div>
         </div>
@@ -191,6 +180,9 @@
     </div>
 </form>
 
+<div class="row justify-content-center mt-4">
+    <div id="plotlyChart" class="col-md-12"></div>
+</div>
 @section Scripts {
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script>
@@ -199,8 +191,8 @@
                 event.preventDefault(); // Prevent the form from submitting traditionally
 
                 var formData = new FormData(this);
-                var independentVariableName = "Revenue";
-                var dependentVariableName = "Frequency";
+                // var independentVariableName = "Revenue";
+                // var dependentVariableName = "Frequency";
 
                 fetch(this.action, {
                     method: 'POST',
@@ -228,9 +220,10 @@
                         }];
 
                         var layout = {
-                            title: "Simulated Revenue Frequencies",
-                            xaxis: { title: independentVariableName },
-                            yaxis: { title: dependentVariableName },
+                            title: "Simulated Revenues",
+                            xaxis: { title: "Revenue" },
+                            yaxis: { title: "Frequecy" },
+                            text: "Confidence Interval" + data.Confidence,
                             annotations: [{
                                 x: 0.5,
                                 y: 1.13,

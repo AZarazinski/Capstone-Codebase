@@ -1,22 +1,45 @@
 ﻿@page
 @model MadisonCountyCollaborationApplication.Pages.Dataset.WhatIfOutputModel
+@using Newtonsoft.Json
 @{
 }
-<div class="container mt-4">
-    <h2>What-If Analysis Result</h2>
 
-    <div class="mb-4">
-        <h4>Expected Outcome:</h4>
-        <p>@Model.ExpectedOutcome</p>
+<div class="container mt-4">
+    <!-- Card for What-If Analysis Result -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">What-If Analysis Result</h2>
+            <div class="mb-4">
+                <h4>Expected Outcome:</h4>  @string.Format("{0:#,0.000}", @Model.ExpectedOutcome)
+                <h4>Lower Bound:</h4> @string.Format("{0:#,0.000}", @Model.LowerBound)
+                <h4>Upper Bound:</h4> @string.Format("{0:#,0.000}", @Model.UpperBound)
+            </div>
+            <!-- Placeholder for the plot -->
+            <div id="boxPlot"></div>
+        </div>
     </div>
 
-@*     <div class="mb-4">
-        <h4>Variables:</h4>
-        <ul>
-            @foreach (var variable in Model.IndependentVariables)
-            {
-                <li>@variable.Replace("_", " ").TrimStart('_'): @Model.WhatIfInputs[variable]</li>
-            }
-        </ul>
-    </div> *@
+    <!-- Card for explanation of the boxplot -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">Understanding Your Boxplot:</h4>
+            <p>This boxplot visualizes the range of possible outcomes based on the analysis. The central line represents the median outcome, the box covers the middle 50% of results (from the 25th to the 75th percentile), and the 'whiskers' extend to show the full range of data, excluding any outliers. The expected outcome is highlighted to show where it falls within these possibilities, helping you understand its relative position. Such insights can guide decision-making by highlighting the spread and central tendency of the predicted results.</p>
+        </div>
+    </div>
 </div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        var values = @Html.Raw(JsonConvert.SerializeObject(Model.Values));
+        var data = [{
+            x: values,
+            type: 'box',
+            orientation: 'h' // This makes the boxplot horizontal
+        }];
+
+        Plotly.newPlot('boxPlot', data);
+    });
+</script>
+
