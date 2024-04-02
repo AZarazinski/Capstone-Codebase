@@ -2,3 +2,9 @@
 @model MadisonCountyCollaborationApplication.Pages.Process.FileHandlingModel
 @{
 }
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    </div>
+}

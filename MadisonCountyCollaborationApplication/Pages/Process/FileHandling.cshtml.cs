@@ -40,6 +40,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             if (!System.IO.File.Exists(filePath)) // error message if the file does not exist 
             {
                 ModelState.AddModelError("", "File does not exist.");
+                Console.WriteLine("File Exists");
                 return Page();
             }
 
@@ -50,6 +51,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Error processing file: {ex.Message}"); // error message if there is an error processing file
+                Console.WriteLine("Error processing");
                 return Page();
             }
 
@@ -100,7 +102,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
         private async Task<int> GetDatasetID(string tableName)
         {
-            string sqlQuery = @"SELECT datasetID FROM DataSets WHERE dataSetName = @TableName;";
+            string sqlQuery = @"SELECT datasetID FROM DataSet WHERE dataSetName = @TableName;";
             using (var connection = new SqlConnection(MainDBconnString))
             {
                 await connection.OpenAsync();
@@ -190,7 +192,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         public static List<string> FetchAllDatasets()
         {
             List<string> datasetNames = new List<string>();
-            string sqlQuery = "SELECT FileName FROM DataSets"; // Adjust if your actual table name differs
+            string sqlQuery = "SELECT FileName FROM DataSet"; // Adjust if your actual table name differs
             using (var connection = new SqlConnection(MainDBconnString)) // Use the actual connection string variable
             using (var command = new SqlCommand(sqlQuery, connection))
             {
@@ -216,7 +218,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             var userID = DBClass.UserNameIDConverter(username);
 
             // Assuming the DataSet table has a column named "TableName"
-            string addFileQuery = @"INSERT INTO DataSets (dataSetName, userID) VALUES (@FileName, " + userID + ");";
+            string addFileQuery = @"INSERT INTO DataSet (dataSetName, userID) VALUES (@FileName, " + userID + ");";
 
             using (var connection = new SqlConnection(MainDBconnString))
             {

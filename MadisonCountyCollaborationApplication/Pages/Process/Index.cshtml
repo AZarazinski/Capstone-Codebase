@@ -124,7 +124,7 @@
                 <tbody>
                     @{
                         string sqlQuery = 
-$"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateUploaded ,Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
+$"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateCreated ,Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
                         SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
 
                         while (DatasetReader.Read())
@@ -137,7 +137,7 @@ $"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateUploaded ,Users.use
                                     </a>
                                 </td>
                                 <td>@DatasetReader["userName"].ToString()</td>
-                                <td>@DatasetReader["dateUploaded"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
+                                <td>@DatasetReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
                             </tr>
                         }
                         DatasetReader.Close(); // Always close the SqlDataReader when done.

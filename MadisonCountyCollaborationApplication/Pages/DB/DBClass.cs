@@ -164,7 +164,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             cmdProductRead.Connection = MainDBconnection;
             cmdProductRead.Connection.ConnectionString = MainDBconnString;
             cmdProductRead.Parameters.AddWithValue("@datasetID", dataID);
-            cmdProductRead.CommandText = "Select Count(*) FROM DataSets WHERE dataSetID = @datasetID";
+            cmdProductRead.CommandText = "Select Count(*) FROM DataSet WHERE dataSetID = @datasetID";
             cmdProductRead.Connection.Open();
             if (((int)cmdProductRead.ExecuteScalar()) > 0)
             {
@@ -181,7 +181,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlCommand cmdKnowledgeRead = new SqlCommand();
             cmdKnowledgeRead.Connection = MainDBconnection;
             cmdKnowledgeRead.Connection.ConnectionString = MainDBconnString;
-            cmdKnowledgeRead.CommandText = "SELECT * FROM DataSets";
+            cmdKnowledgeRead.CommandText = "SELECT * FROM DataSet";
             cmdKnowledgeRead.Connection.Open(); // Open connection here, close in Model!
 
             SqlDataReader tempReader = cmdKnowledgeRead.ExecuteReader();
@@ -199,7 +199,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlCommand cmdContentRead = new SqlCommand();
             cmdContentRead.Connection = MainDBconnection;
             cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT TOP 1 datasetID FROM DataSets ORDER BY datasetID DESC";
+            cmdContentRead.CommandText = "SELECT TOP 1 datasetID FROM DataSet ORDER BY datasetID DESC";
             cmdContentRead.Connection.Open(); // Open connection here, close in Model!
 
             SqlDataReader tempReader = cmdContentRead.ExecuteReader();
@@ -215,7 +215,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlCommand cmdContentRead = new SqlCommand();
             cmdContentRead.Connection = MainDBconnection;
             cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT dataSetName FROM DataSets WHERE datasetID = @dataID";
+            cmdContentRead.CommandText = "SELECT dataSetName FROM DataSet WHERE datasetID = @dataID";
             cmdContentRead.Parameters.AddWithValue("@dataID", ID);
             cmdContentRead.Connection.Open(); // Open connection here, close in Model!
 
@@ -250,7 +250,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         //functions for adding values to 
         public static void CreateDataset(String title)
         {
-            String sqlQuery = "INSERT INTO DataSets (dataSetName) VALUES('";
+            String sqlQuery = "INSERT INTO DataSet (dataSetName) VALUES('";
             sqlQuery += title + "')";
 
             SqlCommand cmdProductRead = new SqlCommand();

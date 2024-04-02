@@ -26,9 +26,9 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (Context.Session.GetString("username") != null)
                         {
-                            string username = Context.Session.GetString("username");
+                            @* string username = Context.Session.GetString("username");
                             var userID = DBClass.UserNameIDConverter(username);
-                            bool isAdmin = DBClass.CheckAdmin(userID);
+                            bool isAdmin = DBClass.CheckAdmin(userID); *@
 
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Home">Home</a>
@@ -36,13 +36,13 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Documents/DocumentCenter">Document Center</a>
                             </li>
-                            @if (isAdmin)
+                            @* @if (isAdmin)
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-page="/AdminDashboard">Admin Dashboard</a>
                                 </li>
                             }
-                            DBClass.MainDBconnection.Close();
+                            DBClass.MainDBconnection.Close(); *@
                         }
                     </ul>
                     <ul class="navbar-right" style="list-style-type: none;">

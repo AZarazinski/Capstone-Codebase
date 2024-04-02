@@ -90,7 +90,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fileupload", fileName);
                 string queryName = Path.GetFileNameWithoutExtension(fileName);
 
-                string sqlQuery = $"SELECT COUNT(*) FROM DataSets WHERE dataSetName = '{queryName}';";
+                string sqlQuery = $"SELECT COUNT(*) FROM DataSet WHERE dataSetName = '{queryName}';";
                 using (var reader = DBClass.GeneralReaderQuery(sqlQuery))
                 {
                     if (reader.Read() && (int)reader[0] > 0)
