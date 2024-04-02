@@ -61,7 +61,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         private async Task ProcessCsvFile(string filePath)
         {
             string tableName = Path.GetFileNameWithoutExtension(filePath).Replace(" ", "_").Replace("-", "_");
-            string fullTableName = tableName + (DBClass.ExtractDatasetID() + 1).ToString(); // Construct the full table name
+            string fullTableName = tableName + "_" + (DBClass.ExtractDatasetID() + 1).ToString(); // Construct the full table name
+                                    // include underscore before ID to assist in string manipulation
+
             DBClass.MainDBconnection.Close();
 
             using (var reader = new StreamReader(filePath))

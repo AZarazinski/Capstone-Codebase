@@ -73,10 +73,6 @@ namespace MadisonCountyCollaborationApplication.Pages
                 phone = "1234567890",
                 userType = "Admin",
                 userPassword = "12345",
-                street = "123 Street",
-                city = "Harrisonburg",
-                userState = "VA",
-                zip = "22801"
             };
 
 

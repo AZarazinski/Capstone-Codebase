@@ -294,7 +294,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             {
                 sqlCommand.Connection = MainDBconnection;
                 sqlCommand.Connection.ConnectionString = MainDBconnString;
-                sqlCommand.CommandText = "SELECT COUNT(*) FROM Users WHERE userID = @userID AND admin = 'admin';";
+                sqlCommand.CommandText = "SELECT COUNT(*) FROM Users WHERE userID = @userID AND userType = 'admin';";
                 sqlCommand.Parameters.AddWithValue("@userID", userID);
                 sqlCommand.Connection.Open();
                 int count = (int)sqlCommand.ExecuteScalar();

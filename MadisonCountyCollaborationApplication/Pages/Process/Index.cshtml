@@ -124,7 +124,7 @@
                 <tbody>
                     @{
                         string sqlQuery = 
-$"SELECT Datasets.datasetID, Datasets.dataSetName, Datasets.dateUploaded ,Users.userName FROM Datasets INNER JOIN Users ON Users.userID = DataSets.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = Datasets.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
+$"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateUploaded ,Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
                         SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
 
                         while (DatasetReader.Read())
