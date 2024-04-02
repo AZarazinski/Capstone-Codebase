@@ -15,8 +15,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
         public string? currentProcessFolderName { get; set; }
 
-
-
         public IActionResult OnGet()
         {
             // Attempt to get collabID from the session.

@@ -122,8 +122,8 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlCommand cmdContentRead = new SqlCommand();
             cmdContentRead.Connection = MainDBconnection;
             cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT DataAssists.datasetID, DataSets.dataSetName FROM DataAssists " +
-                "LEFT JOIN DataSets ON DataAssists.datasetID = DataSets.datasetID" +
+            cmdContentRead.CommandText = "SELECT DataAssists.datasetID, DataSet.dataSetName FROM DataAssists " +
+                "LEFT JOIN DataSet ON DataAssists.datasetID = DataSet.datasetID" +
                 " WHERE ProcessID = @ProcessID";
             cmdContentRead.Parameters.AddWithValue("@ProcessID", ProcessID);
             cmdContentRead.Connection.Open();
@@ -228,10 +228,9 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         }
         public static DataTable FetchDataForTable(string tableName)
         {
-            // WARNING: Directly using user input in SQL queries can lead to SQL injection.
-            // Ensure tableName is validated against a list of known, safe table names or use another form of verification.
+
             DataTable dataTable = new DataTable();
-            string query = $"SELECT * FROM [{tableName}]"; // Unsafe: Do not use as is.
+            string query = $"SELECT * FROM [{tableName}]"; 
 
             using (var connection = new SqlConnection(MainDBconnString))
             {
