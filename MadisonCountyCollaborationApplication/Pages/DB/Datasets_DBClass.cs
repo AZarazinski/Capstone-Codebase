@@ -13,7 +13,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
         // Connection String - How to find and connect to DB
         private static readonly String? MainDBconnString =
-            "Server=Localhost;Database=Lab4;Trusted_Connection=True";
+            "Server=Localhost;Database=MainDB;Trusted_Connection=True";
 
         public static List<T> AttributeReader<T>(string column, string dataSet)
         {
