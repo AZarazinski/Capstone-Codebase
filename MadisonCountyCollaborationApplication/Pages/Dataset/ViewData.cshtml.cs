@@ -58,20 +58,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 Data = DBClass.FetchDataForTable(DatasetName);
                 DBClass.MainDBconnection.Close();
 
-                //Populate dropdown menu for adding to collaboration
-                CollaborationOptions = new List<SelectListItem>();
-
-                using (var CollabReader = DBClass.GeneralReaderQuery("SELECT * FROM Collaboration"))
-                {
-                    while (CollabReader.Read())
-                    {
-                        CollaborationOptions.Add(new SelectListItem
-                        {
-                            Text = CollabReader["collabName"].ToString(),
-                            Value = CollabReader["collabID"].ToString()
-                        });
-                    }
-                }
+                
 
                 return Page();
             }

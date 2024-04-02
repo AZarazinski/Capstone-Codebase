@@ -122,8 +122,8 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlCommand cmdContentRead = new SqlCommand();
             cmdContentRead.Connection = MainDBconnection;
             cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT DataAssists.datasetID, DataSet.dataSetName FROM DataAssists " +
-                "LEFT JOIN DataSet ON DataAssists.datasetID = DataSet.datasetID" +
+            cmdContentRead.CommandText = "SELECT DatasetProcess.datasetID, DataSet.dataSetName FROM DatasetProcess" +
+                "LEFT JOIN DataSet ON DatasetProcess.datasetID = DataSet.datasetID" +
                 " WHERE ProcessID = @ProcessID";
             cmdContentRead.Parameters.AddWithValue("@ProcessID", ProcessID);
             cmdContentRead.Connection.Open();
@@ -139,9 +139,9 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //DATASET SECTION
 
-        public static void InsertIntoDataAssists(int selectedCollabID, int datasetID)
+        public static void InsertIntoDatasetProcess(int selectedCollabID, int datasetID)
         {
-            string sqlQuery = "INSERT INTO DataAssists (collabID, datasetID) VALUES (@CollabID, @DatasetID)";
+            string sqlQuery = "INSERT INTO DatasetProcess(collabID, datasetID) VALUES (@CollabID, @DatasetID)";
 
             using (var connection = new SqlConnection(MainDBconnString))
             {
