@@ -31,9 +31,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         [BindProperty]
         public List<double> PValues { get; set; } = new List<double>();
         [BindProperty]
-        public double ConfidenceLevel {  get; set; } = .05;
+        public double ConfidenceLevel { get; set; } = .05;
         [BindProperty]
-        public double Aplha {  get; set; } = .05;
+        public double Aplha { get; set; } = .05;
         [BindProperty]
         public double DegreesOfFreedom { get; set; }
         [BindProperty]
@@ -76,8 +76,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 {
                     Console.WriteLine("StandardErrors session data is null or empty.");
                 }
-                if (!string.IsNullOrWhiteSpace(confidenceLevelJson)) 
-                { 
+                if (!string.IsNullOrWhiteSpace(confidenceLevelJson))
+                {
                     ConfidenceLevel = JsonSerializer.Deserialize<double>(confidenceLevelJson);
                 }
 
@@ -122,7 +122,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 Console.WriteLine(StandardErrors.Count); // Should now reflect the correct count
             }
             double standardErrorOfPrediction = CalculateStandardErrorOfPrediction(WhatIfInputs, Slopes, StandardErrors);
-            
+
             var criticalValueJson = HttpContext.Session.GetString("CriticalValue");
             CriticalValue = JsonSerializer.Deserialize<double>(criticalValueJson);
 
@@ -148,7 +148,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 
             // Redirect to the WhatIfOutput page
             return RedirectToPage("WhatIfOutput", new { ExpectedOutcome = expectedOutcome, LowerBound = lowerBound, UpperBound = upperBound });
-        
+
         }
 
         private double CalculateExpectedOutcome(List<double> variableInputs, List<double> Slopes, double? Intercept)
