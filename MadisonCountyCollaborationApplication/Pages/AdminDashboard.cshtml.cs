@@ -39,56 +39,56 @@ namespace MadisonCountyCollaborationApplication.Pages
             }
         }
 
-        //public IActionResult OnGet() 
-        //{
-
-        //    string username = HttpContext.Session.GetString("username");
-        //    var userID = DBClass.UserNameIDConverter(username);
-
-        //    bool isAdmin = DBClass.CheckAdmin(userID);
-
-        //    if (isAdmin)
-        //    {
-        //        return Page();
-        //    }
-        //    else
-        //    {
-        //        return RedirectToPage("Home");
-        //    }
-
-        //}
-
-
-        public void OnGet() //ADD THIS METHOD TO ABOVE ONCE PAGE IS FINISHED
+        public IActionResult OnGet()
         {
-            UserList = new List<SelectListItem>();
-            
-            using (var UserReader = DBClass.GeneralReaderQuery("SELECT * FROM Users"))
+
+            string username = HttpContext.Session.GetString("username");
+            var userID = DBClass.UserNameIDConverter(username);
+
+            bool isAdmin = DBClass.CheckAdmin(userID);
+
+            if (isAdmin)
             {
-                while (UserReader.Read())
+
+                UserList = new List<SelectListItem>();
+
+                using (var UserReader = DBClass.GeneralReaderQuery("SELECT * FROM Users"))
                 {
-                    UserList.Add(new SelectListItem
+                    while (UserReader.Read())
                     {
-                        Text = UserReader["userName"].ToString(),
-                        Value = UserReader["userID"].ToString()
-                    });
+                        UserList.Add(new SelectListItem
+                        {
+                            Text = UserReader["userName"].ToString(),
+                            Value = UserReader["userID"].ToString()
+                        });
+                    }
                 }
+
+                ProcessList = new List<SelectListItem>();
+
+                using (var ProcessReader = DBClass.GeneralReaderQuery("SELECT * FROM Process"))
+                {
+                    while (ProcessReader.Read())
+                    {
+                        ProcessList.Add(new SelectListItem
+                        {
+                            Text = ProcessReader["processName"].ToString(),
+                            Value = ProcessReader["processID"].ToString()
+                        });
+                    }
+                }
+
+                return Page();
+            }
+            else
+            {
+                return RedirectToPage("Home");
             }
 
-            ProcessList = new List<SelectListItem>();
-
-            using (var ProcessReader = DBClass.GeneralReaderQuery("SELECT * FROM Process"))
-            {
-                while (ProcessReader.Read())
-                {
-                    ProcessList.Add(new SelectListItem
-                    {
-                        Text = ProcessReader["processName"].ToString(),
-                        Value = ProcessReader["processID"].ToString()
-                    });
-                }
-            }
         }
+
+
+        
 
         public IActionResult OnPostAddProcess()
         {
