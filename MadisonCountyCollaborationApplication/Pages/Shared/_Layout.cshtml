@@ -40,9 +40,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Home">Home</a>
                             </li>
-                            <li class="nav-item">
+                            @* <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Documents/DocumentCenter">Document Center</a>
-                            </li>
+                            </li> *@
                             @* @if (isAdmin)
                             {
                                 <li class="nav-item">
@@ -50,15 +50,22 @@
                                 </li>
                             }
                             DBClass.MainDBconnection.Close(); *@
-                      
-                           @foreach (var process in userProcesses)
-                           {
 
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Process/Index" asp-route-processID="@process.ProcessID">@process.ProcessName</a>
-                                </li>
+                           
 
-                           }
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-dark dropdown-toggle" href="#" id="processesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    My Processes
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="processesDropdown">
+                                    @foreach (var process in userProcesses)
+                                    {
+                                        <a class="dropdown-item" asp-area="" asp-page="/Process/Index" asp-route-processID="@process.ProcessID">@process.ProcessName</a>
+                                    }
+                                </div>
+                            </li>
+
+
                         }
                     </ul>
                     <ul class="navbar-right" style="list-style-type: none;">
@@ -99,6 +106,26 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var dropdowns = document.querySelectorAll('.navbar .nav-item.dropdown');
+            dropdowns.forEach(function (dropdown) {
+                dropdown.addEventListener('mouseenter', function (e) {
+                    var dropdownMenu = this.querySelector('.dropdown-menu');
+                    if (dropdownMenu) {
+                        dropdownMenu.classList.add('show');
+                    }
+                });
+                dropdown.addEventListener('mouseleave', function (e) {
+                    var dropdownMenu = this.querySelector('.dropdown-menu');
+                    if (dropdownMenu) {
+                        dropdownMenu.classList.remove('show');
+                    }
+                });
+            });
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

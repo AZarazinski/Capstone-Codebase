@@ -46,3 +46,13 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+/* Adjust the top position of the dropdown menu */
+.navbar .dropdown-menu {
+    margin-top: 0; /* Remove any margin between the toggle and the menu */
+}
+
+/* Optional: Ensure the dropdown toggle and menu are tightly aligned */
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+}
