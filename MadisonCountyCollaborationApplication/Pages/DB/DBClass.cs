@@ -49,6 +49,44 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         //PROCESS SECTION           
 
         //Functions for displaying tables
+
+        public static List<MadisonCountyCollaborationApplication.Pages.DataClasses.Process> GetUserProcesses(string username)
+        {
+            var processes = new List<MadisonCountyCollaborationApplication.Pages.DataClasses.Process>();
+            string query = @"
+        SELECT Process.ProcessID, Process.processName
+        FROM Process
+        JOIN UserProcess ON Process.ProcessID = UserProcess.ProcessID
+        JOIN Users ON UserProcess.UserID = Users.UserID
+        WHERE Users.UserName = @Username";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Username", username);
+                    connection.Open();
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            processes.Add(new MadisonCountyCollaborationApplication.Pages.DataClasses.Process
+                            {
+                                ProcessID = reader.GetInt32(0),
+                                ProcessName = reader.GetString(1)
+                            });
+
+
+                        }
+                    }
+                }
+            }
+
+            return processes;
+        }
+
+
         public static SqlDataReader ProcessReader()
         {
             SqlCommand cmdProcessRead = new SqlCommand();
@@ -63,19 +101,32 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         }
 
 
-        public static SqlDataReader ProcessGetName(int ProcessID)
+        public static string ProcessGetName(int ProcessID)
         {
-            SqlCommand cmdContentRead = new SqlCommand();
-            cmdContentRead.Connection = MainDBconnection;
-            cmdContentRead.Connection.ConnectionString = MainDBconnString;
-            cmdContentRead.CommandText = "SELECT processName FROM Process WHERE ProcessID = @ProcessID";
-            cmdContentRead.Parameters.AddWithValue("@ProcessID", ProcessID);
-            cmdContentRead.Connection.Open(); // Open connection here, close in Model!
+            string processName = null;
 
-            SqlDataReader tempReader = cmdContentRead.ExecuteReader();
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                var query = "SELECT processName FROM Process WHERE ProcessID = @ProcessID";
 
-            return tempReader;
+                using (var cmdContentRead = new SqlCommand(query, connection))
+                {
+                    cmdContentRead.Parameters.AddWithValue("@ProcessID", ProcessID);
+                    connection.Open();
+
+                    using (var reader = cmdContentRead.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            processName = reader["processName"].ToString();
+                        }
+                    }
+                }
+            }
+
+            return processName;
         }
+
 
         public static bool ProcessExist(int ProcessID)
         {

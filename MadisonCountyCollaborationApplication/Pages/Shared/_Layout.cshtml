@@ -10,8 +10,15 @@
     <link rel="stylesheet" href="~/MadisonCountyCollaborationApplication.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @using MadisonCountyCollaborationApplication.Pages.DB
     @{
-        
+        var username = Context.Session.GetString("username");
+        List<MadisonCountyCollaborationApplication.Pages.DataClasses.Process> userProcesses = new List<MadisonCountyCollaborationApplication.Pages.DataClasses.Process>();
+
+        if (!string.IsNullOrEmpty(username))
+        {
+            userProcesses = DBClass.GetUserProcesses(username);
+        }
     }
 
     <header>
@@ -43,6 +50,15 @@
                                 </li>
                             }
                             DBClass.MainDBconnection.Close(); *@
+                      
+                           @foreach (var process in userProcesses)
+                           {
+
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-page="/Process/Index" asp-route-processID="@process.ProcessID">@process.ProcessName</a>
+                                </li>
+
+                           }
                         }
                     </ul>
                     <ul class="navbar-right" style="list-style-type: none;">

@@ -1,65 +1,68 @@
 using MadisonCountyCollaborationApplication.Pages.DataClasses;
 using MadisonCountyCollaborationApplication.Pages.DB;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data.SqlClient;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace MadisonCountyCollaborationApplication.Pages.Process
 {
     public class IndexModel : PageModel
     {
-
         public string ProcessName { get; set; }
-        [BindProperty]
         public int ProcessID { get; set; }
 
-        public string? currentProcessFolderName { get; set; }
+        public string? CurrentProcessFolderName { get; set; }
 
-        public IActionResult OnGet()
+        public IActionResult OnGet(int? processID)
         {
-            // Attempt to get collabID from the session.
-            ProcessID = HttpContext.Session.GetInt32("processID") ?? 0;
-            if (ProcessID <= 0)
+            // Attempt to get ProcessID from the route first.
+            if (processID.HasValue)
             {
-                // Handle the case where collabID is not found or invalid.
-                ViewData["ErrorMessage"] = "Invalid Collaboration ID. Please select a collaboration.";
-                return Page(); // Or consider redirecting to an error page or listing page.
+                ProcessID = processID.Value;
+                HttpContext.Session.SetInt32("processID", ProcessID);
+            }
+            else
+            {
+                // Attempt to get ProcessID from the session.
+                ProcessID = HttpContext.Session.GetInt32("processID") ?? 0;
             }
 
-            if (HttpContext.Session.GetString("username") == null)
+            // If no valid ProcessID is found, return an error message.
+            if (ProcessID <= 0)
             {
-                // If not logged in, redirect to the login page.
-                HttpContext.Session.SetString("LoginError", "You must login to access that page!");
+                ViewData["ErrorMessage"] = "Invalid Process ID. Please select a process.";
+                return Page();
+            }
+
+            // Ensure the user is logged in by checking the session.
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("username")))
+            {
+                HttpContext.Session.SetString("LoginError", "You must log in to access that page!");
                 return RedirectToPage("/User/Login");
             }
 
-            ViewData["LoginMessage"] = "Login for " + HttpContext.Session.GetString("username") + " successful!";
+            // Fetch the process name using the updated DBClass method that manages connections safely.
+            ProcessName = DBClass.ProcessGetName(ProcessID);
 
-            try
+            if (string.IsNullOrEmpty(ProcessName))
             {
-                // Fetch the collaboration name
-                SqlDataReader ProcessGetName = DBClass.ProcessGetName(ProcessID);
-                if (ProcessGetName.Read())
-                {
-                    ProcessName = ProcessGetName["processName"].ToString();
-                    HttpContext.Session.SetString("processName", ProcessName);
-                }
-                ProcessGetName.Close(); // Ensure you close the reader to free up resources
-
-
-
-
-            }
-            finally
-            {
-                DBClass.MainDBconnection.Close(); // Ensure the database connection is closed after operation
+                ViewData["ErrorMessage"] = "Process not found.";
+                return Page();
             }
 
+            // Optionally, store the current process name in the session for later use if needed.
+            HttpContext.Session.SetString("processName", ProcessName);
 
-
+            // No errors, so return the page to the user.
+            ViewData["LoginMessage"] = "Login successful!";
+            CurrentProcessFolderName = ProcessName.Replace(" ", "_"); // Modify as needed for your folder naming convention.
 
             return Page();
         }
+
 
 
         public async Task<IActionResult> OnPostUploadAsync(IFormFile fileUpload)

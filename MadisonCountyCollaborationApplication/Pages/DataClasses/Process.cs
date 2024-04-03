@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MadisonCountyCollaborationApplication.Pages.DB;
+using System.ComponentModel.DataAnnotations;
 
 namespace MadisonCountyCollaborationApplication.Pages.DataClasses
 {
