@@ -2,6 +2,15 @@
 @model MadisonCountyCollaborationApplication.Pages.MonteCarloRevCompModel
 @{
 }
+@* breadcrum navigation *@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
+        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
+        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Monte Carlo Revenue Comp</li>
+    </ol>
+</nav>
 <div class="text-center">
     <h1 class="display-4">Complex Rev Simulation</h1>
 </div>

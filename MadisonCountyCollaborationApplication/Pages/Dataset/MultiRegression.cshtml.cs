@@ -40,7 +40,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public double ConfidenceIntervalUpper { get; set; }
         public List<double> PValues { get; set; } = new List<double>();
         public int DegreesOfFreedom { get ; set; }
-
+        [BindProperty]
+        public string ProcessName { get; set; }
+        [BindProperty]
+        public string DatasetName { get; set; }
 
 
         public class VariableSlopePair
@@ -58,6 +61,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     + " successful!";
 
                 LoadData();
+                //get process name
+                ProcessName = HttpContext.Session.GetString("processName");
+
+                //get dataset name
+                DatasetName = HttpContext.Session.GetString("datasetName");
                 return Page();
             }
             else

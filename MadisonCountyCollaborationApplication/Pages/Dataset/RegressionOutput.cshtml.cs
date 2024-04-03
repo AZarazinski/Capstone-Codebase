@@ -38,6 +38,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public double DegreesOfFreedom { get; set; }
         [BindProperty]
         public double CriticalValue { get; set; }
+        [BindProperty]
+        public string ProcessName { get; set; }
+        [BindProperty]
+        public string DatasetName { get; set; }
 
 
         public IActionResult OnGet()
@@ -63,12 +67,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 IndependentVariables = JsonSerializer.Deserialize<List<string>>(variablesJson);
                 DependentVariable = JsonSerializer.Deserialize<string>(dependentVariableJson);
                 var standardErrorsJson = HttpContext.Session.GetString("StandardError");
-                Console.WriteLine(standardErrorsJson); // Debugging purpose
 
                 if (!string.IsNullOrWhiteSpace(standardErrorsJson))
                 {
                     StandardErrors = JsonSerializer.Deserialize<List<double>>(standardErrorsJson);
-                    Console.WriteLine(StandardErrors.Count); // Should now reflect the correct count
                 }
                 else
                 {
@@ -77,7 +79,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 if (!string.IsNullOrWhiteSpace(confidenceLevelJson)) 
                 { 
                     ConfidenceLevel = JsonSerializer.Deserialize<double>(confidenceLevelJson);
-                    Console.WriteLine(ConfidenceLevel.ToString());
                 }
 
                 if (!string.IsNullOrWhiteSpace(pValuesJson))
@@ -85,7 +86,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     PValues = JsonSerializer.Deserialize<List<double>>(pValuesJson);
                 }
                 double Alpha = (1.0 - (ConfidenceLevel / 100.0));
-                Console.WriteLine(Alpha.ToString());
+                //get process name
+                ProcessName = HttpContext.Session.GetString("processName");
+
+                //get dataset name
+                DatasetName = HttpContext.Session.GetString("datasetName");
 
                 // Optionally, you can call other methods here to perform additional initialization or processing
 

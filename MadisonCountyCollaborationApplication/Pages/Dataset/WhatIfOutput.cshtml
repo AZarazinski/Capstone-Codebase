@@ -3,6 +3,20 @@
 @using Newtonsoft.Json
 @{
 }
+<!-- Bootstrap 4 -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+@* breadcrum navigation *@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
+        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
+        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
+        <li class="breadcrumb-item"><a asp-page="MultiRegression">Multi Regression</a></li>
+        <li class="breadcrumb-item"><a asp-page="RegressionOutput">Regression Output</a></li>
+        <li class="breadcrumb-item active" aria-current="page">What-If Output</li>
+    </ol>
+</nav>
 
 <div class="container mt-4">
     <!-- Card for What-If Analysis Result -->
@@ -10,27 +24,37 @@
         <div class="card-body">
             <h2 class="card-title">What-If Analysis Result</h2>
             <div class="mb-4">
-                <h4>Expected Outcome:</h4>  @string.Format("{0:#,0.000}", @Model.ExpectedOutcome)
+                <p class="mb-4">
+                    Based on the data given, the analysis predicts a @Model.ConfidenceLevel% probability that actual value for @Model.DependentVariable.TrimStart('_').Replace("_", " ")
+                    will fall within the range (@string.Format("{0:#,0.000}", @Model.LowerBound), @string.Format("{0:#,0.000}", @Model.UpperBound)) with an expected value of @string.Format("{0:#,0.000}", @Model.ExpectedOutcome).
+                </p>
+@*                 <h4>Expected Outcome:</h4> @string.Format("{0:#,0.000}", @Model.ExpectedOutcome)
                 <h4>Lower Bound:</h4> @string.Format("{0:#,0.000}", @Model.LowerBound)
-                <h4>Upper Bound:</h4> @string.Format("{0:#,0.000}", @Model.UpperBound)
+                <h4>Upper Bound:</h4> @string.Format("{0:#,0.000}", @Model.UpperBound) *@
             </div>
             <!-- Placeholder for the plot -->
             <div id="boxPlot"></div>
         </div>
     </div>
 
-    <!-- Card for explanation of the boxplot -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h4 class="card-title">Understanding Your Boxplot:</h4>
-            <p>This boxplot visualizes the range of possible outcomes based on the analysis. The central line represents the median outcome, the box covers the middle 50% of results (from the 25th to the 75th percentile), and the 'whiskers' extend to show the full range of data, excluding any outliers. The expected outcome is highlighted to show where it falls within these possibilities, helping you understand its relative position. Such insights can guide decision-making by highlighting the spread and central tendency of the predicted results.</p>
+    <!-- Button to toggle Explanation of the Boxplot -->
+    <button class="btn btn-info mb-2" type="button" data-toggle="collapse" data-target="#boxPlotExplanation" aria-expanded="false" aria-controls="boxPlotExplanation">
+        Understand Your Boxplot
+    </button>
+
+    <!-- Collapsible Card for Explanation of the Boxplot -->
+    <div class="collapse" id="boxPlotExplanation">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="card-title">Understanding Your Boxplot:</h4>
+                <p>This boxplot visualizes the range of possible outcomes based on the analysis. The central line represents the median outcome, the box covers the middle 50% of results (from the 25th to the 75th percentile), and the 'whiskers' extend to show the full range of data, excluding any outliers. The expected outcome is highlighted to show where it falls within these possibilities, helping you understand its relative position. Such insights can guide decision-making by highlighting the spread and central tendency of the predicted results.</p>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-<script>
+@* <script>
     document.addEventListener('DOMContentLoaded', (event) => {
         var values = @Html.Raw(JsonConvert.SerializeObject(Model.Values));
         var data = [{
@@ -41,5 +65,45 @@
 
         Plotly.newPlot('boxPlot', data);
     });
+</script> *@
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        var values = @Html.Raw(JsonConvert.SerializeObject(Model.Values));
+
+        var data = [{
+            // Switch 'y' to 'x' for horizontal orientation
+            x: values, // Now 'x' holds the data for the horizontal box plot
+            type: 'box',
+            orientation: 'h', // Confirms the plot is horizontal
+            name: '', //Removes the 'trace 0'
+            marker: {
+                color: 'green' // Sets the box color to green
+            }
+        }];
+
+        var layout = {
+            title: 'Predicted Range for @Model.DependentVariable.TrimStart('_').Replace("_", " ")',
+            xaxis: {
+                title: 'Values' // This now correctly matches the horizontal layout
+            },
+            yaxis: {
+                // In a horizontal layout, the y-axis might not represent 'Outcome' directly but categories or groups if applicable
+                title: '@Model.DependentVariable.TrimStart('_').Replace("_", " ")' // Adjust or leave blank if not categorizing data on the y-axis
+            },
+            paper_bgcolor: 'white',
+            plot_bgcolor: 'white',
+            font: {
+                family: 'Arial, sans-serif',
+                size: 12,
+                color: '#000'
+            }
+        };
+
+        Plotly.newPlot('boxPlot', data, layout);
+    });
 </script>
+
+
+
 

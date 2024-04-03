@@ -4,6 +4,14 @@
 @model MadisonCountyCollaborationApplication.Pages.Dataset.SingleRegressionModel
 @{
 }
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
+        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
+        <li class="breadcrumb-item"><a asp-page="../Process/Index/ViewData">@Model.DatasetName</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Single Regression</li>
+    </ol>
+</nav>
 @if (ViewData.ContainsKey("ErrorMessage"))
 {
     <script type="text/javascript">
@@ -25,7 +33,6 @@
         });
     </script>
 }
-
 
 <div class="container">
     <div class="row justify-content-center">

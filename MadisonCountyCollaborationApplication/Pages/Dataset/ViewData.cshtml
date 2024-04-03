@@ -4,8 +4,15 @@
 @{
     ViewData["Title"] = "View Dataset";
 }
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
+        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
+        <li class="breadcrumb-item active" aria-current="page">View Data</li>
+    </ol>
+</nav>
 
-<h2 class="mb-3">@Model.DatasetName</h2>
+<h2 class="mb-3">@Model.DatasetNameDisplay</h2>
 
 <div class="mb-4">
     <form method="post" asp-page-handler="RedirectToAnalysis">

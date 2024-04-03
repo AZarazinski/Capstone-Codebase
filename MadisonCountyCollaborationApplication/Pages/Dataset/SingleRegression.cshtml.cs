@@ -33,6 +33,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public List<double> independentDataList { get; set; } = new List<double>();
         public string PlotImageBase64 { get; set; }
         public string ChartConfigJson { get; private set; }
+        [BindProperty]
+        public string ProcessName { get; set; }
+        [BindProperty]
+        public string DatasetName { get; set; }
 
         public IActionResult OnGet()
         {
@@ -43,6 +47,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     + " successful!";
 
                 LoadData();
+                //get process name
+                ProcessName = HttpContext.Session.GetString("processName");
+
+                //get dataset name
+                DatasetName = HttpContext.Session.GetString("datasetName");
 
                 return Page();
             }

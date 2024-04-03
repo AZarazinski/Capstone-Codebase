@@ -37,7 +37,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public int SelectedCollabID { get; set; } // Binds the selected collaboration ID
         public List<SelectListItem> CollaborationOptions { get; set; } // Holds dropdown options
 
-
+        [BindProperty]
+        public string ProcessName { get; set; }
+        [BindProperty]
+        public string DatasetNameDisplay { get; set; }
         public ViewDataModel()
         {
             AttributeList = new List<Attributes>();
@@ -49,7 +52,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 ViewData["LoginMessage"] = "Login for "
                     + HttpContext.Session.GetString("username")
                     + " successful!";
+                //get process name
+                ProcessName = HttpContext.Session.GetString("processName");
 
+                //get dataset name
+                DatasetNameDisplay = HttpContext.Session.GetString("datasetName");
                 DatasetID = datasetID;
                 //DatasetID = (int)HttpContext.Session.GetInt32("datasetID");
                 HttpContext.Session.SetInt32("datasetID", DatasetID);

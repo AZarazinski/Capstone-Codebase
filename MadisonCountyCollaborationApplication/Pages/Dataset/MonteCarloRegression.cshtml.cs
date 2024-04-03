@@ -59,6 +59,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public Parameters param8 { get; set; }
         [BindProperty]
         public Parameters param9 { get; set; }
+        [BindProperty]
+        public string ProcessName { get; set; }
+        [BindProperty]
+        public string DatasetName { get; set; }
 
         public string ChartConfigJson { get; private set; }
         public IActionResult OnGet()
@@ -73,6 +77,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 // Deserialize data
                 IndependentVariables = System.Text.Json.JsonSerializer.Deserialize<List<string>>(variablesJson);
                 DependentVariable = System.Text.Json.JsonSerializer.Deserialize<string>(dependentVariableJson);
+                //get process name
+                ProcessName = HttpContext.Session.GetString("processName");
+
+                //get dataset name
+                DatasetName = HttpContext.Session.GetString("datasetName");
 
                 // Optionally, you can call other methods here to perform additional initialization or processing
 

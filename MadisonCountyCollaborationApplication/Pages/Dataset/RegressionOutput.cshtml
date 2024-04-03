@@ -1,9 +1,12 @@
 ﻿@page
 @model MadisonCountyCollaborationApplication.Pages.Dataset.RegressionOutputModel
 @{
+    var regressionSuccessful = Model.Slopes.Zip(Model.PValues.Skip(1), (slope, pValue) => pValue <= Model.Aplha).All(x => x); // Assuming Model.Alpha is the significance level (commonly 0.05)
 }
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <style>
     .custom-curved-box {
         border-radius: 15px;
@@ -29,78 +32,29 @@
         color: #dc3545; /* Danger color for non-significant values */
     }
 </style>
+@* breadcrum navigation *@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
+        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
+        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
+        <li class="breadcrumb-item"><a asp-page="MultiRegression">Multi Regression</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Regression Output</li>
+    </ol>
+</nav>
+
 <div class="container mt-4">
-    <div class="regression-equation mb-4">
-        <h3>Regression Equation</h3>
-        @if (!string.IsNullOrEmpty(Model.DependentVariable) && Model.Intercept.HasValue && Model.Slopes != null && Model.IndependentVariables != null)
-        {
-            <p>@Model.DependentVariable.TrimStart('_').Replace("_", " ") = @string.Format("{0:#,0.000}", Model.Intercept) @(String.Join(" ", Model.Slopes.Select((s, index) => $"{(s >= 0 ? "+" : "-")} {Math.Abs(s):#,0.0000} * ({Model.IndependentVariables[index].TrimStart('_').Replace("_", " ")})")))</p>
-        }
-        else
-        {
-            <p>Regression equation data is not available.</p>
-        }
+    <!-- Regression Success/Failure Notification -->
+    <div class="alert @(regressionSuccessful ? "alert-success" : "alert-danger")" role="alert">
+        <strong>@(regressionSuccessful ? "Regression Successful" : "Regression Not Successful")</strong>
     </div>
-
-    <div class="results-section mb-4">
-        <h3>Regression Results</h3>
-        <ul>
-            <li>
-                <strong>Intercept:</strong> @string.Format("{0:#,0.000}", Model.Intercept)
-                <ul>
-                    <li>
-                        Standard Error: @string.Format("{0:#,0.000}", Model.StandardErrors[0])
-                    </li>
-                    <li>
-                        P-value:  @{
-                            if (Model.PValues[0] <= Model.Aplha)
-                            {
-                                <text><span class="significant">@string.Format("{0:#,0.000}", Model.PValues[0]) </span><strong class="significant">Significant</strong></text>
-                            }
-                            else
-                            {
-                                <text><span class="not-significant">@string.Format("{0:#,0.000}", Model.PValues[0]) </span><strong class="not-significant">Not Significant</strong></text>
-
-                            }
-                        }
-                    </li>
-                </ul>
-            </li>
-            @for (int i = 0; i < Model.IndependentVariables.Count; i++)
-            {
-                <li>
-                    <strong>@Model.IndependentVariables[i].Replace("_", " ").TrimStart('_'):</strong>
-                    <ul>
-                        <li>
-                            <strong>Slope:</strong> @string.Format("{0:#,0.0000}", Model.Slopes[i])
-                        </li>
-                        <li>
-                            Standard Error: @string.Format("{0:#,0.000}", Model.StandardErrors[i + 1]) <!-- Intercept is at index 0 -->
-                        </li>
-                        <li>
-                            P-value:  @{
-                                if (Model.PValues[i + 1] <= Model.Aplha)
-                                {
-                                    <text><span class="significant">@string.Format("{0:#,0.000}", Model.PValues[i + 1]) </span><strong class="significant">Significant</strong></text>
-                                }
-                                else
-                                {
-                                    <text><span class="not-significant">@string.Format("{0:#,0.000}", Model.PValues[i + 1]) </span><strong class="not-significant">Not Significant</strong></text>
-
-                                }
-                            }
-                        </li>
-                    </ul>
-                </li>
-            }
-        </ul>
-    </div>
-
 
     <!-- What-If Scenario Analysis -->
     <div class="card bg-primary text-white custom-curved-box mb-3">
         <div class="card-body">
             <h4 class="card-title">What-If Scenario Analysis</h4>
+            <p>Enter values below to see a predicted outcome based on your data.</p>
+            <!-- Your existing What-If form here -->
             <form method="post" asp-page-handler="CalculateWhatIfScenario">
                 <input type="hidden" asp-for="Intercept" />
                 @for (int i = 0; i < @Model.Slopes.Count; i++)
@@ -117,24 +71,87 @@
                 }
                 <button type="submit" class="btn btn-outline-primary rounded shadow-sm text-dark bg-white">Calculate What-If Scenario</button>
             </form>
-
-
-            <div id="whatIfResult">
-                @if (Model.ShowResults)
-                {
-                    <div class="alert alert-success" role="alert">
-                        <strong>Expected Outcome:</strong> @Model.ExpectedOutcome
-                    </div>
-                }
-            </div>
         </div>
     </div>
-</div>
-<br />
-<form asp-page-handler="Simulate" method="post">
-    <div class="d-grid gap-2">
-        <button class="btn btn-primary" type="submit">Regression Simulation</button>
+    <!-- Button to toggle Regression Equation and Results -->
+    <button class="btn btn-info mb-2" type="button" data-toggle="collapse" data-target="#regressionDetails" aria-expanded="false" aria-controls="regressionDetails">
+        Show Regression Details
+    </button>
+
+    <!-- Collapsible Regression Equation and Results -->
+    <div class="collapse" id="regressionDetails">
+        <div class="regression-equation mb-4">
+            <h3>Regression Equation</h3>
+            @if (!string.IsNullOrEmpty(Model.DependentVariable) && Model.Intercept.HasValue && Model.Slopes != null && Model.IndependentVariables != null)
+            {
+                <p>@Model.DependentVariable.TrimStart('_').Replace("_", " ") = @string.Format("{0:#,0.000}", Model.Intercept) @(String.Join(" ", Model.Slopes.Select((s, index) => $"{(s >= 0 ? "+" : "-")} {Math.Abs(s):#,0.0000} * ({Model.IndependentVariables[index].TrimStart('_').Replace("_", " ")})")))</p>
+            }
+            else
+            {
+                <p>Regression equation data is not available.</p>
+            }
+        </div>
+
+        <div class="results-section mb-4">
+
+            <h3>Regression Results</h3>
+            <ul>
+                <li>
+                    <strong>Intercept:</strong> @string.Format("{0:#,0.000}", Model.Intercept)
+                    <ul>
+                        <li>
+                            Standard Error: @string.Format("{0:#,0.000}", Model.StandardErrors[0])
+                        </li>
+                        <li>
+                            P-value:  @{
+                                if (Model.PValues[0] <= Model.Aplha)
+                                {
+                                    <text><span class="significant">@string.Format("{0:#,0.000}", Model.PValues[0]) </span><strong class="significant">Significant</strong></text>
+                                }
+                                else
+                                {
+                                    <text><span class="not-significant">@string.Format("{0:#,0.000}", Model.PValues[0]) </span><strong class="not-significant">Not Significant</strong></text>
+
+                                }
+                            }
+                        </li>
+                    </ul>
+                </li>
+                @for (int i = 0; i < Model.IndependentVariables.Count; i++)
+                {
+                    <li>
+                        <strong>@Model.IndependentVariables[i].Replace("_", " ").TrimStart('_'):</strong>
+                        <ul>
+                            <li>
+                                <strong>Slope:</strong> @string.Format("{0:#,0.0000}", Model.Slopes[i])
+                            </li>
+                            <li>
+                                Standard Error: @string.Format("{0:#,0.000}", Model.StandardErrors[i + 1]) <!-- Intercept is at index 0 -->
+                            </li>
+                            <li>
+                                P-value:  @{
+                                    if (Model.PValues[i + 1] <= Model.Aplha)
+                                    {
+                                        <text><span class="significant">@string.Format("{0:#,0.000}", Model.PValues[i + 1]) </span><strong class="significant">Significant</strong></text>
+                                    }
+                                    else
+                                    {
+                                        <text><span class="not-significant">@string.Format("{0:#,0.000}", Model.PValues[i + 1]) </span><strong class="not-significant">Not Significant</strong></text>
+
+                                    }
+                                }
+                            </li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
     </div>
-</form>
-<br />
-<br />
+
+    <!-- Your existing Regression Simulation form here -->
+    <form asp-page-handler="Simulate" method="post">
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary" type="submit">Regression Simulation</button>
+        </div>
+    </form>
+</div>
