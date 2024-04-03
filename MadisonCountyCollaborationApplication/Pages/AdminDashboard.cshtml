@@ -7,64 +7,77 @@
 <h1>Admin Dashboard</h1>
 
 
-<section>
-<div class="text-center">
-    <h1 class="display-4">Create New User</h1>
-</div>
+<section id="AddProcess">
+    <h1>Add Process</h1>
+    <form method="post" asp-page-handler="AddProcess">
+    
+        <div class="form-floating mb-3">
+            <input type="text" asp-for="ProcessName" class="form-control" id="floatingInput" placeholder="Process Name" >
+            <label for="floatingInput">Process Name</label>
+        </div>
+    
+        <input type="submit" value="Add Process" class="btn btn-primary" />
+    
+    </form>
+</section>
 
-<form asp-page="CreateUser" asp-page-handler="Create">
-    @* username *@
-    <input type="text" placeholder="UserName:" asp-for="NewUser.userName" class="form-control" />
-    <span asp-validation-for="NewUser.userName" class="text-danger"></span>
-    <br />
-    @* password *@
-    <input type="text" placeholder="Password: " asp-for="NewUser.userPassword" class="form-control" />
-    <span asp-validation-for="NewUser.userPassword" class="text-danger"></span>
-    <br />
-    <div class="input-group mb-3">
-        @* names *@
-        <input type="text" aria-label="First name" class="form-control" asp-for="NewUser.firstName" placeholder="First Name" />
-        <span asp-validation-for="NewUser.firstName" class="text-danger"></span>
-        <input type="text" aria-label="Last name" class="form-control" asp-for="NewUser.lastName" placeholder="Last Name" />
-        <span asp-validation-for="NewUser.lastName" class="text-danger"></span>
-    </div>
-    <br />
-    <div class="input-group mb-3">
-        @* email and phone *@
-        <input type="text" aria-label="Email" class="form-control" asp-for="NewUser.email" placeholder="Email" />
-        <span asp-validation-for="NewUser.email" class="text-danger"></span>
-        <input type="text" aria-label="Phone Number" class="form-control" asp-for="NewUser.phone" placeholder="Phone Number" />
-        <span asp-validation-for="NewUser.phone" class="text-danger"></span>
-    </div>
-    <br />
-    <div class="input-group">
-        @* user type *@
-        <select class="form-select" id="Type" aria-label="aggregation method" asp-for="NewUser.userType">
-            <option value="">Choose User Type</option>
-            <option value="Admin">Admin</option>
-            <option value="Employee">Employee</option>
+<section id="AddUserToProcess">
+    <h1>Add User to Process</h1>
+
+    <form method="post" asp-page-handler="AddUserToProcess">
+
+        <select asp-for="NewUserProcess.UserID" asp-items="Model.UserList" class="form-select">
+            <option value="">Select a User</option>
         </select>
-        <span asp-validation-for="NewUser.userType" class="text-danger"></span>
 
-    </div>
-    <br />
-</form>
+        <select asp-for="NewUserProcess.ProcessID" asp-items="Model.ProcessList" class="form-select">
+            <option value="">Select a Process</option>
+        </select>
 
-<div class="position-fixed bottom-0 start-0 p-3">
-    <form method="post" asp-page-handler="ClearInputs">
-        <button type="submit" class="btn btn-secondary">Clear Inputs</button>
+        <input type="submit" value="Add User to Process" class="btn btn-primary" />
+
     </form>
-
-    <br />
-    <form method="post" asp-page-handler="Populate">
-        <button type="submit" class="btn btn-secondary">Populate</button>
-    </form>
-</div>
 </section>
 
+    @* //CREATE USER SECTION// *@
 
-<section>
-
-
+<section id="AddUser">
+    <h2>Create New User</h2>
+    <form method="post" asp-page-handler="AddUser">
+        <div class="form-group">
+            <label for="userName">Username</label>
+            <input type="text" asp-for="NewUser.userName" class="form-control" id="userName" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label for="userPassword">Password</label>
+            <input type="password" asp-for="NewUser.userPassword" class="form-control" id="userPassword" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" asp-for="NewUser.firstName" class="form-control" id="firstName" placeholder="Enter first name">
+        </div>
+        <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" asp-for="NewUser.lastName" class="form-control" id="lastName" placeholder="Enter last name">
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" asp-for="NewUser.email" class="form-control" id="email" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" asp-for="NewUser.phone" class="form-control" id="phone" placeholder="Enter phone number">
+        </div>
+        <div class="form-group">
+            <label for="userType">User Type</label>
+            <select asp-for="NewUser.userType" class="form-control" id="userType">
+                <option value="Admin">Admin</option>
+                <option value="User">User</option>
+                <!-- Add more user types as needed -->
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Create User</button>
+    </form>
 </section>
+
 

@@ -49,12 +49,10 @@
             @foreach (var process in Model.ProcessList)
             {
                 <div class="card" tabindex="0" role="button" onclick="selectProcess(@process.ProcessID)">
-                    <div class="card-header">
+                    <div class="card-body">
                         @process.ProcessName
                     </div>
-                    <div class="card-body">
-                        @process.NotesAndInfo
-                    </div>
+                    
                 </div>
             }
         </div>

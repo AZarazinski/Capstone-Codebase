@@ -40,6 +40,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                     cmdGeneralRead.ExecuteNonQuery();
                 }
             }
+            MainDBconnection.Close();
         }
 
 
@@ -97,13 +98,12 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         public static void CreateProcess(MadisonCountyCollaborationApplication.Pages.DataClasses.Process process)
         {
             // SQL query now only includes processName and notesAndInfo fields
-            String sqlQuery = "INSERT INTO Process (processName, notesAndInfo) VALUES(@ProcessName, @NotesAndInfo);";
+            String sqlQuery = "INSERT INTO Process (processName) VALUES(@ProcessName);";
 
             using (SqlCommand cmdProductRead = new SqlCommand(sqlQuery, MainDBconnection))
             {
                 // Adding parameters to prevent SQL injection
                 cmdProductRead.Parameters.AddWithValue("@ProcessName", process.ProcessName);
-                cmdProductRead.Parameters.AddWithValue("@NotesAndInfo", process.NotesAndInfo ?? string.Empty); // Handling potential nulls
 
                 MainDBconnection.ConnectionString = MainDBconnString;
                 if (MainDBconnection.State != System.Data.ConnectionState.Open)
@@ -280,7 +280,6 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
 
 
-
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //USERS SECTION
@@ -439,16 +438,11 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                     CommandType = CommandType.StoredProcedure
                 };
                 userCommand.Parameters.AddWithValue("@Username", newUser.userName);
-                userCommand.Parameters.AddWithValue("@Password", hashedPassword); // Use hashed password
                 userCommand.Parameters.AddWithValue("@firstName", newUser.firstName);
                 userCommand.Parameters.AddWithValue("@lastName", newUser.lastName);
                 userCommand.Parameters.AddWithValue("@email", newUser.email);
                 userCommand.Parameters.AddWithValue("@phone", newUser.phone);
                 userCommand.Parameters.AddWithValue("@type", newUser.userType);
-                userCommand.Parameters.AddWithValue("@street", newUser.street);
-                userCommand.Parameters.AddWithValue("@city", newUser.city);
-                userCommand.Parameters.AddWithValue("@state", newUser.userState);
-                userCommand.Parameters.AddWithValue("@zip", newUser.zip);
 
                 userDbConnection.Open();
                 userCommand.ExecuteNonQuery();

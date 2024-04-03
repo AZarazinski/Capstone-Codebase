@@ -46,14 +46,14 @@
     <br />
     <div class="input-group mb-3">
         @* street and city *@
-        <input type="text" placeholder="Street" asp-for="NewUser.street" class="form-control" />
+       @*  <input type="text" placeholder="Street" asp-for="NewUser.street" class="form-control" />
         <span asp-validation-for="NewUser.street" class="text-danger"></span>
         <input type="text" aria-label="City" class="form-control" asp-for="NewUser.city" placeholder="City" />
-        <span asp-validation-for="NewUser.city" class="text-danger"></span>
+        <span asp-validation-for="NewUser.city" class="text-danger"></span> *@
     </div>
     <div class="input-group">
         @* state *@
-        <select class="form-select" id="groupbyselect" aria-label="aggregation method" asp-for="NewUser.userState">
+       @*  <select class="form-select" id="groupbyselect" aria-label="aggregation method" asp-for="NewUser.userState">
             <option selected>State</option>
             <option value="AL">AL</option>
             <option value="AK">AK</option>
@@ -113,17 +113,17 @@
             <option value="WI">WI</option>
             <option value="WY">WY</option>
         </select>
-        <span asp-validation-for="NewUser.city" class="text-danger"></span>
+        <span asp-validation-for="NewUser.city" class="text-danger"></span> *@
 
     </div>
     <br />
     @* zip *@
-    <input type="text" aria-label="Zip" class="form-control" asp-for="NewUser.zip" placeholder="Zip" />
+@*     <input type="text" aria-label="Zip" class="form-control" asp-for="NewUser.zip" placeholder="Zip" />
     <span asp-validation-for="NewUser.zip" class="text-danger"></span>
     <br />
     <div class="d-grid gap-2">
         <input type="submit" value="Create" class="btn btn-primary" />
-    </div>
+    </div> *@
 </form>
 
 <div class="position-fixed bottom-0 start-0 p-3">

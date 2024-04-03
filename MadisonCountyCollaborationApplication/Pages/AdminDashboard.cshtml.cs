@@ -1,11 +1,31 @@
 using MadisonCountyCollaborationApplication.Pages.DB;
+using MadisonCountyCollaborationApplication.Pages.DataClasses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace MadisonCountyCollaborationApplication.Pages
 {
     public class AdminDashboardModel : PageModel
     {
+        [BindProperty(SupportsGet = false)]
+        public DataClasses.Users NewUser { get; set; }
+
+        [BindProperty(SupportsGet = false)]
+        public DataClasses.UserProcess NewUserProcess { get; set; }
+
+
+        [BindProperty(SupportsGet = false)]
+        public string ProcessName { get; set; }
+
+
+        public List<SelectListItem> UserList { get; set; }
+
+        public List<SelectListItem> ProcessList { get; set; }
+
+ 
+
         public IActionResult OnGetSessionCheck()
         {
             if (HttpContext.Session.GetString("username") != null)
@@ -38,22 +58,104 @@ namespace MadisonCountyCollaborationApplication.Pages
 
         //}
 
-        [BindProperty]
-        public MadisonCountyCollaborationApplication.Pages.DataClasses.Users NewUser { get; set; }
 
-      
-        public IActionResult OnPostCreate()
+        public void OnGet() //ADD THIS METHOD TO ABOVE ONCE PAGE IS FINISHED
         {
-            if (!ModelState.IsValid)
+            UserList = new List<SelectListItem>();
+            
+            using (var UserReader = DBClass.GeneralReaderQuery("SELECT * FROM Users"))
             {
-                return Page();
+                while (UserReader.Read())
+                {
+                    UserList.Add(new SelectListItem
+                    {
+                        Text = UserReader["userName"].ToString(),
+                        Value = UserReader["userID"].ToString()
+                    });
+                }
             }
-            // Add hashed PW to AUTH and create user and add to Users table
-            DBClass.CreateAndHashUser(NewUser);
-            DBClass.MainDBconnection.Close();
 
-            return RedirectToPage("Login");
+            ProcessList = new List<SelectListItem>();
+
+            using (var ProcessReader = DBClass.GeneralReaderQuery("SELECT * FROM Process"))
+            {
+                while (ProcessReader.Read())
+                {
+                    ProcessList.Add(new SelectListItem
+                    {
+                        Text = ProcessReader["processName"].ToString(),
+                        Value = ProcessReader["processID"].ToString()
+                    });
+                }
+            }
         }
+
+        public IActionResult OnPostAddProcess()
+        {
+            //if (!ModelState.IsValid)
+            //{
+            //    return Page();
+            //}
+            //else
+            //{
+
+                string addProcess = $"INSERT INTO Process (processName) VALUES (" + "'" + ProcessName + "'" + ");";
+
+                DBClass.GeneralInsertQuery(addProcess);
+
+
+
+            return RedirectToPage("AdminDashboard");
+            //}
+
+        }
+
+
+        public IActionResult OnPostAddUserToProcess()
+        {
+            //if (!ModelState.IsValid)
+            //{
+            //    return Page();
+            //}
+            //else
+            //{
+                string userProcessQuery = $"INSERT INTO UserProcess (userID, processID) VALUES (" + NewUserProcess.UserID + "," + NewUserProcess.ProcessID + ");";
+
+                DBClass.GeneralInsertQuery(userProcessQuery);
+
+                return RedirectToPage("AdminDashboard");
+            //}
+        }
+
+
+
+
+        public IActionResult OnPostAddUser()
+        {
+         
+
+            //if (ModelState.IsValid)
+            //{
+            //    try
+            //    {
+                    // Assuming DBClass.CreateAndHashUser properly implements user creation
+                    DBClass.CreateAndHashUser(NewUser);
+                    TempData["SuccessMessage"] = "User created successfully.";
+                    return RedirectToPage("AdminDashboard"); // Or wherever you want to redirect
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        ModelState.AddModelError("", "An error occurred while creating the user.");
+            //    }
+            //}
+
+            // This is for re-displaying the page with validation errors, if any.
+            return Page();
+        }
+
+
+
+
         public IActionResult OnPostClearInputs()
         {
             ModelState.Clear();
@@ -72,12 +174,14 @@ namespace MadisonCountyCollaborationApplication.Pages
                 email = "zackbanjamin@gmail.com",
                 phone = "1234567890",
                 userType = "Admin",
-                userPassword = "12345",
             };
 
 
             return Page(); // Return to the same page with preset values populated
         }
+
+
+
 
     }
 }
