@@ -20,14 +20,6 @@ namespace MadisonCountyCollaborationApplication.Pages.DataClasses
         public String? userType { get; set; }
         [Required(ErrorMessage = "Password is Required")]
         public String? userPassword { get; set; }
-        [Required(ErrorMessage = "Street is Required")]
-        public String? street { get; set; }
-        [Required(ErrorMessage = "City is Required")]
-        public String? city { get; set; }
-        [Required(ErrorMessage = "State is Required")]
-        public String? userState { get; set; }
-        [Required(ErrorMessage = "Zip code is Required")]
-        public String? zip { get; set; }
 
     }
 }

@@ -28,6 +28,8 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             var cmdGeneralRead = new SqlCommand(sqlQuery, connection);
             connection.Open();
             return cmdGeneralRead.ExecuteReader(CommandBehavior.CloseConnection);
+
+            
         }
         //GENERAL INSERT STATEMENT -- PARKER T. SHORT 
         public static void GeneralInsertQuery(string sqlQuery)
@@ -40,6 +42,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                     cmdGeneralRead.ExecuteNonQuery();
                 }
             }
+            MainDBconnection.Close();
         }
 
 
@@ -148,13 +151,12 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         public static void CreateProcess(MadisonCountyCollaborationApplication.Pages.DataClasses.Process process)
         {
             // SQL query now only includes processName and notesAndInfo fields
-            String sqlQuery = "INSERT INTO Process (processName, notesAndInfo) VALUES(@ProcessName, @NotesAndInfo);";
+            String sqlQuery = "INSERT INTO Process (processName) VALUES(@ProcessName);";
 
             using (SqlCommand cmdProductRead = new SqlCommand(sqlQuery, MainDBconnection))
             {
                 // Adding parameters to prevent SQL injection
                 cmdProductRead.Parameters.AddWithValue("@ProcessName", process.ProcessName);
-                cmdProductRead.Parameters.AddWithValue("@NotesAndInfo", process.NotesAndInfo ?? string.Empty); // Handling potential nulls
 
                 MainDBconnection.ConnectionString = MainDBconnString;
                 if (MainDBconnection.State != System.Data.ConnectionState.Open)
@@ -331,7 +333,6 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
 
 
-
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //USERS SECTION
@@ -342,6 +343,13 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         {
             using (SqlCommand sqlCommand = new SqlCommand())
             {
+
+                //ensures that the connection state is closed before changing the conn string
+                //should eliminate any DB errors 
+                if (MainDBconnection.State == ConnectionState.Open)
+                {
+                    MainDBconnection.Close();
+                }
                 sqlCommand.Connection = MainDBconnection;
                 sqlCommand.Connection.ConnectionString = MainDBconnString;
                 sqlCommand.CommandText = "SELECT COUNT(*) FROM Users WHERE userID = @userID AND userType = 'admin';";
@@ -350,6 +358,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                 int count = (int)sqlCommand.ExecuteScalar();
 
                 return (count > 0);
+
             }
         }
 
@@ -435,6 +444,13 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         }
         public static bool HashedParameterLogin(string Username, string Password)
         {
+            //ensures that the connection state is closed before changing the conn string
+            //should eliminate any DB errors while logging in
+            if (MainDBconnection.State == ConnectionState.Open)
+            {
+                MainDBconnection.Close();
+            }
+
             string loginQuery =
                 "SELECT Password FROM HashedCredentials WHERE Username = @Username";
 
@@ -447,9 +463,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
             cmdLogin.Connection.Open();
 
-            // ExecuteScalar() returns back data type Object
-            // Use a typecast to convert this to an int.
-            // Method returns first column of first row.
+ 
             SqlDataReader hashReader = cmdLogin.ExecuteReader();
             if (hashReader.Read())
             {
@@ -461,6 +475,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                 }
             }
 
+            
             return false;
         }
         
@@ -490,16 +505,11 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                     CommandType = CommandType.StoredProcedure
                 };
                 userCommand.Parameters.AddWithValue("@Username", newUser.userName);
-                userCommand.Parameters.AddWithValue("@Password", hashedPassword); // Use hashed password
                 userCommand.Parameters.AddWithValue("@firstName", newUser.firstName);
                 userCommand.Parameters.AddWithValue("@lastName", newUser.lastName);
                 userCommand.Parameters.AddWithValue("@email", newUser.email);
                 userCommand.Parameters.AddWithValue("@phone", newUser.phone);
                 userCommand.Parameters.AddWithValue("@type", newUser.userType);
-                userCommand.Parameters.AddWithValue("@street", newUser.street);
-                userCommand.Parameters.AddWithValue("@city", newUser.city);
-                userCommand.Parameters.AddWithValue("@state", newUser.userState);
-                userCommand.Parameters.AddWithValue("@zip", newUser.zip);
 
                 userDbConnection.Open();
                 userCommand.ExecuteNonQuery();

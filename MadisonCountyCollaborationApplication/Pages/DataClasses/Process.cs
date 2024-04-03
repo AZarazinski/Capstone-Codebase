@@ -13,5 +13,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DataClasses
         public string NotesAndInfo { get; set; }
 
 
+
+
     }
 }
