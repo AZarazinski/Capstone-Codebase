@@ -170,7 +170,7 @@
         <div class="tab-content" id="DocumentTableContainer">
             @if (!string.IsNullOrEmpty(currentProcessFolderName) && Directory.Exists(currentProcessFolderPath))
             {
-                <table class="table table-hover">
+                @* <table class="table table-hover">
                     <thead>
                         <tr>
                             <th>Document Name</th>
@@ -188,6 +188,38 @@
                                 <td>@System.IO.Path.GetExtension(filePath).TrimStart('.').ToUpperInvariant()</td>
                                 <td>@(fileInfo.Length / 1024)</td>
                             </tr>
+                        }
+                    </tbody>
+                </table> *@
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Uploaded By</th>
+                            <th>Date Uploaded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            string documentQuery = $"SE";
+                            SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
+
+                            while (DocumentReader.Read())
+                            {
+                                <tr>
+                                    <td>@DocumentReader["datasetID"].ToString()</td>
+                                    <td>
+                                        <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DocumentReader["datasetID"]">
+                                            @DocumentReader["dataSetName"].ToString()
+                                        </a>
+                                    </td>
+                                    <td>@DocumentReader["userName"].ToString()</td>
+                                    <td>@DocumentReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
+                                </tr>
+                            }
+                            DocumentReader.Close(); // Always close the SqlDataReader when done.
                         }
                     </tbody>
                 </table>
@@ -210,23 +242,23 @@
                 </thead>
                 <tbody>
                     @{
-                        string sqlQuery = $@"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateCreated, Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
-                        SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
+                        string datasetQuery = $@"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateCreated, Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
+                        SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(datasetQuery);
 
-                        while (DatasetReader.Read())
+                        while (DocumentReader.Read())
                         {
                             <tr>
-                                <td>@DatasetReader["datasetID"].ToString()</td>
+                                <td>@DocumentReader["datasetID"].ToString()</td>
                                 <td>
-                                    <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
-                                        @DatasetReader["dataSetName"].ToString()
+                                    <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DocumentReader["datasetID"]">
+                                        @DocumentReader["dataSetName"].ToString()
                                     </a>
                                 </td>
-                                <td>@DatasetReader["userName"].ToString()</td>
-                                <td>@DatasetReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
+                                <td>@DocumentReader["userName"].ToString()</td>
+                                <td>@DocumentReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
                             </tr>
                         }
-                        DatasetReader.Close(); // Always close the SqlDataReader when done.
+                        DocumentReader.Close(); // Always close the SqlDataReader when done.
                     }
                 </tbody>
             </table>

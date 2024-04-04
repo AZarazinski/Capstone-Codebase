@@ -190,10 +190,10 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //DOCUMENT SECTION
 
-        public static void InsertIntoDocumentTable(string title, int fileCount, string documentType, string filePath, int userID, int? processID)
+        public static void InsertIntoDocumentTable(string documentName, string documentType, int userID, int? processID)
         {
-            string documentInsertQuery = @"INSERT INTO Document(title, fileCount, documentType, filePath, userID)
-                                    VALUES(@title, @fileCount, @documentType, @filePath, @userID);
+            string documentInsertQuery = @"INSERT INTO Document(documentName, documentType, userID)
+                                    VALUES(@title, @documentType, @userID);
                                     SELECT SCOPE_IDENTITY();";
 
             string documentProcessInsertQuery = @"INSERT INTO DocumentProcess(processID, documentID)
@@ -209,10 +209,8 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                         // Insert into Document table and retrieve the newly inserted document's ID
                         using (var cmd = new SqlCommand(documentInsertQuery, connection, transaction))
                         {
-                            cmd.Parameters.AddWithValue("@title", title);
-                            cmd.Parameters.AddWithValue("@fileCount", fileCount);
+                            cmd.Parameters.AddWithValue("@documentName", documentName);
                             cmd.Parameters.AddWithValue("@documentType", documentType);
-                            cmd.Parameters.AddWithValue("@filePath", filePath);
                             cmd.Parameters.AddWithValue("@userID", userID);
 
                             // Execute the insert query and retrieve the documentID
