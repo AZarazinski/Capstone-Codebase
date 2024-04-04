@@ -2,7 +2,14 @@
 @using System.Data.SqlClient;
 @using MadisonCountyCollaborationApplication.Pages.DB;
 @using System.IO;
+@using MadisonCountyCollaborationApplication.Pages.DataClasses;
+@inject WhiteListService whitelistService
 @model MadisonCountyCollaborationApplication.Pages.Process.IndexModel
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="~/MadisonCountyCollaborationApplication.Custom.css" asp-append-version="true" />
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -25,9 +32,23 @@
             position: relative;
             float: right;
         }
+        /* Increase spacing below each radio button group */
+        .form-check {
+            margin-bottom: 1rem; /* Adjust the spacing as needed */
+        }
+
+        /* Ensure the form fits the modal body */
+        #upload-card {
+            width: 100%; /* Ensures card expands to fill modal body */
+        }
+
+        /* Optional: Adjust modal body padding if needed */
+        .modal-body {
+            padding: 2rem; /* Adjust padding for consistent spacing */
+        }
+
     </style>
 </head>
-
 
 <body>
 
@@ -53,15 +74,6 @@
         var currentProcessFolderPath = System.IO.Path.Combine(documentsFolderPath, currentProcessFolderName);
     }
 
-    <div class="card" id="upload-card">
-        <div class="upload">
-            <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
-                <label for="fileUpload">Choose a file:</label>
-                <input type="file" id="fileUpload" name="fileUpload">
-                <button type="submit" class="btn btn-primary">Upload</button>
-            </form>
-        </div>
-    </div>
 
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -71,6 +83,79 @@
     </nav>
 
     <h1>@Model.ProcessName</h1>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        Upload File
+    </button>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card" id="upload-card">
+                        <div class="upload">
+                            <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+                                <label for="fileUpload" class="btn btn-primary">Choose a file</label>
+                                <input type="file" id="fileUpload" name="fileUpload" style="display: none;">
+                                <span id="fileNameDisplay"></span> <!-- Display shortened file name here -->
+                                <div class="input-group mt-3">
+                                    <div class="form-group">
+                                        <!-- Radio options for CSV files -->
+                                        <!-- Default -->
+                                        <div class="form-check csv-option" style="display:none;">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="datasetRadio" value="dataset">
+                                            <label class="form-check-label" for="datasetRadio">Dataset</label>
+                                        </div>
+
+                                        <br />
+                                        <!-- Other Options -->
+                                        <div class="form-check csv-option" style="display:none;">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="tylerCSVRadio" value="tylerCSV">
+                                            <label class="form-check-label" for="tylerCSVRadio">Tyler CSV</label>
+                                        </div>
+
+                                        <!-- Radio options for non-CSV files -->
+                                        <!-- Default -->
+                                        <div class="form-check document-option" style="display:none;">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="documentRadio" value="document" checked>
+                                            <label class="form-check-label" for="documentRadio">Document</label>
+                                        </div>
+                                        <br />
+
+                                        <!-- Other Options-->
+                                        <div class="form-check document-option" style="display:none;">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="swotRadio" value="swot">
+                                            <label class="form-check-label" for="swotRadio">SWOT</label>
+                                        </div>
+                                        <br />
+
+                                        <div class="form-check document-option" style="display:none;">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="pestRadio" value="pest">
+                                            <label class="form-check-label" for="pestRadio">PEST</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Upload</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <ul class="nav nav-tabs" id="contentTabs">
         <li class="nav-item">
@@ -125,8 +210,7 @@
                 </thead>
                 <tbody>
                     @{
-                        string sqlQuery = 
-$"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateCreated ,Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
+                        string sqlQuery = $@"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateCreated, Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
                         SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(sqlQuery);
 
                         while (DatasetReader.Read())
@@ -150,10 +234,55 @@ $"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateCreated ,Users.user
     </div>
 
     </div>
+    <script>
+        console.log("Inline script executed");
+    </script>
 
     @section Scripts {
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            console.log("Script loaded");
+            $(document).ready(function () {
+                // Retrieve the whitelist from Razor Page model
+                const whiteList = @Html.Raw(Json.Serialize(Model.Whitelist));
+                console.log("Whitelist:", whiteList);
+
+                $('#fileUpload').change(function () {
+                    console.log("Change event triggered"); // Add this line
+
+                    const fileName = this.files[0].name;
+                    const fileExtension = "." + fileName.split('.').pop().toLowerCase();
+                    const isAllowed = whiteList.includes(fileExtension);
+                    const displayFileName = fileName.length > 25 ? fileName.substring(0, 25) + '...' + fileExtension : fileName;
+
+                    // Display the custom formatted file name
+                    $('#fileNameDisplay').text(displayFileName).show();
+
+                    // Reset state, hide all options, and remove any previous warning
+                    $('.form-check').hide();
+                    $('#fileTypeNotAllowed').remove();
+
+                    if (isAllowed) {
+                        if (fileExtension === '.csv') {
+                            $('.csv-option').show();
+                            $('#datasetRadio').prop('checked', true);
+                        } else {
+                            $('.document-option').show();
+                            $('#documentRadio').prop('checked', true);
+                        }
+                    } else {
+                        $('<p id="fileTypeNotAllowed" style="color: red;">File Type Disallowed</p>').insertAfter('#fileUpload');
+                    }
+                });
+            });
+
+
+
+            $(document).ready(function () {
+                // Setup the event listener for the button click to show the modal
+                $('#launchModalButton').click(function () {
+                    $('#myModal').modal('show');
+                });
+
                 // Setup tab switching functionality
                 const tabs = document.querySelectorAll('#contentTabs .nav-link');
                 tabs.forEach(tab => {

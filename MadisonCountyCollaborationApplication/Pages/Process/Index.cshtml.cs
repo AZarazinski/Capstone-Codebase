@@ -3,19 +3,32 @@ using MadisonCountyCollaborationApplication.Pages.DB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
+using System;
 
 namespace MadisonCountyCollaborationApplication.Pages.Process
 {
     public class IndexModel : PageModel
     {
         public string ProcessName { get; set; }
+        [BindProperty]
         public int ProcessID { get; set; }
 
         public string? CurrentProcessFolderName { get; set; }
+        [BindProperty]
+        public IFormFile File { get; set; }
 
+        [BindProperty]
+        public string FileTypeOptions { get; set; }
+        private readonly WhiteListService _whitelistService;
+        public IndexModel(WhiteListService whitelistService)
+        {
+            _whitelistService = whitelistService;
+        }
+        public List<string> Whitelist { get; private set; }
         public IActionResult OnGet(int? processID)
         {
             // Attempt to get ProcessID from the route first.
@@ -23,6 +36,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             {
                 ProcessID = processID.Value;
                 HttpContext.Session.SetInt32("processID", ProcessID);
+                Whitelist = _whitelistService.GetWhitelist();
+                foreach (var element in Whitelist)
+                {
+                    Console.WriteLine(element.ToString());
+                }
             }
             else
             {
@@ -59,7 +77,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             // No errors, so return the page to the user.
             ViewData["LoginMessage"] = "Login successful!";
             CurrentProcessFolderName = ProcessName.Replace(" ", "_"); // Modify as needed for your folder naming convention.
-
             return Page();
         }
 
@@ -67,6 +84,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
         public async Task<IActionResult> OnPostUploadAsync(IFormFile fileUpload)
         {
+            var fileTypeOption = Request.Form["FileTypeOptions"];
+            Console.WriteLine($"Selected File Type Option: {fileTypeOption}");
             // Check if there's a file to upload
             if (fileUpload == null || fileUpload.Length <= 0)
             {
@@ -84,11 +103,15 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
             var fileName = Path.GetFileName(fileUpload.FileName);
             var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
-
-            // Handle CSV files separately
+            int userID = Convert.ToInt32(DBClass.UserNameIDConverter(HttpContext.Session.GetString("username")));
+            // Inserting FileUpload info into the Document and ProcessDocument Tables HERE
+            DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), 0, fileTypeOption, fileExtension, userID, processID);
             if (fileExtension == ".csv")
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fileupload", fileName);
+                // Insert into the DB Document and ProcessDocument tables
+                DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), 0, fileTypeOption, filePath, userID, processID);
+                DBClass.MainDBconnection.Close();
                 string queryName = Path.GetFileNameWithoutExtension(fileName);
 
                 string sqlQuery = $"SELECT COUNT(*) FROM DataSet WHERE dataSetName = '{queryName}';";
@@ -124,6 +147,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
                 string folderName = folders[processID.Value]; // Assuming collabID is always valid here
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents", folderName, fileName);
+                // Insert into the DB Document and ProcessDocument tables
+                DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), 0, fileTypeOption, filePath, userID, processID);
+                DBClass.MainDBconnection.Close();
+
 
                 var directory = Path.GetDirectoryName(filePath);
                 Directory.CreateDirectory(directory); // CreateDirectory is a no-op if the directory already exists
@@ -133,6 +160,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                     await fileUpload.CopyToAsync(fileStream);
                 }
                 //Area to add SUCCESS Message!!
+                Console.WriteLine($"Selected File Type Option: {FileTypeOptions}");
+
 
                 return RedirectToPage("./Index", new { processID = processID.Value });
             }

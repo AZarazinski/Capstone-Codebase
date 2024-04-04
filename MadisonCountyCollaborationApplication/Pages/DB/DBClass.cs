@@ -186,6 +186,60 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             return tempReader;
         }
 
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //DOCUMENT SECTION
+
+        public static void InsertIntoDocumentTable(string title, int fileCount, string documentType, string filePath, int userID, int? processID)
+        {
+            string documentInsertQuery = @"INSERT INTO Document(title, fileCount, documentType, filePath, userID)
+                                    VALUES(@title, @fileCount, @documentType, @filePath, @userID);
+                                    SELECT SCOPE_IDENTITY();";
+
+            string documentProcessInsertQuery = @"INSERT INTO DocumentProcess(processID, documentID)
+                                           VALUES(@processID, @documentID);";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Insert into Document table and retrieve the newly inserted document's ID
+                        using (var cmd = new SqlCommand(documentInsertQuery, connection, transaction))
+                        {
+                            cmd.Parameters.AddWithValue("@title", title);
+                            cmd.Parameters.AddWithValue("@fileCount", fileCount);
+                            cmd.Parameters.AddWithValue("@documentType", documentType);
+                            cmd.Parameters.AddWithValue("@filePath", filePath);
+                            cmd.Parameters.AddWithValue("@userID", userID);
+
+                            // Execute the insert query and retrieve the documentID
+                            int documentID = Convert.ToInt32(cmd.ExecuteScalar());
+
+                            // Insert into DocumentProcess table
+                            using (var cmdDocProcess = new SqlCommand(documentProcessInsertQuery, connection, transaction))
+                            {
+                                cmdDocProcess.Parameters.AddWithValue("@processID", processID);
+                                cmdDocProcess.Parameters.AddWithValue("@documentID", documentID);
+                                cmdDocProcess.ExecuteNonQuery();
+                            }
+
+                            // Commit the transaction
+                            transaction.Commit();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Rollback the transaction if an exception occurs
+                        transaction.Rollback();
+                        Console.WriteLine("Error occurred: " + ex.Message);
+                    }
+                }
+            }
+        }
+
 
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------

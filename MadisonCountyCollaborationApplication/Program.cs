@@ -1,9 +1,13 @@
+using MadisonCountyCollaborationApplication.Pages.DataClasses;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
 builder.Services.AddSession();
+
+builder.Services.AddScoped<WhiteListService>(); // Add this line to register WhiteListService
 
 var app = builder.Build();
 
