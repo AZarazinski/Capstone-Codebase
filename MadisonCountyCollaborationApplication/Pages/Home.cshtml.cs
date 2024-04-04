@@ -31,7 +31,7 @@ namespace MadisonCountyCollaborationApplication.Pages
                 {
                     HttpContext.Session.SetInt32("processID", ProcessID);
                     DBClass.MainDBconnection.Close();
-                    return RedirectToPage("/Process/Index");
+                    return RedirectToPage("/Process/Index", new { ProcessID = ProcessID }); //routes ProcessID in URL
                 }
                 else
                 {
