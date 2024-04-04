@@ -203,7 +203,7 @@
                     </thead>
                     <tbody>
                         @{
-                            string documentQuery = $"SE";
+                            string documentQuery = $"SELECT documentName, documentType, dateCreated FROM Document INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID" + Model.ProcessName + ";";
                             SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
 
                             while (DocumentReader.Read())
