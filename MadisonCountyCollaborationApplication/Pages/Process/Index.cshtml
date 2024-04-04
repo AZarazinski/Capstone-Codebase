@@ -243,22 +243,22 @@
                 <tbody>
                     @{
                         string datasetQuery = $@"SELECT DataSet.datasetID, DataSet.dataSetName, DataSet.dateCreated, Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
-                        SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(datasetQuery);
+                        SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(datasetQuery);
 
-                        while (DocumentReader.Read())
+                        while (DatasetReader.Read())
                         {
                             <tr>
-                                <td>@DocumentReader["datasetID"].ToString()</td>
+                                <td>@DatasetReader["datasetID"].ToString()</td>
                                 <td>
-                                    <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DocumentReader["datasetID"]">
-                                        @DocumentReader["dataSetName"].ToString()
+                                    <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
+                                        @DatasetReader["dataSetName"].ToString()
                                     </a>
                                 </td>
-                                <td>@DocumentReader["userName"].ToString()</td>
-                                <td>@DocumentReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
+                                <td>@DatasetReader["userName"].ToString()</td>
+                                <td>@DatasetReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
                             </tr>
                         }
-                        DocumentReader.Close(); // Always close the SqlDataReader when done.
+                        DatasetReader.Close(); // Always close the SqlDataReader when done.
                     }
                 </tbody>
             </table>
