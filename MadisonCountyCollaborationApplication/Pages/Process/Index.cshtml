@@ -203,18 +203,14 @@
                     </thead>
                     <tbody>
                         @{
-                            string documentQuery = $"SELECT documentName, documentType, dateCreated FROM Document INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID" + Model.ProcessName + ";";
+                            string documentQuery = $"SELECT Document.documentName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN  Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID =" + Model.ProcessID + ";";
                             SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
 
                             while (DocumentReader.Read())
                             {
                                 <tr>
-                                    <td>@DocumentReader["datasetID"].ToString()</td>
-                                    <td>
-                                        <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DocumentReader["datasetID"]">
-                                            @DocumentReader["dataSetName"].ToString()
-                                        </a>
-                                    </td>
+                                    <td>@DocumentReader["documentName"].ToString()</td>
+                                    <td>@DocumentReader["documentType"].ToString()</td>
                                     <td>@DocumentReader["userName"].ToString()</td>
                                     <td>@DocumentReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
                                 </tr>

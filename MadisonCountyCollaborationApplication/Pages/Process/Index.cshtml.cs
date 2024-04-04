@@ -105,12 +105,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
             int userID = Convert.ToInt32(DBClass.UserNameIDConverter(HttpContext.Session.GetString("username")));
             // Inserting FileUpload info into the Document and ProcessDocument Tables HERE
-            DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), 0, fileTypeOption, fileExtension, userID, processID);
             if (fileExtension == ".csv")
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fileupload", fileName);
                 // Insert into the DB Document and ProcessDocument tables
-                DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), 0, fileTypeOption, filePath, userID, processID);
+                DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), fileTypeOption, userID, processID);
                 DBClass.MainDBconnection.Close();
                 string queryName = Path.GetFileNameWithoutExtension(fileName);
 
@@ -148,7 +147,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 string folderName = folders[processID.Value]; // Assuming collabID is always valid here
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents", folderName, fileName);
                 // Insert into the DB Document and ProcessDocument tables
-                DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), 0, fileTypeOption, filePath, userID, processID);
+                DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), fileTypeOption, userID, processID);
                 DBClass.MainDBconnection.Close();
 
 

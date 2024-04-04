@@ -193,7 +193,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         public static void InsertIntoDocumentTable(string documentName, string documentType, int userID, int? processID)
         {
             string documentInsertQuery = @"INSERT INTO Document(documentName, documentType, userID)
-                                    VALUES(@title, @documentType, @userID);
+                                    VALUES(@documentName, @documentType, @userID);
                                     SELECT SCOPE_IDENTITY();";
 
             string documentProcessInsertQuery = @"INSERT INTO DocumentProcess(processID, documentID)
