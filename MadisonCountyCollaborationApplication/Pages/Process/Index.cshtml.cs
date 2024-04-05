@@ -43,32 +43,29 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         public IActionResult OnGet(int? processID)
         {
             // Attempt to get ProcessID from the route first.
-            //if (processID.HasValue)
-            //{
-            //    ProcessID = processID.Value;
-            //    HttpContext.Session.SetInt32("processID", ProcessID);
-            //    Whitelist = _whitelistService.GetWhitelist();
-            //    foreach (var element in Whitelist)
-            //    {
-            //        Console.WriteLine(element.ToString());
-            //    }
-            //}
-            //else
-            //{
-            //    // Attempt to get ProcessID from the session.
-            //    ProcessID = HttpContext.Session.GetInt32("processID") ?? 0;
-            //}
-
-            //// If no valid ProcessID is found, return an error message.
-            //if (ProcessID <= 0)
-            //{
-            //    ViewData["ErrorMessage"] = "Invalid Process ID. Please select a process.";
-            //    return Page();
-            //}
-
-            if (HttpContext.Session.GetInt32("processID") is int storedProcessId)
+            if (processID.HasValue)
             {
-                ProcessID = storedProcessId;
+                ProcessID = processID.Value;
+                HttpContext.Session.SetInt32("processID", ProcessID); // Store ProcessID in session.
+
+                // Assuming Whitelist is a property of your PageModel and you want to load it here.
+                Whitelist = _whitelistService.GetWhitelist(); // Load some whitelist information.
+                foreach (var element in Whitelist)
+                {
+                    Console.WriteLine(element.ToString()); // Example processing.
+                }
+            }
+            else
+            {
+                // Attempt to get ProcessID from the session if not in route.
+                ProcessID = HttpContext.Session.GetInt32("processID") ?? 0;
+            }
+
+            // If no valid ProcessID is found, return an error message.
+            if (ProcessID <= 0)
+            {
+                ViewData["ErrorMessage"] = "Invalid Process ID. Please select a process.";
+                return Page();
             }
 
             // Ensure the user is logged in by checking the session.
@@ -78,7 +75,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 return RedirectToPage("/User/Login");
             }
 
-            // Fetch the process name using the updated DBClass method that manages connections safely.
+            // Fetch the process name using the updated DBClass method that safely manages connections.
             ProcessName = DBClass.ProcessGetName(ProcessID);
 
             if (string.IsNullOrEmpty(ProcessName))
@@ -93,10 +90,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             // No errors, so return the page to the user.
             ViewData["LoginMessage"] = "Login successful!";
             CurrentProcessFolderName = ProcessName.Replace(" ", "_"); // Modify as needed for your folder naming convention.
+
             return Page();
         }
 
-        
+
+
 
 
 

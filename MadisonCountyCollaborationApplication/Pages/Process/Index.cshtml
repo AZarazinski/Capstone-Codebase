@@ -57,27 +57,7 @@
 
 <body>
 
-    @{
-        var documentsFolderPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents");
-        var ProcessFolderMap = new Dictionary<int, string>
-    {
-    { 3, "Admin" },
-    { 1, "Budgeting" },
-    { 5, "Economic" },
-    { 4, "Management" },
-    { 2, "Revenue" }
-    };
-
-        ProcessFolderMap.TryGetValue(Model.ProcessID, out string currentProcessFolderName);
-
-        if (string.IsNullOrEmpty(currentProcessFolderName))
-        {
-            // Optionally, handle the case where there's no matching folder for the ProcessID
-            currentProcessFolderName = "Default"; // Setting a default folder name or handle it as needed
-        }
-
-        var currentProcessFolderPath = System.IO.Path.Combine(documentsFolderPath, currentProcessFolderName);
-    }
+ 
 
 
     <nav aria-label="breadcrumb">
@@ -181,51 +161,43 @@
 
     <div class="card">
         <div class="tab-content" id="DocumentTableContainer">
-            @if (!string.IsNullOrEmpty(currentProcessFolderName) && Directory.Exists(currentProcessFolderPath))
-            {
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Uploaded By</th>
+                        <th>Date Uploaded</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        string documentQuery = $@"SELECT Document.documentName, STUFF(documentName, 1, CHARINDEX('_', documentName, CHARINDEX('_', documentName) + 1), '') AS displayDocName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
+                        SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
 
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Uploaded By</th>
-                            <th>Date Uploaded</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @{
-                            string documentQuery = $@"SELECT Document.documentName, STUFF(documentName, 1, CHARINDEX('_', documentName, CHARINDEX('_', documentName) + 1), '') AS displayDocName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
-                            SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
-
-                            while (DocumentReader.Read())
-                            {
-                                <tr>
-                                    <td>@DocumentReader["displayDocName"].ToString()</td>
-                                    <td>@DocumentReader["documentType"].ToString()</td>
-                                    <td>@DocumentReader["userName"].ToString()</td>
-                                    <td>@DocumentReader["dateCreated"].ToString()</td>
-                                    <td>
-                                        <!-- Download button form -->
-                                        <form method="post" asp-page-handler="DownloadDocument">
-                                            <input type="hidden" name="documentName" value="@DocumentReader["documentName"].ToString()" />
-                                            <button type="submit" class="btn btn-primary btn-sm">Download</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            }
-                            DocumentReader.Close();
+                        while (DocumentReader.Read())
+                        {
+                            <tr>
+                                <td>@DocumentReader["displayDocName"].ToString()</td>
+                                <td>@DocumentReader["documentType"].ToString()</td>
+                                <td>@DocumentReader["userName"].ToString()</td>
+                                <td>@DocumentReader["dateCreated"].ToString()</td>
+                                <td>
+                                    <!-- Download button form -->
+                                    <form method="post" asp-page-handler="DownloadDocument">
+                                        <input type="hidden" name="documentName" value="@DocumentReader["documentName"].ToString()" />
+                                        <button type="submit" class="btn btn-primary btn-sm">Download</button>
+                                    </form>
+                                </td>
+                            </tr>
                         }
-                    </tbody>
-                </table>
-
-            }
-            else
-            {
-                <p>No documents found for this process.</p>
-            }
+                        DocumentReader.Close();
+                    }
+                </tbody>
+            </table>
         </div>
+    </div>
 
         <div class="tab-content" id="DatasetTableContainer" style="display: none;">
             <table class="table table-hover">
