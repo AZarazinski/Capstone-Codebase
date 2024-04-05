@@ -15,6 +15,8 @@ namespace MadisonCountyCollaborationApplication.Pages
         [BindProperty(SupportsGet = false)]
         public DataClasses.UserProcess NewUserProcess { get; set; }
 
+        [BindProperty(SupportsGet = false)]
+        public string RemoveUserID { get; set; }
 
         [BindProperty(SupportsGet = false)]
         public string ProcessName { get; set; }
@@ -154,6 +156,16 @@ namespace MadisonCountyCollaborationApplication.Pages
         }
 
 
+        public IActionResult OnPostRemoveUser()
+        {
+
+            string removeUserQuery = $"DELETE FROM Users WHERE userID =" + RemoveUserID + ";";
+
+            DBClass.GeneralInsertQuery(removeUserQuery);
+
+            return RedirectToPage("AdminDashboard");
+
+        }
 
 
         public IActionResult OnPostClearInputs()

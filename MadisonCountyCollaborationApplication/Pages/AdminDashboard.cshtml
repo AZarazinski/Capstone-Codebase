@@ -1,4 +1,6 @@
 ﻿@page
+@using System.Data.SqlClient
+@using MadisonCountyCollaborationApplication.Pages.DB
 @model MadisonCountyCollaborationApplication.Pages.AdminDashboardModel
 @{
 }
@@ -20,6 +22,39 @@
 
 
 <h1 id="header">Admin Dashboard</h1>
+
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @{
+            string userQuery = $"SELECT userID, userName, firstName, lastName FROM Users";
+            SqlDataReader userReader = DBClass.GeneralReaderQuery(userQuery);
+
+            while (userReader.Read())
+            {
+            <tr>
+                <td>@userReader["userID"].ToString()</td>
+                <td>@userReader["userName"].ToString()</td>
+                <td>@userReader["firstName"].ToString()</td>
+                <td>@userReader["lastName"].ToString()</td>
+            </tr>
+            }    
+            userReader.Close();
+        }
+    </tbody>
+
+</table>
+
 
 
 <div class="container text-center container-md">
@@ -72,47 +107,100 @@
 
     <!--CREATE USER-->
     <div class="row">
-        <div class="card">
-            <div class="card-title">
-                Create a New User
+        <div class="col-lg">
+            <div class="card">
+                <div class="card-title">
+                    Create a New User
+                </div>
+
+
+                <form method="post" asp-page-handler="AddUser">
+                    <div class="row">
+                        <div class="col">
+                            <label for="userName">Username</label>
+                            <input type="text" asp-for="NewUser.userName" class="form-control" id="userName" placeholder="Enter username">
+                        </div>
+                        <div class="col">
+                            <label for="userPassword">Password</label>
+                            <input type="password" asp-for="NewUser.userPassword" class="form-control" id="userPassword" placeholder="Password">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="firstName">First Name</label>
+                            <input type="text" asp-for="NewUser.firstName" class="form-control" id="firstName" placeholder="Enter first name">
+                        </div>
+                        <div class="col">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" asp-for="NewUser.lastName" class="form-control" id="lastName" placeholder="Enter last name">
+                        </div>
+                    </div>
+                    <div class="row"></div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" asp-for="NewUser.email" class="form-control" id="email" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="phone" asp-for="NewUser.phone" class="form-control" id="phone" placeholder="Enter phone number">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="userType">User Type</label>
+                            <select asp-for="NewUser.userType" class="form-control" id="userType">
+                                <option value="Admin">Admin</option>
+                                <option value="User">User</option>
+                                <!-- Add more user types as needed -->
+                            </select>
+                        </div>
+                        <div class="col">
+                        <button type="submit" class="btn btn-primary">Create User</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg">
+
+            <div class="card">
+                <div class="card-title">
+                    Add a User to a Process
+                </div>
+
+                <form method="post" asp-page-handler="AddUserToProcess">
+
+                    <select asp-for="NewUserProcess.UserID" asp-items="Model.UserList" class="form-select">
+                        <option value="">Select a User</option>
+                    </select>
+
+                    <select asp-for="NewUserProcess.ProcessID" asp-items="Model.ProcessList" class="form-select">
+                        <option value="">Select a Process</option>
+                    </select>
+
+                    <input type="submit" value="Add User to Process" class="btn btn-primary" />
+
+                </form>
+            </div>
+
+            <div class="card">
+                div class="card">
+                <div class="card-title">
+                    Remove a User
+                </div>
+                <form method="post" asp-page-handler="RemoveUser">
+                    <select asp-for="RemoveUserID" asp-items="Model.UserList" class="form-select">
+                        <option value="">Select a User</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-primary">Remove User</button>
+                </form>
             </div>
 
 
-            <form method="post" asp-page-handler="AddUser">
-                <div class="form-group">
-                    <label for="userName">Username</label>
-                    <input type="text" asp-for="NewUser.userName" class="form-control" id="userName" placeholder="Enter username">
-                </div>
-                <div class="form-group">
-                    <label for="userPassword">Password</label>
-                    <input type="password" asp-for="NewUser.userPassword" class="form-control" id="userPassword" placeholder="Password">
-                </div>
-                <div class="form-group">
-                    <label for="firstName">First Name</label>
-                    <input type="text" asp-for="NewUser.firstName" class="form-control" id="firstName" placeholder="Enter first name">
-                </div>
-                <div class="form-group">
-                    <label for="lastName">Last Name</label>
-                    <input type="text" asp-for="NewUser.lastName" class="form-control" id="lastName" placeholder="Enter last name">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" asp-for="NewUser.email" class="form-control" id="email" placeholder="Enter email">
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="text" asp-for="NewUser.phone" class="form-control" id="phone" placeholder="Enter phone number">
-                </div>
-                <div class="form-group">
-                    <label for="userType">User Type</label>
-                    <select asp-for="NewUser.userType" class="form-control" id="userType">
-                        <option value="Admin">Admin</option>
-                        <option value="User">User</option>
-                        <!-- Add more user types as needed -->
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Create User</button>
-            </form>
+            </div>
+
         </div>
-    </div>
+
+
 </div>
