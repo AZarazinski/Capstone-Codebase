@@ -43,27 +43,32 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         public IActionResult OnGet(int? processID)
         {
             // Attempt to get ProcessID from the route first.
-            if (processID.HasValue)
-            {
-                ProcessID = processID.Value;
-                HttpContext.Session.SetInt32("processID", ProcessID);
-                Whitelist = _whitelistService.GetWhitelist();
-                foreach (var element in Whitelist)
-                {
-                    Console.WriteLine(element.ToString());
-                }
-            }
-            else
-            {
-                // Attempt to get ProcessID from the session.
-                ProcessID = HttpContext.Session.GetInt32("processID") ?? 0;
-            }
+            //if (processID.HasValue)
+            //{
+            //    ProcessID = processID.Value;
+            //    HttpContext.Session.SetInt32("processID", ProcessID);
+            //    Whitelist = _whitelistService.GetWhitelist();
+            //    foreach (var element in Whitelist)
+            //    {
+            //        Console.WriteLine(element.ToString());
+            //    }
+            //}
+            //else
+            //{
+            //    // Attempt to get ProcessID from the session.
+            //    ProcessID = HttpContext.Session.GetInt32("processID") ?? 0;
+            //}
 
-            // If no valid ProcessID is found, return an error message.
-            if (ProcessID <= 0)
+            //// If no valid ProcessID is found, return an error message.
+            //if (ProcessID <= 0)
+            //{
+            //    ViewData["ErrorMessage"] = "Invalid Process ID. Please select a process.";
+            //    return Page();
+            //}
+
+            if (HttpContext.Session.GetInt32("processID") is int storedProcessId)
             {
-                ViewData["ErrorMessage"] = "Invalid Process ID. Please select a process.";
-                return Page();
+                ProcessID = storedProcessId;
             }
 
             // Ensure the user is logged in by checking the session.

@@ -196,7 +196,7 @@
                     </thead>
                     <tbody>
                         @{
-                            string documentQuery = $@"SELECT SUBSTRING(Document.documentName, 1, CHARINDEX('_', documentName) - 1) AS displayDocName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
+                            string documentQuery = $@"SELECT Document.documentName, STUFF(documentName, 1, CHARINDEX('_', documentName, CHARINDEX('_', documentName) + 1), '') AS displayDocName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
                             SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
 
                             while (DocumentReader.Read())
