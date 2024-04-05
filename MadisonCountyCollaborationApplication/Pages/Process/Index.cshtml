@@ -183,27 +183,6 @@
         <div class="tab-content" id="DocumentTableContainer">
             @if (!string.IsNullOrEmpty(currentProcessFolderName) && Directory.Exists(currentProcessFolderPath))
             {
-                @* <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Document Name</th>
-                            <th>Type</th>
-                            <th>File Size (KB)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var filePath in Directory.GetFiles(currentProcessFolderPath))
-                        {
-                            FileInfo fileInfo = new FileInfo(filePath);
-                            string fileName = System.IO.Path.GetFileName(filePath);
-                            <tr>
-                                <td><a href="@($"/Documents/{currentProcessFolderName}/{fileName}")" target="_blank">@fileName</a></td>
-                                <td>@System.IO.Path.GetExtension(filePath).TrimStart('.').ToUpperInvariant()</td>
-                                <td>@(fileInfo.Length / 1024)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table> *@
 
                 <table class="table table-hover">
                     <thead>
@@ -217,13 +196,13 @@
                     </thead>
                     <tbody>
                         @{
-                            string documentQuery = $@"SELECT Document.documentName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
+                            string documentQuery = $@"SELECT SUBSTRING(Document.documentName, 1, CHARINDEX('_', documentName) - 1) AS displayDocName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
                             SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
 
                             while (DocumentReader.Read())
                             {
                                 <tr>
-                                    <td>@DocumentReader["documentName"].ToString()</td>
+                                    <td>@DocumentReader["displayDocName"].ToString()</td>
                                     <td>@DocumentReader["documentType"].ToString()</td>
                                     <td>@DocumentReader["userName"].ToString()</td>
                                     <td>@DocumentReader["dateCreated"].ToString()</td>

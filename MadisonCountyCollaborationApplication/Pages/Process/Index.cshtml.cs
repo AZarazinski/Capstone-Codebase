@@ -91,54 +91,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             return Page();
         }
 
-        public async Task<IActionResult> OnPostDownloadDocumentAsync(string documentName)
-        {
-            try
-            {
-                // Use the literal document name from the database, which includes the timestamp
-                var blobClient = GetBlobClient(documentName);
-                if (await blobClient.ExistsAsync())
-                {
-                    try
-                    {
-                        var download = await blobClient.DownloadAsync();
-                        var stream = download.Value.Content;
-                        var contentType = "application/octet-stream"; // Consider setting the actual content type if known.
-                        return File(stream, contentType, documentName);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log the detailed exception
-                        // Consider using a logging framework or storing the message in TempData
-                        TempData["ErrorMessage"] = $"Error downloading the file: {ex.Message}";
-                        return Page();
-                    }
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Document not found in Blob Storage.";
-                    return Page();
-                }
-
-                TempData["ErrorMessage"] = "Document not found in Blob Storage.";
-                return Page();
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
-                return Page();
-            }
-        }
+        
 
 
 
 
-        private BlobClient GetBlobClient(string fullDocumentName)
-        {
-            // Assuming _blobServiceClient is already set up with your Azure Storage connection string
-            var containerClient = _blobServiceClient.GetBlobContainerClient(StorageContainerName);
-            return containerClient.GetBlobClient(fullDocumentName);
-        }
+
 
 
         public async Task<IActionResult> OnPostUploadAsync(IFormFile fileUpload)
@@ -215,6 +173,92 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             await blobClient.UploadAsync(fileStream);
         }
 
+
+        private BlobClient GetBlobClient(string fullDocumentName)
+        {
+            // Assuming _blobServiceClient is already set up with your Azure Storage connection string
+            var containerClient = _blobServiceClient.GetBlobContainerClient(StorageContainerName);
+            return containerClient.GetBlobClient(fullDocumentName);
+        }
+
+        public async Task<IActionResult> OnPostDownloadDocumentAsync(string documentName)
+        {
+            try
+            {
+                // Use the literal document name from the database, which includes the timestamp
+                var blobClient = GetBlobClient(documentName);
+                if (await blobClient.ExistsAsync())
+                {
+                    try
+                    {
+                        var download = await blobClient.DownloadAsync();
+                        var stream = download.Value.Content;
+                        var contentType = "application/octet-stream"; // Consider setting the actual content type if known.
+                        return File(stream, contentType, documentName);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the detailed exception
+                        // Consider using a logging framework or storing the message in TempData
+                        TempData["ErrorMessage"] = $"Error downloading the file: {ex.Message}";
+                        return Page();
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Document not found in Blob Storage.";
+                    return Page();
+                }
+
+                TempData["ErrorMessage"] = "Document not found in Blob Storage.";
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                return Page();
+            }
+        }
+
+
+        public async Task<IActionResult> OnPostDownloadDatasetAsync(string datasetName)
+        {
+            try
+            {
+                // Use the literal document name from the database, which includes the timestamp
+                var blobClient = GetBlobClient(datasetName);
+                if (await blobClient.ExistsAsync())
+                {
+                    try
+                    {
+                        var download = await blobClient.DownloadAsync();
+                        var stream = download.Value.Content;
+                        var contentType = "application/octet-stream"; // Consider setting the actual content type if known.
+                        return File(stream, contentType, datasetName);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the detailed exception
+                        // Consider using a logging framework or storing the message in TempData
+                        TempData["ErrorMessage"] = $"Error downloading the file: {ex.Message}";
+                        return Page();
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Document not found in Blob Storage.";
+                    return Page();
+                }
+
+                TempData["ErrorMessage"] = "Document not found in Blob Storage.";
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                return Page();
+            }
+        }
 
     }
 }
