@@ -8,9 +8,17 @@ builder.Services.AddRazorPages();
 builder.Services.AddSession();
 builder.Services.AddScoped<WhiteListService>(); // Existing registration of WhiteListService
 
-// Retrieve the connection string from appsettings.json and register BlobServiceClient with the DI container
-var azureFileStorageConfig = builder.Configuration.GetSection("AzureFileStorage");
-builder.Services.AddSingleton(new BlobServiceClient(azureFileStorageConfig["ConnectionString"]));
+// Corrected to match the updated appsettings.json structure
+var azureBlobStorageConfig = builder.Configuration.GetSection("AzureBlobStorage");
+if (azureBlobStorageConfig.Exists()) // Ensure the configuration section exists
+{
+    // Register BlobServiceClient with the DI container using the retrieved connection string
+    builder.Services.AddSingleton(new BlobServiceClient(azureBlobStorageConfig["ConnectionString"]));
+}
+else
+{
+    throw new InvalidOperationException("Azure Blob Storage configuration section is missing in appsettings.json");
+}
 
 var app = builder.Build();
 

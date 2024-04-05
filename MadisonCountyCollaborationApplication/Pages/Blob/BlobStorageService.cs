@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using Microsoft.Extensions.Configuration;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using System;
 using System.IO;
@@ -7,8 +8,16 @@ using System.Threading.Tasks;
 public class BlobStorageService
 {
     private readonly BlobServiceClient _blobServiceClient;
-    private static readonly string StorageConnString = "DefaultEndpointsProtocol=https;AccountName=upstreamconsultingblob;AccountKey=9PC0UyBVwsYKQyVlDeJ9fLBoKYa7M55cHuDEE6nJ0Ra9t6ON80ydPqRlPnwSvfGgvCeFReUuKg0k+AStZBX4bg==;EndpointSuffix=core.windows.net";
-    private static readonly string StorageContainerName = "documents";
+    private readonly string _documentContainerName;
+    private readonly string _datasetContainerName;
+
+    public BlobStorageService(IConfiguration configuration)
+    {
+        var connectionString = configuration["AzureBlobStorage:ConnectionString"];
+        _blobServiceClient = new BlobServiceClient(connectionString);
+        _documentContainerName = configuration["AzureBlobStorage:DocumentContainerName"];
+        _datasetContainerName = configuration["AzureBlobStorage:DatasetContainerName"];
+    }
 
     public BlobStorageService(string connectionString)
     {
@@ -39,7 +48,7 @@ public class BlobStorageService
     private BlobClient GetBlobClient(string fileName, DateTime timestamp)
     {
         string blobName = ConstructBlobName(fileName, timestamp);
-        BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(StorageContainerName);
+        BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_documentContainerName);
         return containerClient.GetBlobClient(blobName);
     }
 

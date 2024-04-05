@@ -199,37 +199,45 @@
         </div>
     </div>
 
-        <div class="tab-content" id="DatasetTableContainer" style="display: none;">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Uploaded By</th>
-                        <th>Date Uploaded</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        string datasetQuery = $@"SELECT Dataset.datasetID, DataSet.dataSetName, DataSet.dateCreated, Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
-                        SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(datasetQuery);
+    <div class="tab-content" id="DatasetTableContainer" style="display: none;">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Uploaded By</th>
+                    <th>Date Uploaded</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    string datasetQuery = $@"SELECT Dataset.datasetID, DataSet.dataSetName, DataSet.dateCreated, Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
+                    SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(datasetQuery);
 
-                        while (DatasetReader.Read())
-                        {
-                            <tr>
-                                <td>
-                                    <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
-                                        @DatasetReader["dataSetName"].ToString()
-                                    </a>
-                                </td>
-                                <td>@DatasetReader["userName"].ToString()</td>
-                                <td>@DatasetReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
-                            </tr>
-                        }
-                        DatasetReader.Close(); // Always close the SqlDataReader when done.
+                    while (DatasetReader.Read())
+                    {
+                        <tr>
+                            <td>
+                                <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
+                                    @DatasetReader["dataSetName"].ToString()
+                                </a>
+                            </td>
+                            <td>@DatasetReader["userName"].ToString()</td>
+                            <td>@DatasetReader.GetDateTime(DatasetReader.GetOrdinal("dateCreated")).ToString("yyyy-MM-dd")</td> <!-- Adjusted for date formatting -->
+                            <td>
+                                <!-- Assuming you want a download button for datasets, ensure you're passing the correct identifier -->
+                                <form method="post" asp-page-handler="DownloadDataset">
+                                    <input type="hidden" name="datasetName" value="@DatasetReader["datasetName"].ToString()" />
+                                    <button type="submit" class="btn btn-primary btn-sm">Download</button>
+                                </form>
+
+                            </td>
+                        </tr>
                     }
-                </tbody>
-            </table>
-        </div>
+                    DatasetReader.Close(); // Always close the SqlDataReader when done.
+                }
+            </tbody>
+        </table>
     </div>
 
     </div>

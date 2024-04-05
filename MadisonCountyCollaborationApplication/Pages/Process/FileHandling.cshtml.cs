@@ -14,13 +14,25 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
     public class FileHandlingModel : PageModel
     {
         private static readonly string MainDBconnString = "Server = upstreamconsulting.database.windows.net,1433; Initial Catalog = MainDB; Persist Security Info=False;User ID = SQLAdmin; Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30";
+
+        [BindProperty(SupportsGet = true)]
+        public string FilePath { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string FileName { get; set; }
+
+
         // Method to check session before accessing the page
         public IActionResult OnGetSessionCheck()
         {
             if (HttpContext.Session.GetString("username") == null)
             { // If user is not logged in, set an error message and redirect to login page
                 HttpContext.Session.SetString("LoginError", "You must login to access that page!");
+                string filePath = HttpContext.Request.Query["filePath"];
+                string fileName = HttpContext.Request.Query["newFileName"];
+
                 return RedirectToPage("/Login/HashedLogin");
+
             }
             else
             {
@@ -28,7 +40,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
         }
         // Method to handle GET requests for processing a CSV file
-        public async Task<IActionResult> OnGetAsync(string filePath)
+        public async Task<IActionResult> OnGetAsync(string filePath, string newFileName)
         {
             int ProcessID = (int)HttpContext.Session.GetInt32("processID");
 
@@ -47,7 +59,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
             try
             {
-                await ProcessCsvFile(filePath);
+                await ProcessCsvFile(filePath, newFileName);
             }
             catch (Exception ex)
             {
@@ -61,11 +73,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             return RedirectToPage("./Index", new { ProcessID = ProcessID });
         }
         // Method to process a CSV file asynchronously
-        private async Task ProcessCsvFile(string filePath)
+        private async Task ProcessCsvFile(string filePath, string fileName)
         {
-            string tableName = Path.GetFileNameWithoutExtension(filePath).Replace(" ", "_").Replace("-", "_");
-            string fullTableName = tableName + "_" + (DBClass.ExtractDatasetID() + 1).ToString(); // Construct the full table name
-                                    // include underscore before ID to assist in string manipulation
+            
 
             DBClass.MainDBconnection.Close();
 
@@ -89,12 +99,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                     records.Add(record);
                 }
 
-                await CreateTableFromCsv(fullTableName, noSpacesHeaders, records);
-                await AddFileToDataSet(fullTableName); // Assume this inserts the dataset name into DataSets
+                await CreateTableFromCsv(fileName, noSpacesHeaders, records);
+                await AddFileToDataSet(fileName); // Assume this inserts the dataset name into DataSets
             }
 
             // After CSV processing and dataset insertion
-            int datasetID = await GetDatasetID(fullTableName); // Retrieve the newly inserted dataset ID. Implement this method based on prior instructions.
+            int datasetID = await GetDatasetID(fileName); // Retrieve the newly inserted dataset ID. Implement this method based on prior instructions.
             int ProcessID = (int)HttpContext.Session.GetInt32("processID"); // Retrieve ProcessID from session
 
             await InsertIntoDatasetProcess(ProcessID, datasetID); // Insert the association into DataAssist. Implement this method based on prior instructions.

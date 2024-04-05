@@ -29,8 +29,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         private readonly BlobServiceClient _blobServiceClient;
 
 
+
         private static readonly string StorageConnString = "DefaultEndpointsProtocol=https;AccountName=upstreamconsultingblob;AccountKey=9PC0UyBVwsYKQyVlDeJ9fLBoKYa7M55cHuDEE6nJ0Ra9t6ON80ydPqRlPnwSvfGgvCeFReUuKg0k+AStZBX4bg==;EndpointSuffix=core.windows.net";
-        private static readonly string StorageContainerName = "documents";
+        private readonly string DocumentsContainerName = "documents";
+        private readonly string DatasetsContainerName = "datasets"; // Assuming datasets are stored here
+
 
         // Single constructor that takes both dependencies
         public IndexModel(WhiteListService whitelistService, BlobServiceClient blobServiceClient)
@@ -130,15 +133,16 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fileupload", fileName);
                 // Insert into the DB Document and ProcessDocument tables
-                DBClass.MainDBconnection.Close();
-                string queryName = Path.GetFileNameWithoutExtension(fileName);
 
+                string dateTimeString = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string newFileName = dateTimeString + "_" + fileName;
 
+                await UploadToBlobStorage(containerName: "datasets", localFileName: newFileName, fileStream: fileUpload.OpenReadStream());
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await fileUpload.CopyToAsync(stream);
-                    return RedirectToPage("FileHandling", new { filePath = filePath });
+                    return RedirectToPage("FileHandling", new { filePath = filePath, newFileName = newFileName });
                 }
             }
             // Handle PDF, DOCX, PNG files
@@ -181,7 +185,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         private BlobClient GetBlobClient(string fullDocumentName)
         {
             // Assuming _blobServiceClient is already set up with your Azure Storage connection string
-            var containerClient = _blobServiceClient.GetBlobContainerClient(StorageContainerName);
+            var containerClient = _blobServiceClient.GetBlobContainerClient(DocumentsContainerName);
             return containerClient.GetBlobClient(fullDocumentName);
         }
 
@@ -229,33 +233,22 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         {
             try
             {
-                // Use the literal document name from the database, which includes the timestamp
-                var blobClient = GetBlobClient(datasetName);
+                string datasetContainerName = "datasets"; // Confirm this is your actual dataset container name
+                var containerClient = _blobServiceClient.GetBlobContainerClient(datasetContainerName);
+                var blobClient = containerClient.GetBlobClient(datasetName);
+
                 if (await blobClient.ExistsAsync())
                 {
-                    try
-                    {
-                        var download = await blobClient.DownloadAsync();
-                        var stream = download.Value.Content;
-                        var contentType = "application/octet-stream"; // Consider setting the actual content type if known.
-                        return File(stream, contentType, datasetName);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log the detailed exception
-                        // Consider using a logging framework or storing the message in TempData
-                        TempData["ErrorMessage"] = $"Error downloading the file: {ex.Message}";
-                        return Page();
-                    }
+                    var download = await blobClient.DownloadAsync();
+                    var stream = download.Value.Content;
+                    var contentType = "application/octet-stream"; // Consider setting the actual content type if known.
+                    return File(stream, contentType, datasetName); // Successfully return the file for download
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Document not found in Blob Storage.";
+                    TempData["ErrorMessage"] = "Dataset not found in Blob Storage.";
                     return Page();
                 }
-
-                TempData["ErrorMessage"] = "Document not found in Blob Storage.";
-                return Page();
             }
             catch (Exception ex)
             {
@@ -263,6 +256,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 return Page();
             }
         }
+
 
     }
 }
