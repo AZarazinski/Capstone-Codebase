@@ -13,7 +13,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
     public class FileHandlingModel : PageModel
     {
-        private static readonly string MainDBconnString = "server=Localhost;Database=MainDB;Trusted_Connection=True";
+        private static readonly string MainDBconnString = "Server = upstreamconsulting.database.windows.net,1433; Initial Catalog = MainDB; Persist Security Info=False;User ID = SQLAdmin; Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30";
         // Method to check session before accessing the page
         public IActionResult OnGetSessionCheck()
         {

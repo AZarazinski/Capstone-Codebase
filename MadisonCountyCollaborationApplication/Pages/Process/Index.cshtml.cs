@@ -8,6 +8,8 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Threading.Tasks;
 using System;
+using Azure.Storage.Blobs;
+using System.Globalization;
 
 namespace MadisonCountyCollaborationApplication.Pages.Process
 {
@@ -24,10 +26,19 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         [BindProperty]
         public string FileTypeOptions { get; set; }
         private readonly WhiteListService _whitelistService;
-        public IndexModel(WhiteListService whitelistService)
+        private readonly BlobServiceClient _blobServiceClient;
+
+
+        private static readonly string StorageConnString = "DefaultEndpointsProtocol=https;AccountName=upstreamconsultingblob;AccountKey=9PC0UyBVwsYKQyVlDeJ9fLBoKYa7M55cHuDEE6nJ0Ra9t6ON80ydPqRlPnwSvfGgvCeFReUuKg0k+AStZBX4bg==;EndpointSuffix=core.windows.net";
+        private static readonly string StorageContainerName = "documents";
+
+        // Single constructor that takes both dependencies
+        public IndexModel(WhiteListService whitelistService, BlobServiceClient blobServiceClient)
         {
             _whitelistService = whitelistService;
+            _blobServiceClient = blobServiceClient;
         }
+
         public List<string> Whitelist { get; private set; }
         public IActionResult OnGet(int? processID)
         {
@@ -80,6 +91,54 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             return Page();
         }
 
+        public async Task<IActionResult> OnPostDownloadDocumentAsync(string documentName)
+        {
+            try
+            {
+                // Use the literal document name from the database, which includes the timestamp
+                var blobClient = GetBlobClient(documentName);
+                if (await blobClient.ExistsAsync())
+                {
+                    try
+                    {
+                        var download = await blobClient.DownloadAsync();
+                        var stream = download.Value.Content;
+                        var contentType = "application/octet-stream"; // Consider setting the actual content type if known.
+                        return File(stream, contentType, documentName);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the detailed exception
+                        // Consider using a logging framework or storing the message in TempData
+                        TempData["ErrorMessage"] = $"Error downloading the file: {ex.Message}";
+                        return Page();
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Document not found in Blob Storage.";
+                    return Page();
+                }
+
+                TempData["ErrorMessage"] = "Document not found in Blob Storage.";
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
+                return Page();
+            }
+        }
+
+
+
+
+        private BlobClient GetBlobClient(string fullDocumentName)
+        {
+            // Assuming _blobServiceClient is already set up with your Azure Storage connection string
+            var containerClient = _blobServiceClient.GetBlobContainerClient(StorageContainerName);
+            return containerClient.GetBlobClient(fullDocumentName);
+        }
 
 
         public async Task<IActionResult> OnPostUploadAsync(IFormFile fileUpload)
@@ -112,56 +171,27 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 DBClass.MainDBconnection.Close();
                 string queryName = Path.GetFileNameWithoutExtension(fileName);
 
-                string sqlQuery = $"SELECT COUNT(*) FROM DataSet WHERE dataSetName = '{queryName}';";
-                using (var reader = DBClass.GeneralReaderQuery(sqlQuery))
-                {
-                    if (reader.Read() && (int)reader[0] > 0)
-                    {
-                        ViewData["DatasetError"] = "This Dataset already exists. Please upload a new one";
-                        return RedirectToPage("Index", new { processID = processID });
-                    }
-                    else
-                    {
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await fileUpload.CopyToAsync(stream);
-                        }
 
-                        return RedirectToPage("FileHandling", new { filePath = filePath });
-                    }
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await fileUpload.CopyToAsync(stream);
+                    return RedirectToPage("FileHandling", new { filePath = filePath });
                 }
             }
             // Handle PDF, DOCX, PNG files
             else if (fileExtension == ".pdf" || fileExtension == ".docx" || fileExtension == ".png")
             {
-                var folders = new Dictionary<int, string>
-                {
-                    { 3, "Admin" },
-                    { 1, "Budgeting" },
-                    { 5, "Economic" },
-                    { 4, "Management" },
-                    { 2, "Revenue" }
-                };
+                string dateTimeString = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string newFileName = dateTimeString + "_" + fileName;
 
-                string folderName = folders[processID.Value]; // Assuming collabID is always valid here
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Documents", folderName, fileName);
-                // Insert into the DB Document and ProcessDocument tables
-                DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), fileTypeOption, userID, processID);
+                DBClass.InsertIntoDocumentTable(newFileName, fileTypeOption, userID, processID);
                 DBClass.MainDBconnection.Close();
 
 
-                var directory = Path.GetDirectoryName(filePath);
-                Directory.CreateDirectory(directory); // CreateDirectory is a no-op if the directory already exists
+                await UploadToBlobStorage(containerName: "documents", localFileName: newFileName, fileStream: fileUpload.OpenReadStream());
 
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await fileUpload.CopyToAsync(fileStream);
-                }
-                //Area to add SUCCESS Message!!
-                Console.WriteLine($"Selected File Type Option: {FileTypeOptions}");
-
-
-                return RedirectToPage("./Index", new { processID = processID.Value });
+                return RedirectToPage("./Index", new { ProcessID = ProcessID });
             }
             else
             {
@@ -169,6 +199,20 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 ModelState.AddModelError("", "Unsupported file type. Only .csv, .pdf, .docx, and .png files are supported.");
                 return Page();
             }
+        }
+
+        private async Task UploadToBlobStorage(string containerName, string localFileName, Stream fileStream)
+        {
+            // Construct blob client
+            BlobServiceClient blobServiceClient = new BlobServiceClient(StorageConnString);
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+
+
+            // Get blob reference
+            BlobClient blobClient = containerClient.GetBlobClient(localFileName);
+
+            // Upload file with metadata
+            await blobClient.UploadAsync(fileStream);
         }
 
 

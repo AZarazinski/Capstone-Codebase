@@ -212,11 +212,12 @@
                             <th>Type</th>
                             <th>Uploaded By</th>
                             <th>Date Uploaded</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @{
-                            string documentQuery = $"SELECT Document.documentName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN  Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID =" + Model.ProcessID + ";";
+                            string documentQuery = $@"SELECT Document.documentName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
                             SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
 
                             while (DocumentReader.Read())
@@ -225,13 +226,21 @@
                                     <td>@DocumentReader["documentName"].ToString()</td>
                                     <td>@DocumentReader["documentType"].ToString()</td>
                                     <td>@DocumentReader["userName"].ToString()</td>
-                                    <td>@DocumentReader["dateCreated"].ToString()</td> <!-- Placeholder for Upload Date, adjust as necessary -->
+                                    <td>@DocumentReader["dateCreated"].ToString()</td>
+                                    <td>
+                                        <!-- Download button form -->
+                                        <form method="post" asp-page-handler="DownloadDocument">
+                                            <input type="hidden" name="documentName" value="@DocumentReader["documentName"].ToString()" />
+                                            <button type="submit" class="btn btn-primary btn-sm">Download</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             }
-                            DocumentReader.Close(); // Always close the SqlDataReader when done.
+                            DocumentReader.Close();
                         }
                     </tbody>
                 </table>
+
             }
             else
             {
@@ -354,3 +363,11 @@
 
 </body>
 </html>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
