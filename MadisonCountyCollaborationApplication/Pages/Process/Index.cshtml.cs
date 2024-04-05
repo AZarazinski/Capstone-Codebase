@@ -109,7 +109,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fileupload", fileName);
                 // Insert into the DB Document and ProcessDocument tables
-                DBClass.InsertIntoDocumentTable(Path.GetFileNameWithoutExtension(fileUpload.FileName), fileTypeOption, userID, processID);
                 DBClass.MainDBconnection.Close();
                 string queryName = Path.GetFileNameWithoutExtension(fileName);
 
