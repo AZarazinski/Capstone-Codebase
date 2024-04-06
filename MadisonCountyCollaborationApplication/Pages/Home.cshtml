@@ -20,13 +20,15 @@
     }
 
     .card {
-        flex: 1 1 calc(20% - 20px); /* Makes cards more flexible */
+        flex: 1 1 calc(20% - 20px);
         margin-bottom: 20px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Adds shadow for depth */
-        transition: transform 0.2s; /* Smooth transition for scaling */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
         padding: 15px;
-        border-radius: 5px; /* Rounds corners of the cards */
+        border-radius: 5px;
+        max-width: 100%;
     }
+
 
     .card:hover {
         transform: scale(1.05); /* Scales card on hover */
@@ -42,7 +44,7 @@
 
 <h2>My Processes</h2>
 
-@if (Model.ProcessList.Any())
+@* @if (Model.ProcessList.Any())
 {
     <form asp-page-handler="Select" method="post" id="processForm">
         <div class="box-table">
@@ -58,7 +60,28 @@
         </div>
         <input type="hidden" name="ProcessID" id="processIdInput" value="" />
     </form>
+} *@
+@if (Model.ProcessList.Any())
+{
+    <form asp-page-handler="Select" method="post" id="processForm">
+        <div class="container">
+            <div class="row">
+                @foreach (var process in Model.ProcessList)
+                {
+                    <div class="col-md-4">
+                        <div class="card" tabindex="0" role="button" onclick="selectProcess(@process.ProcessID)">
+                            <div class="card-body">
+                                @process.ProcessName
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+        <input type="hidden" name="ProcessID" id="processIdInput" value="" />
+    </form>
 }
+
 else
 {
     <p>No processes found. Please create a new process.</p>

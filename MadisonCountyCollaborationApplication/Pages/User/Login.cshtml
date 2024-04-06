@@ -1,6 +1,7 @@
 ﻿@page
 @model MadisonCountyCollaborationApplication.Pages.Users.LoginModel
 @{
+ 
 }
 
 <!-- Include Bootstrap Icons CSS -->
@@ -34,13 +35,21 @@
                 <div class="mb-3">
                     <div class="row">
                         <div class="col">
-                            <button type="button" class="btn btn-secondary btn-block" onclick="populateFields()">Populate</button>
+                            <button type="button" class="btn btn-secondary btn-block mr-3" onclick="populateFields()">Populate</button>
                         </div>
-                        <div class="col-2">
+                        <div class="col">
                             <button type="button" class="btn btn-secondary btn-block" onclick="clearFields()">Clear</button>
                         </div>
                     </div>
                 </div>
+
+
+
+
+
+
+              
+
                 @if (HttpContext.Session.GetString("username") != null)
                 {
                     <p class="text-success text-center">@ViewData["LoginMessage"]</p>
