@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'Bootstrap Icons';
+    src: url('../fonts/bootstrap-icons.woff2') format('woff2'), url('../fonts/bootstrap-icons.woff') format('woff'); /* Adjust paths as needed */
+}
+
+
 html {
   font-size: 14px;
 }
@@ -16,3 +22,23 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.navbar-nav .nav-item {
+    margin-right: 20px; /* Adjust the spacing as needed */
+}
+
+
+    .navbar-nav .nav-item:hover {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Increased blur radius */
+    }
+
+    .navbar-nav .nav-item a {
+        transition: background-color 0.3s ease, color 0.3s ease; /* Adjust time as needed */
+    }
+
+
+.navbar-right .nav-item {
+    position: relative; /* Make the list item a positioning container */
+}
+
+
