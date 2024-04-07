@@ -58,6 +58,9 @@
             margin-right: 0.3em;
         }
 
+        .button-group{
+            display: inline;
+        }
       
     </style>
 </head>
@@ -257,7 +260,11 @@
                             <td>@DatasetReader["userName"].ToString()</td>
                             <td>@DatasetReader.GetDateTime(DatasetReader.GetOrdinal("dateCreated")).ToString("yyyy-MM-dd")</td> <!-- Adjusted for date formatting -->
                             <td>
-                                <!-- Assuming you want a download button for datasets, ensure you're passing the correct identifier -->
+                                <div class="col">
+                                <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]" class="btn btn-secondary">View Dataset</a>
+                            </div>
+
+                            <div class="col">
                                 <form method="post" asp-page-handler="DownloadDataset">
                                     <input type="hidden" name="datasetName" value="@DatasetReader["datasetName"].ToString()" />
                                     <button type="submit" class="btn btn-primary btn-sm">
@@ -270,7 +277,7 @@
                                         Download
                                     </button>
                                 </form>
-
+                                </div>
                             </td>
                         </tr>
                     }
@@ -280,7 +287,7 @@
         </table>
     </div>
 
-    </div>
+    
     <script>
         console.log("Inline script executed");
     </script>
