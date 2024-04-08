@@ -4,6 +4,8 @@
 @{
     ViewData["Title"] = "Multiple Regression Analysis";
 }
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
     .form-group {
@@ -13,7 +15,48 @@
     label {
         font-weight: bold;
     }
+
+    /* Center the modal more precisely if needed */
+
+
+    /* Custom margins for rows within the modal */
+    .modal-body .row {
+        margin-bottom: 15px; /* Adjust the vertical spacing between rows */
+    }
+
+    /* Adjustments for checkboxes */
+    .form-check {
+        margin-right: 20px; /* Right margin for each checkbox */
+        margin-bottom: 10px; /* Bottom margin for a more spaced out look */
+    }
+        .modal-dialog {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh; /* Full height of the viewport */
+    }
+
+    .modal {
+        overflow-y: auto;
+    }
+
+    .modal-content {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+    .modal-lg-custom {
+        max-width: 800px; /* Custom width */
+    }
+
+    .modal-dialog {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
 </style>
+
+
 @* breadcrum navigation *@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -38,7 +81,7 @@
             }
         </select>
     </div>
-
+@* <!-- Comment out the original select multiple
     <div class="form-group">
         <label for="IndependentVariables">Select Independent Variables</label>
         <select class="form-control" name="IndependentVariables" id="IndependentVariables" multiple="multiple">
@@ -54,7 +97,54 @@
             Hold CTRL (Windows) or CMD (Mac) to select multiple options.
         </small>
     </div>
+ *@
+<!-- Button to trigger modal -->
+<div class="form-group">
+    <label>Select Independent Variables</label>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal1">
+        Choose Variables
+    </button>
+</div>
+    <div class="form-group">
+        <div class="modal modal-lg" tabindex="-1" id="modal1">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Select Independent Variables</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <!-- modal body without the form tag -->
+                    <div class="modal-body">
+                        @if (Model.Data.Columns != null)
+                        {
+                            <div class="row">
+                                @for (int i = 0; i < Model.Data.Columns.Count; i++)
+                                {
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="@Model.Data.Columns[i].ColumnName" id="checkbox_@i">
 
+                                            <label class="form-check-label" for="checkbox_@i">
+                                                @Model.Data.Columns[i].ColumnName.Replace("_", " ").TrimStart('_')
+                                            </label>
+                                        </div>
+                                    </div>
+                                    if ((i + 1) % 3 == 0 && i + 1 < Model.Data.Columns.Count)
+                                    {
+                                        @:</div><div class="row">
+                                    }
+                                }
+                            </div>
+                        }
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="hiddenInputForIndependentVariables" name="IndependentVariables">
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="form-group">
         <label for="confidenceLevel">Confidence Level (%)</label>
         <input type="number" class="form-control" id="confidenceLevel" name="ConfidenceLevel" min="80" max="99" value="95" step="1">
@@ -64,5 +154,23 @@
         </small>
     </div>
 
+    <input type="hidden" id="hiddenInputForIndependentVariables" name="IndependentVariables">
+    <!-- The rest of your form -->
+
+
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('modal1');
+        modal.addEventListener('hide.bs.modal', function () {
+            let selectedValues = [];
+            this.querySelectorAll('.form-check-input:checked').forEach(function(checkbox) {
+                selectedValues.push(checkbox.value);
+            });
+            document.getElementById('hiddenInputForIndependentVariables').value = selectedValues.join(',');
+        });
+    });
+</script>
+

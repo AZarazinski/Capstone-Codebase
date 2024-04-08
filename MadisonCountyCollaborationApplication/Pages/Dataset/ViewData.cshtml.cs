@@ -103,7 +103,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     return RedirectToPage("MultiRegression");
                 case "Simulation":
                     // Redirect to the Multi Regression analysis page
-                    return RedirectToPage("MonteCarlo");
+                    return RedirectToPage("MonteCarloSimple");
                 case "TylerRegression":
                     return RedirectToPage("TylerRegression");
                 default:

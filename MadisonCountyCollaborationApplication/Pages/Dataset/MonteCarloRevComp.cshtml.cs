@@ -35,12 +35,6 @@ namespace MadisonCountyCollaborationApplication.Pages
         public double confidenceInterval;
         public string ChartConfigJson { get; private set; }
 
-        [BindProperty]
-        public string ProcessName { get; set; }
-        [BindProperty]
-        public string DatasetName { get; set; }
-
-
 
 
         public IActionResult OnGet()
@@ -50,11 +44,6 @@ namespace MadisonCountyCollaborationApplication.Pages
                 ViewData["LoginMessage"] = "Login for "
                     + HttpContext.Session.GetString("username")
                     + " successful!";
-                //get process name
-                ProcessName = HttpContext.Session.GetString("processName");
-
-                //get dataset name
-                DatasetName = HttpContext.Session.GetString("datasetName");
                 return Page();
             }
             else
@@ -69,6 +58,9 @@ namespace MadisonCountyCollaborationApplication.Pages
 
             double[] results = RevenueComplex(iterations, years, Services, Permits, Property, Local, Miscellaneous, Fines,
                 UseOfMoney, Commonwealth, Federal);
+            double[] CI = new Simulation().ConfidenceInterval(results, confidenceInterval);
+
+            string confidence = confidenceInterval + "% Confidence Interval[" + String.Format("{0:0}", CI[0])  + "," + String.Format("{0:0}", CI[1])  + "]";
             var chart = Chart.Histogram<double, double, string>(X: results)
                 .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
                 .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Frequency"));
@@ -89,7 +81,9 @@ namespace MadisonCountyCollaborationApplication.Pages
             ChartConfigJson = chartJson;
             var response = new
             {
-                Data = new { Fields = new[] { results } } // This is your existing data structure
+                Data = new { Fields = new[] { results } },
+                Confidence = confidence
+                // This is your existing data structure
             };
             var jsonResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings
             {

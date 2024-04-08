@@ -2,16 +2,16 @@
 
 namespace MadisonCountyCollaborationApplication.Pages.DataClasses
 {
-    public class Distribution
+    public abstract class Distribution
     {
         public Random rand;
         public Distribution(Random random)
         {
             rand = random;
         }
-        public double GenerateRandom()
-        {
-            return rand.NextDouble();
-        }
+        public abstract double GenerateRandom();
+        
+        public abstract string PrintType();
+        
     }
 }

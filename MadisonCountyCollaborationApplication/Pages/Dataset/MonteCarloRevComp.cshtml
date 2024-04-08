@@ -2,15 +2,6 @@
 @model MadisonCountyCollaborationApplication.Pages.MonteCarloRevCompModel
 @{
 }
-@* breadcrum navigation *@
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
-        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Monte Carlo Revenue Comp</li>
-    </ol>
-</nav>
 <div class="text-center">
     <h1 class="display-4">Complex Rev Simulation</h1>
 </div>
@@ -55,9 +46,9 @@
             <label class="input-group-text" for="confidence">Significance Level</label>
             <div class="input-group">
                 <select class="form-select" id="confidence" aria-label="Select distribution" asp-for="confidenceInterval">
-                    <option selected value=90>90</option>
-                    <option value="95">95</option>
-                    <option value="99">99</option>
+                    <option selected value=0.90>90</option>
+                    <option value=0.95>95</option>
+                    <option value=0.99>99</option>
                 </select>
             </div>
         </div>
@@ -66,16 +57,16 @@
     <br />
     <h4 class="display-4">Property Taxes: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Property.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="propDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="Property_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="propDist" aria-label="Select distribution" asp-for="Property.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="Property_Dist" aria-label="Select distribution" asp-for="Property.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -83,41 +74,142 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="propGrowth">Growth Type</label>
             <div class="input-growth">
                 <select class="form-select" id="propGrowth" aria-label="Select Growth" asp-for="Property.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Property.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Property.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Property.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="Property_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
+
+    <div style="display: none;" id="Property_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="Property_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Property_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Property_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="Property_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Property.param1" name="Property.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Property_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Property.param2" name="Property.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Property_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Property.param3" name="Property.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Property_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Property_Normal').style.display = 'none';
+                document.getElementById('Property_Lognormal').style.display = 'none';
+                document.getElementById('Property_Uniform').style.display = 'none';
+                document.getElementById('Property_Triangular').style.display = 'none';
+                document.getElementById('Property_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('Property_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Property_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Property_first').style.display = 'none';
+                document.getElementById('Property_second').style.display = 'none';
+                document.getElementById('Property_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('Property_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('Property_third').style.display = 'block';
+                    document.getElementById('Property_first').style.display = 'block';
+                    document.getElementById('Property_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('Property_first').style.display = 'block';
+                    document.getElementById('Property_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
 
 
     <br />
     <h4 class="display-4">Other Local Taxes: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Local.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="localDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="Local_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="localDist" aria-label="Select distribution" asp-for="Local.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="Local_Dist" aria-label="Select distribution" asp-for="Local.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -125,41 +217,141 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="localGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="localGrowth" aria-label="Select Growth" asp-for="Local.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Local.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Local.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Local.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="Local_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
 
+    <div style="display: none;" id="Local_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="Local_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Local_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Local_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="Local_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Local.param1" name="Local.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Local_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Local.param2" name="Local.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Local_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Local.param3" name="Local.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Local_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Local_Normal').style.display = 'none';
+                document.getElementById('Local_Lognormal').style.display = 'none';
+                document.getElementById('Local_Uniform').style.display = 'none';
+                document.getElementById('Local_Triangular').style.display = 'none';
+                document.getElementById('Local_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('Local_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Local_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Local_first').style.display = 'none';
+                document.getElementById('Local_second').style.display = 'none';
+                document.getElementById('Local_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('Local_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('Local_third').style.display = 'block';
+                    document.getElementById('Local_first').style.display = 'block';
+                    document.getElementById('Local_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('Local_first').style.display = 'block';
+                    document.getElementById('Local_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
 
     <br />
     <h4 class="display-4">Permits, Privilege Fees & Regulatory Licenses: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Permits.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="permitsDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="Permits_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="permitsDist" aria-label="Select distribution" asp-for="Permits.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="Permits_Dist" aria-label="Select distribution" asp-for="Permits.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -167,39 +359,141 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="permitGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="permitGrowth" aria-label="Select Growth" asp-for="Permits.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Permits.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Permits.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Permits.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="Permits_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
 
+    <div style="display: none;" id="Permits_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="Permits_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Permits_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Permits_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="Permits_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Permits.param1" name="Permits.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Permits_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Permits.param2" name="Permits.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Permits_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Permits.param3" name="Permits.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Permits_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Permits_Normal').style.display = 'none';
+                document.getElementById('Permits_Lognormal').style.display = 'none';
+                document.getElementById('Permits_Uniform').style.display = 'none';
+                document.getElementById('Permits_Triangular').style.display = 'none';
+                document.getElementById('Permits_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('Permits_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Permits_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Permits_first').style.display = 'none';
+                document.getElementById('Permits_second').style.display = 'none';
+                document.getElementById('Permits_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('Permits_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('Permits_third').style.display = 'block';
+                    document.getElementById('Permits_first').style.display = 'block';
+                    document.getElementById('Permits_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('Permits_first').style.display = 'block';
+                    document.getElementById('Permits_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
+    <br />
+
     <h4 class="display-4">Fines and Forfeitures: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Fines.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="fineDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="Fines_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="fineDist" aria-label="Select distribution" asp-for="Fines.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="Fines_Dist" aria-label="Select distribution" asp-for="Fines.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -207,41 +501,142 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="fineGrowth">Growth Type</label>
             <div class="input-growth">
                 <select class="form-select" id="fineGrowth" aria-label="Select Growth" asp-for="Fines.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Fines.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Fines.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Fines.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="Fines_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
+
+    <div style="display: none;" id="Fines_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="Fines_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Fines_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Fines_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="Fines_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Fines.param1" name="Fines.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Fines_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Fines.param2" name="Fines.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Fines_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Fines.param3" name="Fines.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Fines_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Fines_Normal').style.display = 'none';
+                document.getElementById('Fines_Lognormal').style.display = 'none';
+                document.getElementById('Fines_Uniform').style.display = 'none';
+                document.getElementById('Fines_Triangular').style.display = 'none';
+                document.getElementById('Fines_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('Fines_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Fines_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Fines_first').style.display = 'none';
+                document.getElementById('Fines_second').style.display = 'none';
+                document.getElementById('Fines_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('Fines_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('Fines_third').style.display = 'block';
+                    document.getElementById('Fines_first').style.display = 'block';
+                    document.getElementById('Fines_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('Fines_first').style.display = 'block';
+                    document.getElementById('Fines_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
     <br />
 
 
     <h4 class="display-4">Use of Money and Property: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="UseOfMoney.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="moneyDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="UseOfMoney_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="moneyDist" aria-label="Select distribution" asp-for="UseOfMoney.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="UseOfMoney_Dist" aria-label="Select distribution" asp-for="UseOfMoney.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -249,41 +644,142 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="moneyGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="moneyGrowth" aria-label="Select Growth" asp-for="UseOfMoney.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="UseOfMoney.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="UseOfMoney.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="UseOfMoney.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="UseOfMoney_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
+
+    <div style="display: none;" id="UseOfMoney_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="UseOfMoney_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="UseOfMoney_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="UseOfMoney_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="UseOfMoney_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="UseOfMoney.param1" name="UseOfMoney.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="UseOfMoney_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="UseOfMoney.param2" name="UseOfMoney.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="UseOfMoney_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="UseOfMoney.param3" name="UseOfMoney.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('UseOfMoney_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('UseOfMoney_Normal').style.display = 'none';
+                document.getElementById('UseOfMoney_Lognormal').style.display = 'none';
+                document.getElementById('UseOfMoney_Uniform').style.display = 'none';
+                document.getElementById('UseOfMoney_Triangular').style.display = 'none';
+                document.getElementById('UseOfMoney_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('UseOfMoney_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('UseOfMoney_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('UseOfMoney_first').style.display = 'none';
+                document.getElementById('UseOfMoney_second').style.display = 'none';
+                document.getElementById('UseOfMoney_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('UseOfMoney_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('UseOfMoney_third').style.display = 'block';
+                    document.getElementById('UseOfMoney_first').style.display = 'block';
+                    document.getElementById('UseOfMoney_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('UseOfMoney_first').style.display = 'block';
+                    document.getElementById('UseOfMoney_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
     <br />
 
 
     <h4 class="display-4">Charges for Services: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Services.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="serviceDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="Services_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="serviceDist" aria-label="Select distribution" asp-for="Services.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="Services_Dist" aria-label="Select distribution" asp-for="Services.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -291,41 +787,142 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="serviceGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="serviceGrowth" aria-label="Select Growth" asp-for="Services.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Services.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Services.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Services.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="Services_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
+
+    <div style="display: none;" id="Services_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="Services_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Services_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Services_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="Services_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Services.param1" name="Services.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Services_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Services.param2" name="Services.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Services_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Services.param3" name="Services.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Services_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Services_Normal').style.display = 'none';
+                document.getElementById('Services_Lognormal').style.display = 'none';
+                document.getElementById('Services_Uniform').style.display = 'none';
+                document.getElementById('Services_Triangular').style.display = 'none';
+                document.getElementById('Services_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('Services_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Services_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Services_first').style.display = 'none';
+                document.getElementById('Services_second').style.display = 'none';
+                document.getElementById('Services_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('Services_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('Services_third').style.display = 'block';
+                    document.getElementById('Services_first').style.display = 'block';
+                    document.getElementById('Services_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('Services_first').style.display = 'block';
+                    document.getElementById('Services_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
     <br />
 
 
     <h4 class="display-4">Miscellaneous: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Miscellaneous.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="miscDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="Miscellaneous_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="miscDist" aria-label="Select distribution" asp-for="Miscellaneous.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="Miscellaneous_Dist" aria-label="Select distribution" asp-for="Miscellaneous.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -333,41 +930,142 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="miscGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="miscGrowth" aria-label="Select Growth" asp-for="Miscellaneous.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Miscellaneous.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Miscellaneous.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Miscellaneous.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="Miscellaneous_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
+
+    <div style="display: none;" id="Miscellaneous_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="Miscellaneous_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Miscellaneous_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Miscellaneous_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="Miscellaneous_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Miscellaneous.param1" name="Miscellaneous.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Miscellaneous_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Miscellaneous.param2" name="Miscellaneous.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Miscellaneous_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Miscellaneous.param3" name="Miscellaneous.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Miscellaneous_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Miscellaneous_Normal').style.display = 'none';
+                document.getElementById('Miscellaneous_Lognormal').style.display = 'none';
+                document.getElementById('Miscellaneous_Uniform').style.display = 'none';
+                document.getElementById('Miscellaneous_Triangular').style.display = 'none';
+                document.getElementById('Miscellaneous_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('Miscellaneous_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Miscellaneous_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Miscellaneous_first').style.display = 'none';
+                document.getElementById('Miscellaneous_second').style.display = 'none';
+                document.getElementById('Miscellaneous_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('Miscellaneous_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('Miscellaneous_third').style.display = 'block';
+                    document.getElementById('Miscellaneous_first').style.display = 'block';
+                    document.getElementById('Miscellaneous_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('Miscellaneous_first').style.display = 'block';
+                    document.getElementById('Miscellaneous_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
     <br />
 
 
     <h4 class="display-4">Commonwealth Grants: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Commonwealth.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="commonDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="Commonwealth_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="commonDist" aria-label="Select distribution" asp-for="Commonwealth.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="Commonwealth_Dist" aria-label="Select distribution" asp-for="Commonwealth.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -375,41 +1073,142 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="commonGrowth">Growth Type</label>
             <div class="input-group">
                 <select class="form-select" id="commonGrowth" aria-label="Select Growth" asp-for="Commonwealth.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Commonwealth.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Commonwealth.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Commonwealth.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="Commonwealth_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
+
+    <div style="display: none;" id="Commonwealth_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="Commonwealth_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Commonwealth_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Commonwealth_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="Commonwealth_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Commonwealth.param1" name="Commonwealth.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Commonwealth_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Commonwealth.param2" name="Commonwealth.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Commonwealth_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Commonwealth.param3" name="Commonwealth.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Commonwealth_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Commonwealth_Normal').style.display = 'none';
+                document.getElementById('Commonwealth_Lognormal').style.display = 'none';
+                document.getElementById('Commonwealth_Uniform').style.display = 'none';
+                document.getElementById('Commonwealth_Triangular').style.display = 'none';
+                document.getElementById('Commonwealth_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('Commonwealth_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Commonwealth_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Commonwealth_first').style.display = 'none';
+                document.getElementById('Commonwealth_second').style.display = 'none';
+                document.getElementById('Commonwealth_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('Commonwealth_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('Commonwealth_third').style.display = 'block';
+                    document.getElementById('Commonwealth_first').style.display = 'block';
+                    document.getElementById('Commonwealth_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('Commonwealth_first').style.display = 'block';
+                    document.getElementById('Commonwealth_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
     <br />
 
 
     <h4 class="display-4">Federal Grants: </h4>
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-4">
             Initial Value:
             <input type="number" class="form-control" placeholder="Initial Value" aria-label="Iterations" asp-for="Federal.initial">
         </div>
 
-        <div class="col-md-2">
-            <label class="input-group-text" for="federalDist">Distribution</label>
+        <div class="col-md-4">
+            <label class="input-group-text" for="Federal_Dist">Distribution</label>
             <div class="input-group">
-                <select class="form-select" id="federalDist" aria-label="Select distribution" asp-for="Federal.dist">
-                    <option value="Constant">Constant</option>
+                <select class="form-select" id="Federal_Dist" aria-label="Select distribution" asp-for="Federal.dist">
+                    <option value="Constant">Constant</option> <option selected value="Default">Default</option>
                     <option value="Uniform">Uniform</option>
                     <option value="Triangular">Triangular</option>
                     <option value="Normal">Normal</option>
@@ -417,26 +1216,127 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-4">
             <label class="input-group-text" for="fedGrowth">Growth Type</label>
             <div class="input-growth">
                 <select class="form-select" id="fedGrowth" aria-label="Select Growth" asp-for="Federal.growth">
-                    <option value="Constant">Constant Growth</option>
+                    <option selected value="Constant">Constant Growth</option>
                     <option value="Nonconstant">Nonconstant Growth</option>
-                    <option selected value="None">No Growth</option>
+                    <option value="None">No Growth</option>
                 </select>
             </div>
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="mean/min" aria-label="Iterations" asp-for="Federal.param1">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="variance/max" aria-label="Iterations" asp-for="Federal.param2">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" placeholder="Most Likely" aria-label="Iterations" asp-for="Federal.param3">
+    </div>
+    <br />
+    <div style="display: none;" id="Federal_Normal">
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
         </div>
     </div>
+
+    <div style="display: none;" id="Federal_Lognormal">
+        <br />
+        <div class="row">
+            <div class="col-md-4">
+                Mean:
+            </div>
+            <div class="col-md-4">
+                Standard Deviation:
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none;" id="Federal_Uniform">
+        <div class="row">
+            <div class="col-md-4">
+                Min:
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Federal_Triangular">
+        <div class="row">
+            <div class="col-md-4">
+                Min
+            </div>
+            <div class="col-md-4">
+                Max:
+            </div>
+            <div class="col-md-4">
+                Most Likely:
+            </div>
+        </div>
+    </div>
+    <div style="display: none;" id="Federal_Constant">
+        Value:
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div style="display: none;" id="Federal_first">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Federal.param1" name="Federal.param1">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Federal_second">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Federal.param2" name="Federal.param2">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="display: none;" id="Federal_third">
+                <input type="text" class="form-control" aria-label="Iterations" asp-for="Federal.param3" name="Federal.param3">
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Federal_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Federal_Normal').style.display = 'none';
+                document.getElementById('Federal_Lognormal').style.display = 'none';
+                document.getElementById('Federal_Uniform').style.display = 'none';
+                document.getElementById('Federal_Triangular').style.display = 'none';
+                document.getElementById('Federal_Constant').style.display = 'none';
+
+                // Show the selected tax-related section
+                document.getElementById('Federal_' + selectedValue).style.display = 'block';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('Federal_Dist').addEventListener('change', function () {
+                var selectedValue = this.value;
+
+                // Hide all tax-related sections
+                document.getElementById('Federal_first').style.display = 'none';
+                document.getElementById('Federal_second').style.display = 'none';
+                document.getElementById('Federal_third').style.display = 'none';
+
+                // Show the selected tax-related section
+                if (selectedValue === 'Constant') {
+                    document.getElementById('Federal_first').style.display = 'block';
+                } else if (selectedValue === 'Triangular') {
+                    document.getElementById('Federal_third').style.display = 'block';
+                    document.getElementById('Federal_first').style.display = 'block';
+                    document.getElementById('Federal_second').style.display = 'block';
+                } else if (selectedValue !== 'Default') {
+                    document.getElementById('Federal_first').style.display = 'block';
+                    document.getElementById('Federal_second').style.display = 'block';
+                }
+            });
+        });
+    </script>
     <br />
     <div class="d-grid gap-2">
         <button class="btn btn-primary" type="submit">Run Simulation</button>
@@ -491,6 +1391,7 @@
                                 y: 1.13,
                                 xref: 'paper',
                                 yref: 'paper',
+                                text: data.Confidence,
                                 showarrow: false,
                                 font: { size: 16 }
                             }]

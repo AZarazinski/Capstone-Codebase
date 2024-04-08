@@ -4,14 +4,7 @@
 @using System.Data.SqlClient
 @{
 }
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
-        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Tyler CSV Regression</li>
-    </ol>
-</nav>
+
 @if (ViewData.ContainsKey("ErrorMessage"))
 {
     <script type="text/javascript">
@@ -45,23 +38,32 @@
     <div class="row justify-content-center">
         <form id="dataForm" asp-page-handler="CreateGraph" class="col-md-6">
             <div class="mb-3">
-                <label class="form-label" for="IndependentVariable">Independent Variable</label>
-                <select class="form-select" name="Independent" id="Independent" aria-label="Independent Variable">
-                    
-                        @foreach (string accountNum in Model.AttributeList)
-                        {
-                                <option value="@accountNum">@accountNum</option>
-                        }
-                    
+                <label class="form-label" for="AccountNumber">Account Number</label>
+                <select class="form-select" name="Account" id="AccountNumber" aria-label="Account Number">
+
+                    @foreach (string accountNum in Model.AttributeList)
+                    {
+                        <option value="@accountNum">@accountNum</option>
+                    }
+
                 </select>
             </div>
             <div class="mb-3">
                 <label class="form-label" for="DependentVariable">Dependent Variable</label>
                 <select class="form-select" name="Dependent" id="Dependent" aria-label="Dependent Variable">
-@*                     @foreach (DataColumn column in Model.Data.Columns)
+                    @foreach (DataColumn column in Model.Data.Columns)
                     {
                         <option value="@column.ColumnName">@column.ColumnName.Replace("_", " ").TrimStart('_')</option>
-                    } *@
+                    }
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="IndependentVariable">Independent Variable</label>
+                <select class="form-select" name="Independent" id="Independent" aria-label="Independent Variable">
+                    @foreach (DataColumn column in Model.Data.Columns)
+                    {
+                        <option value="@column.ColumnName">@column.ColumnName.Replace("_", " ").TrimStart('_')</option>
+                    }
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>

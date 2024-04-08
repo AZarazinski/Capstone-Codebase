@@ -61,6 +61,11 @@
         .button-group{
             display: inline;
         }
+
+        .button-spacing {
+            margin-right: 10px; /* Adjust the value as needed */
+        }
+
       
     </style>
 </head>
@@ -118,34 +123,39 @@
                                         <!-- Radio options for CSV files -->
                                         <!-- Default -->
                                         <div class="form-check csv-option" style="display:none;">
-                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="datasetRadio" value="dataset">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="datasetRadio" value="Data Set">
                                             <label class="form-check-label" for="datasetRadio">Dataset</label>
                                         </div>
 
                                         <br />
                                         <!-- Other Options -->
                                         <div class="form-check csv-option" style="display:none;">
-                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="tylerCSVRadio" value="tylerCSV">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="tylerCSVRadio" value="TylerCSV">
                                             <label class="form-check-label" for="tylerCSVRadio">Tyler CSV</label>
                                         </div>
 
                                         <!-- Radio options for non-CSV files -->
                                         <!-- Default -->
                                         <div class="form-check document-option" style="display:none;">
-                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="documentRadio" value="document" checked>
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="documentRadio" value="Document" checked>
                                             <label class="form-check-label" for="documentRadio">Document</label>
                                         </div>
                                         <br />
 
                                         <!-- Other Options-->
                                         <div class="form-check document-option" style="display:none;">
-                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="swotRadio" value="swot">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="instructionRadio" value="Instruction">
+                                            <label class="form-check-label" for="instructionRadio">Instruction</label>
+                                        </div>
+                                        <br />
+                                        <div class="form-check document-option" style="display:none;">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="swotRadio" value="SWOT">
                                             <label class="form-check-label" for="swotRadio">SWOT</label>
                                         </div>
                                         <br />
 
                                         <div class="form-check document-option" style="display:none;">
-                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="pestRadio" value="pest">
+                                            <input class="form-check-input" type="radio" name="FileTypeOptions" id="pestRadio" value="PEST">
                                             <label class="form-check-label" for="pestRadio">PEST</label>
                                         </div>
                                     </div>
@@ -163,6 +173,66 @@
     </div>
 
 
+    <!-- Search Accordion -->
+    <div id="searchAccordion" class="accordion mt-4">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                    <!--Display Text on Accordion Before it Opens-->
+                    <button class="btn btn-link btn-block text-right collapsed" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        <i class="fas fa-plus mr-2"></i>Find Your Documents
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#searchAccordion">
+                <div class="card-body">
+                    <form id="searchForm" method="post" asp-page-handler="Search">
+                        <div class="form-row">
+                            <div class="form-group col-md-2">
+                                <label for="documentName">Document Name</label>
+                                <input type="text" class="form-control" id="documentName" name="DocumentName" placeholder="Enter Document Name"/>
+                            </div>
+                            <!-- Document Type Dropdown -->
+                            <div class="form-group col-md-2">
+                                <label for="documentType">Document Type</label>
+                                <select id="documentType" name="DocumentType" class="form-control">
+                                    <option value="">Select Document Type</option>
+                                    @foreach (var type in Model.Types)
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                </select>
+                            </div>
+                            <!-- User Name Input -->
+                            <div class="form-group col-md-2">
+                            <label for="userFullName">Uploaded By</label>
+                                <input type="text" class="form-control" id="userFullName" name="userFullName" placeholder="Enter user name">
+                            </div>
+                            <!-- Date From Input -->
+                            <div class="form-group col-md-2">
+                                <label for="dateFrom">Date From</label>
+                                <input type="date" class="form-control" id="dateFrom" name="DateFrom">
+                            </div>
+                            <!-- Date To Input -->
+                            <div class="form-group col-md-2">
+                                <label for="dateTo">Date To</label>
+                                <input type="date" class="form-control" id="dateTo" name="DateTo">
+                            </div>
+                            <!-- Search Button -->
+                            <div class="form-group col-md-2 align-self-end">
+                                <button type="submit" class="btn btn-success">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <form asp-page-handler="Clear">
+    <button type="submit" class="btn btn-warning">Clear Search</button>
+    </form>
     <ul class="nav nav-tabs" id="contentTabs">
         <li class="nav-item">
             <a class="nav-link active" id="documents-tab" data-bs-toggle="tab" href="#DocumentTableContainer">
@@ -195,7 +265,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @{
+                    @*-------------------------OLD READER TABLE DISPLAY-------------------------------*@
+                   @*  @{ 
                         string documentQuery = $@"SELECT Document.documentName, STUFF(documentName, 1, CHARINDEX('_', documentName, CHARINDEX('_', documentName) + 1), '') AS displayDocName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
                         SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
 
@@ -228,6 +299,32 @@
                             </tr>
                         }
                         DocumentReader.Close();
+                    } *@
+                    @foreach (var doc in Model.Documents)
+                    {
+                        <tr>
+                            <td>@doc.displayDocName</td> <!-- Assuming displayDocName is the processed document name you want to display -->
+                            <td>@doc.documentType</td>
+                            <td>@doc.userFullName</td> <!-- Concatenated user full name (Last, First) -->
+                            <td>@doc.dateCreated.ToString("yyyy-MM-dd")</td> <!-- Format date as desired -->
+                            <td>
+                                <!-- Download button form -->
+                                <form method="post" asp-page-handler="DownloadDocument">
+                                    <!-- Use doc.documentName to reference the actual document name for the form's input value -->
+                                    <input type="hidden" name="documentName" value="@doc.documentName" />
+
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <div class="icons">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+                                            </svg>
+                                        </div>
+                                        Download
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>

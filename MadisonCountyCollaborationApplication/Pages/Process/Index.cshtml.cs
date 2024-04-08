@@ -15,6 +15,21 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 {
     public class IndexModel : PageModel
     {
+        [BindProperty(SupportsGet = true)]
+        public string DocumentName { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string UserFullName { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string DocumentType { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string UserName { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public DateTime? DateFrom { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public DateTime? DateTo { get; set; }
+        [BindProperty]
+        public List<string> Types { get; set; }
+        public List<Document> Documents { get; set; } = new List<Document>();
         public string ProcessName { get; set; }
         [BindProperty]
         public int ProcessID { get; set; }
@@ -25,6 +40,18 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
         [BindProperty]
         public string FileTypeOptions { get; set; }
+        [BindProperty]
+        public List<string> WhiteList { get; private set; } = new List<string>
+        {
+            ".csv", // Comma-Separated Values
+            ".pdf", // Portable Document Format
+            ".docx", // Microsoft Word Document
+            ".doc", // Microsoft Word Document
+            ".png", // Portable Network Graphics
+            ".jpg",  // JPEG Image
+            ".jpeg", // JPEG Image
+        };
+
         private readonly WhiteListService _whitelistService;
         private readonly BlobServiceClient _blobServiceClient;
 
@@ -43,7 +70,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         }
 
         public List<string> Whitelist { get; private set; }
-        public IActionResult OnGet(int? processID)
+        public IActionResult OnGet(int? processID, string? DocumentName, string? DocumentType, string? UserFullName, DateTime? DateFrom, DateTime? DateTo)
         {
             // Attempt to get ProcessID from the route first.
             if (processID.HasValue)
@@ -86,7 +113,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 ViewData["ErrorMessage"] = "Process not found.";
                 return Page();
             }
-
+            Types = DBClass.GetAllUniqueDocumentTypesForProcess(ProcessID);
+            DBClass.MainDBconnection.Close();
+            LoadDocuments(DocumentName, DocumentType, UserFullName, DateFrom, DateTo);
+            DBClass.MainDBconnection.Close();
             // Optionally, store the current process name in the session for later use if needed.
             HttpContext.Session.SetString("processName", ProcessName);
 
@@ -257,6 +287,76 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
         }
 
+        public IActionResult OnPostSearch()
+        {
+            // Assuming you have validated your input and it's safe to use
+            return RedirectToPage(new
+            {
+                DocumentName = DocumentName,
+                DocumentType = DocumentType,
+                UserName = UserName,
+                DateFrom = DateFrom?.ToString("yyyy-MM-dd"),
+                DateTo = DateTo?.ToString("yyyy-MM-dd"),
+            });
+        }
+        public IActionResult OnPostClear()
+        {
+            return RedirectToPage();
+        }
 
+        private void LoadDocuments(string? documentName, string? documentType, string? userFullName, DateTime? dateFrom, DateTime? dateTo)
+        {
+            Documents.Clear(); // Clear existing items
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@DocumentName", string.IsNullOrEmpty(documentName) ? DBNull.Value : documentName.ToUpper() },
+                { "@DocumentType", string.IsNullOrEmpty(documentType) ? DBNull.Value : documentType },
+                { "@userFullName", string.IsNullOrEmpty(userFullName) ? DBNull.Value : userFullName.ToUpper() }, // Convert to upper case here if needed
+                { "@DateFrom", dateFrom.HasValue ? (object)dateFrom.Value : DBNull.Value },
+                { "@DateTo", dateTo.HasValue ? (object)dateTo.Value : DBNull.Value },
+            };
+
+            string sqlQuery = @"
+                                SELECT
+                                    d.documentID,
+                                    STUFF(d.documentName, 1, CHARINDEX('_', d.documentName, CHARINDEX('_', d.documentName) + 1), '') AS displayDocName,
+                                    d.documentType,
+                                    d.dateCreated,
+                                    u.userName,
+                                    u.lastName + ', ' + u.firstName AS userFullName -- Concatenate last and first names
+                                FROM
+                                    Document d
+                                    JOIN Users u ON d.userID = u.userID
+                                    JOIN DocumentProcess docP ON d.documentID = docP.documentID
+                                    JOIN Process p ON p.processID = docP.processID
+                                WHERE
+                                    (@DocumentName IS NULL OR UPPER(d.documentName) LIKE '%' + UPPER(@DocumentName) + '%')
+                                    AND (@DocumentType IS NULL OR d.documentType = @DocumentType)
+                                    AND (@DateFrom IS NULL OR d.dateCreated >= @DateFrom)
+                                    AND (@DateTo IS NULL OR d.dateCreated <= @DateTo)
+                                    AND ((@userFullName IS NULL OR UPPER(u.lastName) LIKE '%' + UPPER(@userFullName) + '%')
+                                    OR (@userFullName IS NULL OR UPPER(u.firstName) LIKE '%' + UPPER(@userFullName) + '%'));";
+
+
+
+            using (var reader = DBClass.GeneralReaderQueryWithParameters(sqlQuery, parameters))
+            {
+                while (reader.Read())
+                {
+                    var document = new Document
+                    {
+                        documentID = reader.GetInt32(reader.GetOrdinal("documentID")), // "d." prefix not needed here
+                        displayDocName = reader.IsDBNull(reader.GetOrdinal("displayDocName")) ? null : reader.GetString(reader.GetOrdinal("displayDocName")),
+                        documentType = reader.IsDBNull(reader.GetOrdinal("documentType")) ? null : reader.GetString(reader.GetOrdinal("documentType")),
+                        userFullName = reader.IsDBNull(reader.GetOrdinal("userFullName")) ? null : reader.GetString(reader.GetOrdinal("userFullName")),
+                        dateCreated = reader.GetDateTime(reader.GetOrdinal("dateCreated")),
+                        //userID = reader.GetInt32(reader.GetOrdinal("userID")) // Assuming you have a UserID field
+                    };
+
+                    Documents.Add(document);
+                }
+            }
+        }
     }
 }
