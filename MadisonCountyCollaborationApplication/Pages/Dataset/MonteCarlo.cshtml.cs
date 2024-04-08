@@ -5,6 +5,8 @@ using Plotly.NET.CSharp;
 using Newtonsoft.Json;
 using MadisonCountyCollaborationApplication.Pages.DataClasses;
 using MathNet.Numerics.Random;
+using MadisonCountyCollaborationApplication.Pages.DB;
+using System.Data;
 
 
 namespace MadisonCountyCollaborationApplication.Pages.Dataset
@@ -28,6 +30,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public string ProcessName { get; set; }
         [BindProperty]
         public string DatasetName { get; set; }
+        [BindProperty]
+        public int datasetID { get; set; }
 
 
         public IActionResult OnGet()
@@ -39,9 +43,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     + " successful!";
                 //get process name
                 ProcessName = HttpContext.Session.GetString("processName");
-
-                //get dataset name
-                DatasetName = HttpContext.Session.GetString("datasetName");
+                datasetID = (int)HttpContext.Session.GetInt32("datasetID");
+                DatasetName = DBClass.ExtractDatasetName(datasetID);
+                DBClass.MainDBconnection.Close();
                 return Page();
             }
             else

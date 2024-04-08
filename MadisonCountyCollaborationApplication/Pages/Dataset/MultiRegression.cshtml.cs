@@ -63,9 +63,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 LoadData();
                 //get process name
                 ProcessName = HttpContext.Session.GetString("processName");
-
+                datasetID = (int)HttpContext.Session.GetInt32("datasetID");
+                DatasetName = DBClass.ExtractDatasetName(datasetID);
+                DBClass.MainDBconnection.Close();
                 //get dataset name
-                DatasetName = HttpContext.Session.GetString("datasetName");
                 return Page();
             }
             else

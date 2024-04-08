@@ -7,6 +7,8 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+
 <style>
     .form-group {
         margin-bottom: 20px;
@@ -62,7 +64,7 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
         <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
+        <li class="breadcrumb-item"><a asp-page="ViewData "asp-route-datasetID="@Model.datasetID">@Model.DatasetName.TrimStart('_').Replace("_", " ")</a></li>
         <li class="breadcrumb-item active" aria-current="page">Multi Regression</li>
     </ol>
 </nav>

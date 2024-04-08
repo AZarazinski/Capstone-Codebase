@@ -16,6 +16,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
     public class IndexModel : PageModel
     {
         [BindProperty(SupportsGet = true)]
+        public int DocumentID { get; set; }
+        [BindProperty(SupportsGet = true)]
         public string DocumentName { get; set; }
         [BindProperty(SupportsGet = true)]
         public string UserFullName { get; set; }
@@ -40,6 +42,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
         [BindProperty]
         public string FileTypeOptions { get; set; }
+        public bool isPublic { get; set; }
+
         [BindProperty]
         public List<string> WhiteList { get; private set; } = new List<string>
         {
@@ -115,7 +119,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
             Types = DBClass.GetAllUniqueDocumentTypesForProcess(ProcessID);
             DBClass.MainDBconnection.Close();
-            LoadDocuments(DocumentName, DocumentType, UserFullName, DateFrom, DateTo);
+            LoadDocuments(DocumentName, DocumentType, UserFullName, DateFrom, DateTo, ProcessID);
             DBClass.MainDBconnection.Close();
             // Optionally, store the current process name in the session for later use if needed.
             HttpContext.Session.SetString("processName", ProcessName);
@@ -303,7 +307,19 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             return RedirectToPage();
         }
 
-        private void LoadDocuments(string? documentName, string? documentType, string? userFullName, DateTime? dateFrom, DateTime? dateTo)
+        public IActionResult OnPostPublish(int documentID)
+        {
+            DBClass.SetDocumentPublic(documentID);
+            return RedirectToPage();
+        }
+        public IActionResult OnPostUnpublish(int documentID)
+        {
+            // Potentially the same logic here, or different, depending on your application's needs
+            DBClass.SetDocumentPrivate(documentID);
+            return RedirectToPage();
+        }
+
+        private void LoadDocuments(string? documentName, string? documentType, string? userFullName, DateTime? dateFrom, DateTime? dateTo, int processID)
         {
             Documents.Clear(); // Clear existing items
 
@@ -314,6 +330,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 { "@userFullName", string.IsNullOrEmpty(userFullName) ? DBNull.Value : userFullName.ToUpper() }, // Convert to upper case here if needed
                 { "@DateFrom", dateFrom.HasValue ? (object)dateFrom.Value : DBNull.Value },
                 { "@DateTo", dateTo.HasValue ? (object)dateTo.Value : DBNull.Value },
+                { "@processID", processID }
             };
 
             string sqlQuery = @"
@@ -323,19 +340,26 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                                     d.documentType,
                                     d.dateCreated,
                                     u.userName,
-                                    u.lastName + ', ' + u.firstName AS userFullName -- Concatenate last and first names
+                                    u.lastName + ', ' + u.firstName AS userFullName,
+                                    d.isPublic
                                 FROM
                                     Document d
                                     JOIN Users u ON d.userID = u.userID
                                     JOIN DocumentProcess docP ON d.documentID = docP.documentID
                                     JOIN Process p ON p.processID = docP.processID
                                 WHERE
-                                    (@DocumentName IS NULL OR UPPER(d.documentName) LIKE '%' + UPPER(@DocumentName) + '%')
+                                    docP.processID = @processID
+                                    AND (@DocumentName IS NULL OR UPPER(d.documentName) LIKE '%' + UPPER(@DocumentName) + '%')
                                     AND (@DocumentType IS NULL OR d.documentType = @DocumentType)
                                     AND (@DateFrom IS NULL OR d.dateCreated >= @DateFrom)
                                     AND (@DateTo IS NULL OR d.dateCreated <= @DateTo)
-                                    AND ((@userFullName IS NULL OR UPPER(u.lastName) LIKE '%' + UPPER(@userFullName) + '%')
-                                    OR (@userFullName IS NULL OR UPPER(u.firstName) LIKE '%' + UPPER(@userFullName) + '%'));";
+                                    AND (
+                                        @userFullName IS NULL 
+                                        OR UPPER(u.firstName) LIKE '%' + UPPER(@userFullName) + '%' 
+                                        OR UPPER(u.lastName) LIKE '%' + UPPER(@userFullName) + '%'
+                                    );";
+
+
 
 
 
@@ -350,6 +374,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                         documentType = reader.IsDBNull(reader.GetOrdinal("documentType")) ? null : reader.GetString(reader.GetOrdinal("documentType")),
                         userFullName = reader.IsDBNull(reader.GetOrdinal("userFullName")) ? null : reader.GetString(reader.GetOrdinal("userFullName")),
                         dateCreated = reader.GetDateTime(reader.GetOrdinal("dateCreated")),
+                        isPublic = reader.GetBoolean(reader.GetOrdinal("isPublic")) // Directly assign the Public property                        
                         //userID = reader.GetInt32(reader.GetOrdinal("userID")) // Assuming you have a UserID field
                     };
 

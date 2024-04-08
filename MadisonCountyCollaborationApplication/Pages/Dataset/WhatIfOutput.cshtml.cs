@@ -62,6 +62,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public int dataID { get; set; }
         public List<double> WhatIfValues { get; set; } = new List<double>();
 
+
         public IActionResult OnGet()
         {
             if (HttpContext.Session.GetString("username") != null)

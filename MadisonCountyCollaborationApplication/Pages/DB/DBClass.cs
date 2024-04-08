@@ -307,7 +307,43 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             return documentTypes;
         }
 
+        public static void SetDocumentPublic(int documentID)
+        {
+            string sqlQuery = @"
+        UPDATE Document
+        SET isPublic = 1
+        WHERE documentID = @DocumentID;
+    ";
 
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var cmdUpdate = new SqlCommand(sqlQuery, connection))
+                {
+                    cmdUpdate.Parameters.AddWithValue("@DocumentID", documentID);
+                    connection.Open();
+                    cmdUpdate.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static void SetDocumentPrivate(int documentID)
+        {
+            string sqlQuery = @"
+        UPDATE Document
+        SET isPublic = 0
+        WHERE documentID = @DocumentID;
+    ";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var cmdUpdate = new SqlCommand(sqlQuery, connection))
+                {
+                    cmdUpdate.Parameters.AddWithValue("@DocumentID", documentID);
+                    connection.Open();
+                    cmdUpdate.ExecuteNonQuery();
+                }
+            }
+        }
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -4,6 +4,7 @@
 }
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 <style>
     .indented-text {
         padding-left: 20px; /* Adjust the value as needed */
@@ -27,23 +28,23 @@
     <p><b>Uniform:</b> a distribution which requires two parameters, a min (<em>a</em>) and a max (<em>b</em>), in which every value between them is equally likely</p>
     <div>$$U(a,b)$$</div>
     <div>$$f(x) = \frac{1}{b-a} \text{ for } a \leq x \leq b$$</div>
-    <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Uniform Distribution">
+    <img src="~/Distributions/UniformDistribution.png" alt="Normal Distributions" width="500" height="300">
 
     <p><b>Triangular:</b> a distribution which requires three parameters, a min (<em>a</em>), a max (<em>b</em>), and a most likely value (<em>c</em>), in which all values between values from <em>a</em> to <em>c</em> increase linearly, and from <em>c</em> to <em>b</em> decrease linearly</p>
     <div>$$f(x) = \frac{2(x-a)}{(b-a)(c-a)} \text{ for } a \leq x \lt c $$</div>
     <div>$$f(x) = \frac{2}{(b-a)} \text{ for } x=c $$</div>
     <div>$$f(x) = \frac{2(b-x)}{(b-a)(b-c)} \text{ for } c \lt x \leq b $$</div>
-    <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Triangular Distribution">
+    <img src="~/Distributions/TriangularDistribution.png" alt="Normal Distributions" width="500" height="300">
 
     <p><b>Normal:</b> a bell curve distribution with mean &mu; and standard deviation &sigma;</p>
     <div>$$N(\mu,\sigma^2)$$</div>
     <div>$$f(x)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$</div>
-    <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Normal Distribution">
+    <img src="~/Distributions/NormalDistribution.png" alt="Normal Distributions" width="500" height="300">
 
     <p><b>Lognormal:</b> a continuous distribution whose logarithm is normally distributed with mean &mu; and standard deviation &sigma;</p>
     <div>$$Lognormal(\mu,\sigma^2)$$</div>
     <div>$$f(x)=\frac{1}{x\sigma\sqrt{2\pi}}e^{-\frac{\left(\ln x - \mu \right)^2}{2\sigma^2}}$$</div>
-    <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Lognormal Distribution">
+    <img src="~/Distributions/Lognormal.jpg" alt="Normal Distributions" width="500" height="300">
 
 
     <p><b>Constant:</b> a value which does not change</p>

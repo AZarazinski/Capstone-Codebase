@@ -1,3 +1,4 @@
+using MadisonCountyCollaborationApplication.Pages.DB;
 using MathNet.Numerics.Distributions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -59,7 +60,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 var confidenceLevelJson = HttpContext.Session.GetString("ConfidenceLevel");
                 var criticalValueJson = HttpContext.Session.GetString("CriticalValue");
                 CriticalValue = JsonSerializer.Deserialize<double>(criticalValueJson);
-
+                //get dataset name
+                datasetID = (int)HttpContext.Session.GetInt32("datasetID");
+                DatasetName = DBClass.ExtractDatasetName(datasetID);
+                DBClass.MainDBconnection.Close();
 
                 // Deserialize data
                 Intercept = JsonSerializer.Deserialize<double>(interceptJson);
@@ -89,8 +93,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 //get process name
                 ProcessName = HttpContext.Session.GetString("processName");
 
-                //get dataset name
-                DatasetName = HttpContext.Session.GetString("datasetName");
 
                 // Optionally, you can call other methods here to perform additional initialization or processing
 
