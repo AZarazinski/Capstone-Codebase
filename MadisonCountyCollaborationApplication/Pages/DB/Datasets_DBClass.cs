@@ -13,7 +13,8 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
         // Connection String - How to find and connect to DB
         private static readonly String? MainDBconnString =
-            "Server=Localhost;Database=MainDB;Trusted_Connection=True";
+             "Server=tcp:upstreamconsultingdata.database.windows.net,1433;Initial Catalog=MainDB;Persist Security Info=False;User ID=SQLAdmin;Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+
 
         public static List<T> AttributeReader<T>(string column, string dataSet)
         {

@@ -57,7 +57,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
 
 
-        private static readonly string StorageConnString = "DefaultEndpointsProtocol=https;AccountName=upstreamconsultingblob;AccountKey=9PC0UyBVwsYKQyVlDeJ9fLBoKYa7M55cHuDEE6nJ0Ra9t6ON80ydPqRlPnwSvfGgvCeFReUuKg0k+AStZBX4bg==;EndpointSuffix=core.windows.net";
+        private static readonly string StorageConnString = "DefaultEndpointsProtocol=https;AccountName=countyconnectstorage;AccountKey=IezvDEewuBWkAsIqls+LxrQUT3OJVxayH/hq4cNwbsP2bEAZDNPFDSQHScxCEZ2dRcBDw+b2PioZ+AStlmc6Xg==;EndpointSuffix=core.windows.net";
         private readonly string DocumentsContainerName = "documents";
         private readonly string DatasetsContainerName = "datasets"; // Assuming datasets are stored here
 
@@ -159,6 +159,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
             int userID = Convert.ToInt32(DBClass.UserNameIDConverter(HttpContext.Session.GetString("username")));
             // Inserting FileUpload info into the Document and ProcessDocument Tables HERE
+            
             if (fileExtension == ".csv")
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fileupload", fileName);
@@ -248,8 +249,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                     return Page();
                 }
 
-                TempData["ErrorMessage"] = "Document not found in Blob Storage.";
-                return Page();
             }
             catch (Exception ex)
             {
