@@ -23,6 +23,19 @@ body {
   margin-bottom: 60px;
 }
 
+.navbar-right {
+    position: relative;
+    z-index: 1;
+}
+
+.dropdown-menu {
+    position: absolute; /* Ensure absolute positioning */
+    top: 100%; /* Positions below the dropdown button */
+    left: 0; /* Aligns with the left edge of the button */
+    z-index: 1000; /* Set a higher z-index to display on top of navbar-right */
+    /* Other styles for dropdown menu */
+}
+
 .navbar-nav .nav-item {
     margin-right: 20px; /* Adjust the spacing as needed */
 }
@@ -42,3 +55,23 @@ body {
 }
 
 
+/* ... existing styles ... */
+
+.navbar-nav .dropdown-menu {
+    position: absolute; /* Ensures dropdown pops out of normal flow */
+    top: 100%; /* Positions below the dropdown button */
+    left: 0; /* Aligns with the left edge of the button */
+    z-index: 1000; /* Ensures it's above other content */
+    display: none; /* Initially hidden */
+}
+
+.navbar-nav .dropdown.show .dropdown-menu {
+    display: block; /* Make it visible */
+}
+
+/* Other styling for dropdowns */
+.dropdown-menu {
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+}

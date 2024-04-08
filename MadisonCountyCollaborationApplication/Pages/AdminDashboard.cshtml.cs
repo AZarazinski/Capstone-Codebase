@@ -21,12 +21,19 @@ namespace MadisonCountyCollaborationApplication.Pages
         [BindProperty(SupportsGet = false)]
         public string ProcessName { get; set; }
 
+        [BindProperty(SupportsGet = false)]
+        public string RemoveProcessID { get; set; }
+
 
         public List<SelectListItem> UserList { get; set; }
 
         public List<SelectListItem> ProcessList { get; set; }
 
- 
+        public List<SelectListItem> UserTypeList { get; set; }
+
+       
+
+    
 
         public IActionResult OnGetSessionCheck()
         {
@@ -80,6 +87,20 @@ namespace MadisonCountyCollaborationApplication.Pages
                     }
                 }
 
+                UserTypeList = new List<SelectListItem>();
+
+                UserTypeList.Add(new SelectListItem
+                {
+                    Text = "System Administrator",
+                    Value = "admin"
+                });
+
+                UserTypeList.Add(new SelectListItem
+                {
+                    Text = "Normal User",
+                    Value = "normal"
+                });
+
                 return Page();
             }
             else
@@ -94,39 +115,42 @@ namespace MadisonCountyCollaborationApplication.Pages
 
         public IActionResult OnPostAddProcess()
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return Page();
-            //}
-            //else
-            //{
 
-                string addProcess = $"INSERT INTO Process (processName) VALUES (" + "'" + ProcessName + "'" + ");";
+            string addProcess = $"INSERT INTO Process (processName) VALUES (" + "'" + ProcessName + "'" + ");";
 
-                DBClass.GeneralInsertQuery(addProcess);
+            DBClass.GeneralInsertQuery(addProcess);
 
-
+            TempData["SuccessMessage"] = ProcessName + "was created successfully!";
 
             return RedirectToPage("AdminDashboard");
-            //}
+ 
 
         }
 
 
         public IActionResult OnPostAddUserToProcess()
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return Page();
-            //}
-            //else
-            //{
-                string userProcessQuery = $"INSERT INTO UserProcess (userID, processID) VALUES (" + NewUserProcess.UserID + "," + NewUserProcess.ProcessID + ");";
+            string userIDString = NewUserProcess.UserID.ToString();
+            string processIDString = NewUserProcess.ProcessID.ToString();
 
+            var userName = DBClass.UserIDtoName(userIDString);
+            var processName = DBClass.ProcessIDtoName(processIDString);
+
+            var exist = DBClass.UserProcessExist(NewUserProcess.UserID, NewUserProcess.ProcessID);
+            if (!exist)
+            {
+                string userProcessQuery = $"INSERT INTO UserProcess (userID, processID) VALUES (" + NewUserProcess.UserID + "," + NewUserProcess.ProcessID + ");";
                 DBClass.GeneralInsertQuery(userProcessQuery);
 
+                TempData["SuccessMessage"] = userName + " was successfully added to the " + processName + " process!";
+
                 return RedirectToPage("AdminDashboard");
-            //}
+            }
+            else
+            {
+                TempData["ErrorMessage"] = userName + " already has access to the" + processName + " process";
+                return RedirectToPage("AdminDashboard");
+            }
         }
 
 
@@ -134,25 +158,11 @@ namespace MadisonCountyCollaborationApplication.Pages
 
         public IActionResult OnPostAddUser()
         {
-         
 
-            //if (ModelState.IsValid)
-            //{
-            //    try
-            //    {
-                    // Assuming DBClass.CreateAndHashUser properly implements user creation
-                    DBClass.CreateAndHashUser(NewUser);
-                    TempData["SuccessMessage"] = "User created successfully.";
-                    return RedirectToPage("AdminDashboard"); // Or wherever you want to redirect
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        ModelState.AddModelError("", "An error occurred while creating the user.");
-            //    }
-            //}
+            DBClass.CreateAndHashUser(NewUser);
+            TempData["SuccessMessage"] = NewUser.userName + "'s account was created successfully!";
+            return RedirectToPage("AdminDashboard");
 
-            // This is for re-displaying the page with validation errors, if any.
-            return Page();
         }
 
 
@@ -160,12 +170,28 @@ namespace MadisonCountyCollaborationApplication.Pages
         {
 
             string removeUserQuery = $"DELETE FROM Users WHERE userID =" + RemoveUserID + ";";
-
             DBClass.GeneralInsertQuery(removeUserQuery);
 
+            
+            var userName = DBClass.UserIDtoName(RemoveUserID);
+
+            TempData["SuccessMessage"] = userName + " has been removed from the system successfully!";
             return RedirectToPage("AdminDashboard");
 
         }
+
+
+        public IActionResult OnPostRemoveProcess()
+        {
+            string removeProcessQuery = $"DELETE FROM Process WHERE processID =" + RemoveProcessID + ";";
+            DBClass.GeneralInsertQuery(removeProcessQuery);
+
+            var processName = DBClass.ProcessIDtoName(RemoveProcessID);
+
+            TempData["SuccessMessage"] = "The" + processName + " process has been removed from the system!";
+            return RedirectToPage("AdminDashboard");
+        }
+
 
 
         public IActionResult OnPostClearInputs()

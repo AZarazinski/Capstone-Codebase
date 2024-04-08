@@ -6,7 +6,11 @@
 }
 
 <head>
-    <title>Madison County - Admin Dashboard</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <title>County Connect - Admin Dashboard</title>
 
     <style>
 
@@ -23,39 +27,12 @@
 
 <h1 id="header">Admin Dashboard</h1>
 
-
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Username</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @{
-            string userQuery = $"SELECT userID, userName, firstName, lastName FROM Users";
-            SqlDataReader userReader = DBClass.GeneralReaderQuery(userQuery);
-
-            while (userReader.Read())
-            {
-            <tr>
-                <td>@userReader["userID"].ToString()</td>
-                <td>@userReader["userName"].ToString()</td>
-                <td>@userReader["firstName"].ToString()</td>
-                <td>@userReader["lastName"].ToString()</td>
-            </tr>
-            }    
-            userReader.Close();
-        }
-    </tbody>
-
-</table>
-
-
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
 
 <div class="container text-center container-md">
 
@@ -64,17 +41,15 @@
         <!--CREATE PROCESS-->
         <div class="col col-lg">
             <div class="card">
-                <div class="card-title">
-                    Create a New Process
-                </div>
+                <h3>Create a New Process</h3>
                 <form method="post" asp-page-handler="AddProcess">
                 
                     <div class="form-floating mb-3">
                         <input type="text" asp-for="ProcessName" class="form-control" id="floatingInput" placeholder="Process Name" >
                         <label for="floatingInput">Process Name</label>
                     </div>
-                
-                    <input type="submit" value="Add Process" class="btn btn-primary" />
+                <br />
+                    <input type="submit" value="Add Process" class="btn btn-primary" data-bs-target="#myModal" />
                 
                 </form>
             </div>
@@ -83,20 +58,15 @@
         <!--ADD USER TO PROCESS-->
         <div class="col col-lg">
             <div class="card">
-                <div class="card-title">
-                    Add a User to a Process
-                </div>
+               <h3>Remove a Process</h3>
             
-                <form method="post" asp-page-handler="AddUserToProcess">
+                <form method="post" asp-page-handler="RemoveProcess">
+           
             
-                    <select asp-for="NewUserProcess.UserID" asp-items="Model.UserList" class="form-select">
-                        <option value="">Select a User</option>
-                    </select>
-            
-                    <select asp-for="NewUserProcess.ProcessID" asp-items="Model.ProcessList" class="form-select">
+                    <select asp-for="RemoveProcessID" asp-items="Model.ProcessList" class="form-select">
                         <option value="">Select a Process</option>
                     </select>
-            
+            <br />
                     <input type="submit" value="Add User to Process" class="btn btn-primary" />
             
                 </form>
@@ -109,9 +79,7 @@
     <div class="row">
         <div class="col-lg">
             <div class="card">
-                <div class="card-title">
-                    Create a New User
-                </div>
+               <h3>Create a New User</h3>
 
 
                 <form method="post" asp-page-handler="AddUser">
@@ -147,10 +115,8 @@
                     <div class="row">
                         <div class="col">
                             <label for="userType">User Type</label>
-                            <select asp-for="NewUser.userType" class="form-control" id="userType">
-                                <option value="Admin">Admin</option>
-                                <option value="User">User</option>
-                                <!-- Add more user types as needed -->
+                            <select asp-for="NewUser.userType" asp-items="Model.UserTypeList" class="form-select" id="userType">
+                                <option value="">Select a User Type</option>
                             </select>
                         </div>
                         <div class="col">
@@ -164,9 +130,7 @@
         <div class="col-lg">
 
             <div class="card">
-                <div class="card-title">
-                    Add a User to a Process
-                </div>
+                <h3>Add a User to a Process</h3>
 
                 <form method="post" asp-page-handler="AddUserToProcess">
 
@@ -184,16 +148,13 @@
             </div>
 
             <div class="card">
-                div class="card">
-                <div class="card-title">
-                    Remove a User
-                </div>
+            <h3>Remove a User</h3>
                 <form method="post" asp-page-handler="RemoveUser">
                     <select asp-for="RemoveUserID" asp-items="Model.UserList" class="form-select">
                         <option value="">Select a User</option>
                     </select>
 
-                    <button type="submit" class="btn btn-primary">Remove User</button>
+                    <button type="submit" class="btn btn-primary" data-bs-target="#myModal">Remove User</button>
                 </form>
             </div>
 
@@ -203,4 +164,58 @@
         </div>
 
 
+</div>
+
+<div class="card">
+    <h3>Current System Users</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+        </thead>
+    
+        <tbody>
+            @{
+                string userQuery = $"SELECT userID, userName, firstName, lastName FROM Users";
+                SqlDataReader userReader = DBClass.GeneralReaderQuery(userQuery);
+    
+                while (userReader.Read())
+                {
+                    <tr>
+                        <td>@userReader["userID"].ToString()</td>
+                        <td>@userReader["userName"].ToString()</td>
+                        <td>@userReader["firstName"].ToString()</td>
+                        <td>@userReader["lastName"].ToString()</td>
+                    </tr>
+                }
+                userReader.Close();
+            }
+        </tbody>
+    
+    </table>
+</div>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <button  type="submit" class="btn btn-outline-primary">Yes, I'm Sure'</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Send message</button>
+            </div>
+        </div>
+    </div>
 </div>

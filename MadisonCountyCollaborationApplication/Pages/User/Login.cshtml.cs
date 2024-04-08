@@ -29,6 +29,17 @@ namespace MadisonCountyCollaborationApplication.Pages.Users
                 {
                     HttpContext.Session.SetString("username", Username);
                     ViewData["LoginMessage"] = "Login Successful!";
+
+                    string username = HttpContext.Session.GetString("username");
+                    var userID = DBClass.UserNameIDConverter(username);
+
+                    var admin =DBClass.CheckAdmin(userID);
+
+                    if (admin)
+                    {
+                        HttpContext.Session.SetString("userType", "admin" );
+                    }
+
                     DBClass.MainDBconnection.Close();
                     return RedirectToPage("../Home", new { username = Username });
                 }

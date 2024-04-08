@@ -97,11 +97,20 @@
                                         @LocalUser
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><button class="dropdown-item" type="button"> 
-                                            <a asp-page="/User/Logout">Log out</a>
+                                       
+                                        @if (Context.Session.GetString("userType") == "admin")
+                                        {
+                                            <li>
+                                                <button class="dropdown-item" type="button">
+                                                    <a asp-page="/AdminDashboard">Admin Dashboard</a>
+                                                </button>
+                                            </li>
+                                        }
+                                        <li>
+                                            <button class="dropdown-item" type="button">
+                                                <a asp-page="/User/Logout">Log out</a>
                                             </button>
                                         </li>
-                                        
                                     </ul>
                                 </div>
                             </li>

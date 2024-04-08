@@ -105,19 +105,6 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         }
 
 
-        public static SqlDataReader ProcessReader()
-        {
-            SqlCommand cmdProcessRead = new SqlCommand();
-            cmdProcessRead.Connection = MainDBconnection;
-            cmdProcessRead.Connection.ConnectionString = MainDBconnString;
-            cmdProcessRead.CommandText = "SELECT * FROM Process";
-            cmdProcessRead.Connection.Open();
-
-            SqlDataReader tempReader = cmdProcessRead.ExecuteReader();
-
-            return tempReader;
-        }
-
 
         public static string ProcessGetName(int ProcessID)
         {
@@ -199,6 +186,33 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlDataReader tempReader = cmdContentRead.ExecuteReader();
 
             return tempReader;
+        }
+
+        public static string ProcessIDtoName(string processID)
+        {
+
+            string userQuery = "SELECT Users.userName FROM Users WHERE Users.userID = @userid";
+            string processname = " ";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var command = new SqlCommand(userQuery, connection))
+                {
+
+                    // Use parameterized query to prevent SQL injection
+                    command.Parameters.AddWithValue("@userid", processID);
+
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            processname = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+            return processname;
         }
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -494,21 +508,6 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         }
 
 
-        public static int GetUserIDFromUserNameOrEmail(string input)
-        {
-            SqlCommand cmdUserRead = new SqlCommand();
-            cmdUserRead.Connection = MainDBconnection;
-            cmdUserRead.Connection.ConnectionString = MainDBconnString;
-            cmdUserRead.CommandText = "SELECT userID FROM Users WHERE userName = @input OR email = @input;";
-            cmdUserRead.Parameters.AddWithValue("@input", input);
-            cmdUserRead.Connection.Open();
-            SqlDataReader tempReader = cmdUserRead.ExecuteReader();
-            if (tempReader.Read())
-            {
-                return (int)tempReader["userID"];
-            }
-            else return 0;
-        }
         public static bool UserExistInCollab(int userID, int collabID)
         {
             SqlCommand sqlCommand = new SqlCommand();
@@ -527,24 +526,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             return false;
 
         }
-        public static bool AddUserToCollab(int userID, int collabID)
-        {
-            SqlCommand sqlCommand = new SqlCommand();
-            sqlCommand.Connection = MainDBconnection;
-            sqlCommand.Connection.ConnectionString = MainDBconnString;
-            sqlCommand.CommandText = "INSERT INTO Contributes (userID, collabID) VALUES (@userID, @collabID);";
-            sqlCommand.Parameters.AddWithValue("@userID", userID);
-            sqlCommand.Parameters.AddWithValue("@collabID", collabID);
-            sqlCommand.Connection.Open();
-            int rowsAffected = sqlCommand.ExecuteNonQuery();
-            if (rowsAffected > 0)
-            {
-                return true;
-            }
-
-            return false;
-
-        }
+ 
         public static bool HashedParameterLogin(string Username, string Password)
         {
             using (SqlConnection loginConnection = new SqlConnection(AuthConnString))
@@ -623,6 +605,55 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             }
         }
 
-   
+
+        public static string UserIDtoName(string userID)
+        {
+            
+            string userQuery = "SELECT Users.userName FROM Users WHERE Users.userID = @userid";
+            string username = " ";
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                using (var command = new SqlCommand(userQuery, connection))
+                {
+                    
+                    // Use parameterized query to prevent SQL injection
+                    command.Parameters.AddWithValue("@userid", userID);
+
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            username = reader.GetString(0);
+                        }
+                    }
+                }
+            }
+            return username;
+        }
+
+
+
+
+        //ADMIN DASHBOARD SESSION
+        public static bool UserProcessExist(int userID, int processID)
+        {
+
+            SqlCommand cmdProductRead = new SqlCommand();
+            cmdProductRead.Connection = MainDBconnection;
+            cmdProductRead.Connection.ConnectionString = MainDBconnString;
+            cmdProductRead.Parameters.AddWithValue("@userID", userID);
+            cmdProductRead.Parameters.AddWithValue("@processID", processID);
+            cmdProductRead.CommandText = $"SELECT Count(*) FROM UserProcess WHERE userID = @userID AND processID = @processID;";
+            cmdProductRead.Connection.Open();
+            if (((int)cmdProductRead.ExecuteScalar()) > 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
     }
 }
