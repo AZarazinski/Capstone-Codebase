@@ -79,7 +79,12 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             // Attempt to get ProcessID from the route first.
             if (processID.HasValue)
             {
+
                 ProcessID = processID.Value;
+
+                Types = DBClass.GetAllUniqueDocumentTypesForProcess(ProcessID);
+                DBClass.MainDBconnection.Close();
+
                 HttpContext.Session.SetInt32("processID", ProcessID); // Store ProcessID in session.
 
                 // Assuming Whitelist is a property of your PageModel and you want to load it here.
@@ -119,7 +124,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
             Types = DBClass.GetAllUniqueDocumentTypesForProcess(ProcessID);
             DBClass.MainDBconnection.Close();
-            LoadDocuments(DocumentName, DocumentType, UserFullName, DateFrom, DateTo, ProcessID);
+            LoadDocuments(DocumentName, DocumentType, UserFullName, DateFrom, DateTo);
             DBClass.MainDBconnection.Close();
             // Optionally, store the current process name in the session for later use if needed.
             HttpContext.Session.SetString("processName", ProcessName);
@@ -130,6 +135,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
             return Page();
         }
+
 
 
 
@@ -192,7 +198,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
                 await UploadToBlobStorage(containerName: "documents", localFileName: newFileName, fileStream: fileUpload.OpenReadStream());
 
-                return RedirectToPage("./Index", new { ProcessID = ProcessID });
+                return RedirectToPage("./Index", new { ProcessID = processID });
             }
             else
             {
@@ -217,11 +223,17 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         }
 
 
-        private BlobClient GetBlobClient(string fullDocumentName)
+        private BlobClient GetBlobClient(string documentName)
         {
-            // Assuming _blobServiceClient is already set up with your Azure Storage connection string
-            var containerClient = _blobServiceClient.GetBlobContainerClient(DocumentsContainerName);
-            return containerClient.GetBlobClient(fullDocumentName);
+            // Create a new BlobServiceClient using the storage connection string directly.
+            // This mirrors the approach used in your upload method.
+            BlobServiceClient blobServiceClient = new BlobServiceClient(StorageConnString);
+
+            // Assuming DocumentsContainerName is a class member that holds the name of your documents container.
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient(DocumentsContainerName);
+
+            // Return the BlobClient for the specified document.
+            return containerClient.GetBlobClient(documentName);
         }
 
         public async Task<IActionResult> OnPostDownloadDocumentAsync(string documentName)
@@ -266,7 +278,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
         {
             try
             {
-                string datasetContainerName = "datasets"; // Confirm this is your actual dataset container name
+                // Directly use the dataset container name instead of fetching from Configuration
+                string datasetContainerName = "datasets"; // This is statically defined, similar to your documents approach
                 var containerClient = _blobServiceClient.GetBlobContainerClient(datasetContainerName);
                 var blobClient = containerClient.GetBlobClient(datasetName);
 
@@ -289,6 +302,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                 return Page();
             }
         }
+
+
 
         public IActionResult OnPostSearch()
         {
@@ -319,48 +334,40 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             return RedirectToPage();
         }
 
-        private void LoadDocuments(string? documentName, string? documentType, string? userFullName, DateTime? dateFrom, DateTime? dateTo, int processID)
+        private void LoadDocuments(string? documentName, string? documentType, string? userFullName, DateTime? dateFrom, DateTime? dateTo)
         {
             Documents.Clear(); // Clear existing items
 
             var parameters = new Dictionary<string, object>
-            {
-                { "@DocumentName", string.IsNullOrEmpty(documentName) ? DBNull.Value : documentName.ToUpper() },
-                { "@DocumentType", string.IsNullOrEmpty(documentType) ? DBNull.Value : documentType },
-                { "@userFullName", string.IsNullOrEmpty(userFullName) ? DBNull.Value : userFullName.ToUpper() }, // Convert to upper case here if needed
-                { "@DateFrom", dateFrom.HasValue ? (object)dateFrom.Value : DBNull.Value },
-                { "@DateTo", dateTo.HasValue ? (object)dateTo.Value : DBNull.Value },
-                { "@processID", processID }
-            };
+    {
+        { "@DocumentName", string.IsNullOrEmpty(documentName) ? DBNull.Value : documentName.ToUpper() },
+        { "@DocumentType", string.IsNullOrEmpty(documentType) ? DBNull.Value : documentType },
+        { "@userFullName", string.IsNullOrEmpty(userFullName) ? DBNull.Value : userFullName.ToUpper() }, // Convert to upper case here if needed
+        { "@DateFrom", dateFrom.HasValue ? (object)dateFrom.Value : DBNull.Value },
+        { "@DateTo", dateTo.HasValue ? (object)dateTo.Value : DBNull.Value },
+    };
 
             string sqlQuery = @"
-                                SELECT
-                                    d.documentID,
-                                    STUFF(d.documentName, 1, CHARINDEX('_', d.documentName, CHARINDEX('_', d.documentName) + 1), '') AS displayDocName,
-                                    d.documentType,
-                                    d.dateCreated,
-                                    u.userName,
-                                    u.lastName + ', ' + u.firstName AS userFullName,
-                                    d.isPublic
-                                FROM
-                                    Document d
-                                    JOIN Users u ON d.userID = u.userID
-                                    JOIN DocumentProcess docP ON d.documentID = docP.documentID
-                                    JOIN Process p ON p.processID = docP.processID
-                                WHERE
-                                    docP.processID = @processID
-                                    AND (@DocumentName IS NULL OR UPPER(d.documentName) LIKE '%' + UPPER(@DocumentName) + '%')
-                                    AND (@DocumentType IS NULL OR d.documentType = @DocumentType)
-                                    AND (@DateFrom IS NULL OR d.dateCreated >= @DateFrom)
-                                    AND (@DateTo IS NULL OR d.dateCreated <= @DateTo)
-                                    AND (
-                                        @userFullName IS NULL 
-                                        OR UPPER(u.firstName) LIKE '%' + UPPER(@userFullName) + '%' 
-                                        OR UPPER(u.lastName) LIKE '%' + UPPER(@userFullName) + '%'
-                                    );";
-
-
-
+                        SELECT
+                            d.documentID,
+                            d.documentName,
+                            STUFF(d.documentName, 1, CHARINDEX('_', d.documentName, CHARINDEX('_', d.documentName) + 1), '') AS displayDocName,
+                            d.documentType,
+                            d.dateCreated,
+                            u.userName,
+                            u.lastName + ', ' + u.firstName AS userFullName -- Concatenate last and first names
+                        FROM
+                            Document d
+                            JOIN Users u ON d.userID = u.userID
+                            JOIN DocumentProcess docP ON d.documentID = docP.documentID
+                            JOIN Process p ON p.processID = docP.processID
+                        WHERE
+                            (@DocumentName IS NULL OR UPPER(d.documentName) LIKE '%' + UPPER(@DocumentName) + '%')
+                            AND (@DocumentType IS NULL OR d.documentType = @DocumentType)
+                            AND (@DateFrom IS NULL OR d.dateCreated >= @DateFrom)
+                            AND (@DateTo IS NULL OR d.dateCreated <= @DateTo)
+                            AND ((@userFullName IS NULL OR UPPER(u.lastName) LIKE '%' + UPPER(@userFullName) + '%')
+                            OR (@userFullName IS NULL OR UPPER(u.firstName) LIKE '%' + UPPER(@userFullName) + '%'));";
 
 
             using (var reader = DBClass.GeneralReaderQueryWithParameters(sqlQuery, parameters))
@@ -370,11 +377,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                     var document = new Document
                     {
                         documentID = reader.GetInt32(reader.GetOrdinal("documentID")), // "d." prefix not needed here
+                        documentName = reader.IsDBNull(reader.GetOrdinal("documentName")) ? null : reader.GetString(reader.GetOrdinal("documentName")),
                         displayDocName = reader.IsDBNull(reader.GetOrdinal("displayDocName")) ? null : reader.GetString(reader.GetOrdinal("displayDocName")),
                         documentType = reader.IsDBNull(reader.GetOrdinal("documentType")) ? null : reader.GetString(reader.GetOrdinal("documentType")),
                         userFullName = reader.IsDBNull(reader.GetOrdinal("userFullName")) ? null : reader.GetString(reader.GetOrdinal("userFullName")),
                         dateCreated = reader.GetDateTime(reader.GetOrdinal("dateCreated")),
-                        isPublic = reader.GetBoolean(reader.GetOrdinal("isPublic")) // Directly assign the Public property                        
                         //userID = reader.GetInt32(reader.GetOrdinal("userID")) // Assuming you have a UserID field
                     };
 
