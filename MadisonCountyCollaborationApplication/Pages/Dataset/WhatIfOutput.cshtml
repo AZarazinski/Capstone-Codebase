@@ -68,7 +68,7 @@
     Understand Monte Carlo Results
 </button>
 
-<!-- Collapsible Card for Explanation of the Boxplot -->
+<!-- Collapsible Card for Explanation of the MonteCarlo Sim -->
 <div class="collapse" id="histPlotExplanation">
     <div class="card mb-4">
         <div class="card-body">
@@ -79,19 +79,11 @@
         </div>
     </div>
 </div>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-@* <script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        var values = @Html.Raw(JsonConvert.SerializeObject(Model.Values));
-        var data = [{
-            x: values,
-            type: 'box',
-            orientation: 'h' // This makes the boxplot horizontal
-        }];
-
-        Plotly.newPlot('boxPlot', data);
-    });
-</script> *@
+<form asp-page-handler="Simulate" method="post">
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary" type="submit">Regression Simulation</button>
+    </div>
+</form>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {

@@ -67,6 +67,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             DependentVariable = Dependent;
             LoadData();
             string dataSet = datasetName;
+            Console.WriteLine("#1 dataset: " +dataSet);
             // Assume Datasets_DBClass.AttributeReader<T> is adjusted to return List<string> for validation
             List<string> dependentDataAsString = Datasets_DBClass.AttributeReader<string>(Dependent, dataSet);
             Datasets_DBClass.MainDBconnection.Close();

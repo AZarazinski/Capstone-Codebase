@@ -222,7 +222,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                     .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
                     .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Frequency"));
 
-                confidence = "95% Confidence Interval: [" + String.Format("{0:0}", CI[0]) + "," + String.Format("{0:0}", CI[1]) + "]";
+                string confidence = "With a 95% certainty we can say that your " + DependentVariable +
+                " 1 year out from today will be between " + String.Format("{0:0}", CI[0]) + " and " + String.Format("{0:0}", CI[0]);
                 //var chart = Chart.Histogram(x:results.ToList());
 
                 //.WithTraceInfo("Data Points", ShowLegend: true)
@@ -285,6 +286,9 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
 
             return revenues;
         }
+        public IActionResult OnPostSimulate()
+        {
+            return RedirectToPage("MonteCarloRegression");
+        }
     }
-
 }
