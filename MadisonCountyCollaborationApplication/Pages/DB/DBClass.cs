@@ -12,20 +12,14 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
         // Connection Object at Data Field Level
         public static SqlConnection MainDBconnection = new SqlConnection();
-
-        //// Connection String - How to find and connect to DB
-        //private static readonly String? MainDBconnString =
-        //    "Server=Localhost;Database=MainDB;Trusted_Connection=True";
-        //// Connection String for AUTH database for Hashed Credentials
-        //private static readonly String? AuthConnString =
-        //    "Server=Localhost;Database=AUTH;Trusted_Connection=True";
+        public static SqlConnection AuthDBconnection = new SqlConnection(); 
 
         // Connection String - How to find and connect to DB
         private static readonly String? MainDBconnString =
-            "Server = upstreamconsulting.database.windows.net,1433; Initial Catalog = MainDB; Persist Security Info=False;User ID = SQLAdmin; Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30";
+            "Server=Localhost;Database=MainDB;Trusted_Connection=True;";
         // Connection String for AUTH database for Hashed Credentials
         private static readonly String? AuthConnString =
-            "Server = upstreamconsulting.database.windows.net,1433; Initial Catalog = AUTH; Persist Security Info=False;User ID = SQLAdmin; Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30";
+            "Server=Localhost;Database=AUTH;Trusted_Connection=True;";
 
 
         //GENERAL READER STATEMENT -- PARKER T. SHORT
@@ -553,39 +547,43 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         }
         public static bool HashedParameterLogin(string Username, string Password)
         {
-            //ensures that the connection state is closed before changing the conn string
-            //should eliminate any DB errors while logging in
-            if (MainDBconnection.State == ConnectionState.Open)
+            using (SqlConnection loginConnection = new SqlConnection(AuthConnString))
             {
-                MainDBconnection.Close();
-            }
-
-            string loginQuery =
-                "SELECT Password FROM HashedCredentials WHERE Username = @Username";
-
-            SqlCommand cmdLogin = new SqlCommand();
-            cmdLogin.Connection = MainDBconnection;
-            cmdLogin.Connection.ConnectionString = AuthConnString;
-
-            cmdLogin.CommandText = loginQuery;
-            cmdLogin.Parameters.AddWithValue("@Username", Username);
-
-            cmdLogin.Connection.Open();
-
- 
-            SqlDataReader hashReader = cmdLogin.ExecuteReader();
-            if (hashReader.Read())
-            {
-                string correctHash = hashReader["Password"].ToString();
-
-                if (PasswordHash.ValidatePassword(Password, correctHash))
+                //ensures that the connection state is closed before changing the conn string
+                //should eliminate any DB errors while logging in
+                if (MainDBconnection.State == ConnectionState.Open)
                 {
-                    return true;
+                    MainDBconnection.Close();
                 }
-            }
 
-            
-            return false;
+                string loginQuery =
+                    "SELECT Password FROM HashedCredentials WHERE Username = @Username";
+
+                //SqlCommand cmdLogin = new SqlCommand();
+                //cmdLogin.Connection = AuthDBconnection;
+                //cmdLogin.Connection.ConnectionString = AuthConnString;
+
+                //cmdLogin.CommandText = loginQuery;
+                SqlCommand cmdLogin = new SqlCommand(loginQuery, loginConnection);
+                cmdLogin.Parameters.AddWithValue("@Username", Username);
+
+                cmdLogin.Connection.Open();
+
+
+                SqlDataReader hashReader = cmdLogin.ExecuteReader();
+                if (hashReader.Read())
+                {
+                    string correctHash = hashReader["Password"].ToString();
+
+                    if (PasswordHash.ValidatePassword(Password, correctHash))
+                    {
+                        return true;
+                    }
+                }
+
+
+                return false;
+            }
         }
         
         
