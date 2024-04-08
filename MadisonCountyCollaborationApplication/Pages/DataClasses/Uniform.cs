@@ -12,9 +12,13 @@
             this.rand = rand;
         }
         //inverse uniform CDF
-        public double GenerateRandom()
+        public override double GenerateRandom()
         {
             return min + (max - min) * (1 - rand.NextDouble());
+        }
+        public override string PrintType()
+        {
+            return "Uniform";
         }
     }
 }

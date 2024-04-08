@@ -17,9 +17,13 @@ namespace MadisonCountyCollaborationApplication.Pages.DataClasses
             this.rand = rand;
         }
 
-        public double GenerateRandom()
+        public override double GenerateRandom()
         {
             return constant;
+        }
+        public override string PrintType()
+        {
+            return "Constant";
         }
     }
 }

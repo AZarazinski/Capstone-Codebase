@@ -14,7 +14,7 @@
             this.rand = rand;
         }
         //inverse triangular CDF
-        public double GenerateRandom()
+        public override double GenerateRandom()
         {
             double probability = 1 - rand.NextDouble();
             if (probability < (likely - min) / (max - min))
@@ -25,6 +25,10 @@
             {
                 return max - Math.Sqrt((max - min) * (max - likely) * (1 - probability));
             }
+        }
+        public override string PrintType()
+        {
+            return "Triangular";
         }
     }
 }

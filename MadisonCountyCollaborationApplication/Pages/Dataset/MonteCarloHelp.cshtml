@@ -9,27 +9,21 @@
         padding-left: 20px; /* Adjust the value as needed */
     }
 </style>
-@* breadcrum navigation *@
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
-        <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
-        <li class="breadcrumb-item"><a asp-page="Monte Carlo">Monte Carlo</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Help</li>
-    </ol>
-</nav>
-
 
 <div class="text-center">
     <h1 class="display-4">Monte Carlo Help</h1>
 </div>
 <p><b>Iterations:</b> the number of outcomes to simulate</p>
 <p><b>Years:</b> the the number of years in the future you would like to forecast (may be blank if all parameters are no growth)</p>
-<p><b>Significance Level:</b> Choosing the certainty you would like for the true value</p>
+<p><b>Significance Level:</b> Choosing the certainty you would like for the bounds of the forecasted value</p>
 <p><b>Initial Value:</b> The value at t=0 for the category (May be blank if using no growth)</p>
 <p><b>Distribution:</b> the distribution the variable will follow</p>
 <div class="indented-text">
+    <p><b>Default:</b> a normal distribution with either a mean of the initial value and a variance of the initial value of the initial value / 50 if no growth is chosen, or a mean of 0 and variance 0.01% is a growth is chosen;<sup>2</sup></p>
+    <div>$$\text{No Growth: }N\left(v,\frac{v}{50}\right)$$</div>
+    <div>$$\text{Growth: }N(0,0.0001)$$</div>
+    Where <em>v</em> is the initial value
+
     <p><b>Uniform:</b> a distribution which requires two parameters, a min (<em>a</em>) and a max (<em>b</em>), in which every value between them is equally likely</p>
     <div>$$U(a,b)$$</div>
     <div>$$f(x) = \frac{1}{b-a} \text{ for } a \leq x \leq b$$</div>
@@ -41,12 +35,12 @@
     <div>$$f(x) = \frac{2(b-x)}{(b-a)(b-c)} \text{ for } c \lt x \leq b $$</div>
     <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Triangular Distribution">
 
-    <p><b>Normal:</b> a bell curve distribution with mean &mu; and variance &sigma;<sup>2</sup></p>
+    <p><b>Normal:</b> a bell curve distribution with mean &mu; and standard deviation &sigma;</p>
     <div>$$N(\mu,\sigma^2)$$</div>
     <div>$$f(x)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$</div>
     <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Normal Distribution">
 
-    <p><b>Lognormal:</b> a continuous distribution whose logarithm is normally distributed with mean &mu; and variance &sigma;<sup>2</sup></p>
+    <p><b>Lognormal:</b> a continuous distribution whose logarithm is normally distributed with mean &mu; and standard deviation &sigma;</p>
     <div>$$Lognormal(\mu,\sigma^2)$$</div>
     <div>$$f(x)=\frac{1}{x\sigma\sqrt{2\pi}}e^{-\frac{\left(\ln x - \mu \right)^2}{2\sigma^2}}$$</div>
     <img src="488Labs/wwwroot/Distributions/Uniform.png" alt="Lognormal Distribution">
@@ -57,7 +51,7 @@
 
 <p><b>Growth:</b> How this value will compound over each year</p>
 <div class="indented-text">
-    <p><b>No Growth:</b> This value will not grow over the years, each random variable (<em>X</em>) would be equal to the final output for that category (<em>Y</em>), this would be ideal for an extreme value analysis, an initial value does not need to be supplied.</p>
+    <p><b>No Growth:</b> This value will not grow over the years, each random variable (<em>X</em>) would be equal to the final output for that category (<em>Y</em>), this would be ideal for an extreme value analysis, an initial value does not need to be supplied unless default distribution is chosen.</p>
     <div>$$X\sim D$$</div>
     <div>$$Y=X$$</div>
     <p>Where <em>D</em> is the distribution provided by the user</p>
@@ -76,4 +70,3 @@
 <p><b>Monte Carlo Regression:</b> Here your simulated value (<em>Z</em>) would be the intercept (&Beta;<sub>0</sub>) from the regression plus the linear combination of the slopes (&Beta;<sub>i</sub>) from the regression and the random variables for the categories (<em>Y</em><sub>i</sub>)</p>
 <div>$$Z=\beta_0 + \sum_{i=1}^{n}{\beta _i Y_i}$$</div>
 <p>Where n is the number of simulated categories</p>
-<p><b>Confidence Interval: </b>The range in which the user can be </p>

@@ -53,6 +53,29 @@
     </div>
 </div>
 
+<div class="card mb-4">
+    <div class="card-body">
+        <h2 class="card-title">Simple Monte Carlo Result</h2>
+        <!-- Placeholder for the plot -->
+        <div id="MonteCarlo"></div>
+    </div>
+</div>
+<!-- Button to toggle Explanation of the Boxplot -->
+<button class="btn btn-info mb-2" type="button" data-toggle="collapse" data-target="#histPlotExplanation" aria-expanded="false" aria-controls="histPlotExplanation">
+    Understand Monte Carlo Results
+</button>
+
+<!-- Collapsible Card for Explanation of the Boxplot -->
+<div class="collapse" id="histPlotExplanation">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">Understanding Your Monte Carlo Simulation:</h4>
+            <p>
+                This histogram visualizes the distribution of outcomes based on a Monte Carlo simulation. Each bar represents the frequency or probability of outcomes within a specified range, illustrating how results cluster around certain values. The peak of the histogram indicates the most likely outcome, showing where the bulk of simulation results lie. The spread of the bars captures the variability and possible range of outcomes, offering a visual representation of uncertainty. The expected outcome, if highlighted, shows its probability relative to other possible outcomes, aiding in understanding its significance within the range of simulated scenarios. Analyzing this histogram provides insights into the likelihood of various results, helping to inform decision-making under uncertainty by quantifying risk and potential reward.
+            </p>
+        </div>
+    </div>
+</div>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 @* <script>
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -104,6 +127,44 @@
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // Added to print JSON data to check formatting
+        // document.getElementById('jsonResponse').textContent = JSON.stringify(data, null, 2);
 
+        var xValues = @Html.Raw(Json.Serialize(Model.results));
+        var xMin = Math.min(...xValues);
+        var xMax = Math.max(...xValues);
+        // Extend the x-range significantly
+        var xExtension = (xMax - xMin) * 0.5; // Extend by 10% of the range on both sides
+        var extendedXMin = 0;
+        var extendedXMax = xMax + xExtension;
+
+        // Generate points for the regression line using the extended range
+
+        var plotData = [{
+            x: xValues,
+            type: 'histogram',
+            name: 'Data Points'
+        }];
+
+        var layout = {
+            title: "Simulated Frequencies for " + @Html.Raw(Json.Serialize(Model.DependentVariable)),
+            xaxis: { title: @Html.Raw(Json.Serialize(Model.DependentVariable)) },
+            yaxis: { title: "Frequecy" },
+            annotations: [{
+                x: 0.5,
+                y: 1.13,
+                xref: 'paper',
+                yref: 'paper',
+                text: @Html.Raw(Json.Serialize(Model.confidence)),
+                showarrow: false,
+                font: { size: 16 }
+            }]
+        };
+
+        Plotly.newPlot('MonteCarlo', plotData, layout);
+    })
+</script>
 
 

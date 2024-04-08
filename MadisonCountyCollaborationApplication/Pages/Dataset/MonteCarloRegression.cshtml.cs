@@ -59,10 +59,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public Parameters param8 { get; set; }
         [BindProperty]
         public Parameters param9 { get; set; }
-        [BindProperty]
-        public string ProcessName { get; set; }
-        [BindProperty]
-        public string DatasetName { get; set; }
 
         public string ChartConfigJson { get; private set; }
         public IActionResult OnGet()
@@ -77,11 +73,6 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 // Deserialize data
                 IndependentVariables = System.Text.Json.JsonSerializer.Deserialize<List<string>>(variablesJson);
                 DependentVariable = System.Text.Json.JsonSerializer.Deserialize<string>(dependentVariableJson);
-                //get process name
-                ProcessName = HttpContext.Session.GetString("processName");
-
-                //get dataset name
-                DatasetName = HttpContext.Session.GetString("datasetName");
 
                 // Optionally, you can call other methods here to perform additional initialization or processing
 
@@ -107,7 +98,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             Intercept = System.Text.Json.JsonSerializer.Deserialize<double>(interceptJson);
             Slopes = System.Text.Json.JsonSerializer.Deserialize<List<double>>(slopesJson);
             IndependentVariables = System.Text.Json.JsonSerializer.Deserialize<List<string>>(variablesJson);
-            DependentVariable = System.Text.Json.JsonSerializer.Deserialize<string>(dependentVariableJson);
+            DependentVariable = System.Text.Json.JsonSerializer.Deserialize<string>(dependentVariableJson).Replace("_"," ");
 
             for (int i = 0; i < IndependentVariables.Count; i++)
             {
@@ -163,6 +154,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
                 .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Frequency"));
 
+            string confidence = confidenceInterval + "% Confidence Interval[" + String.Format("{0:0}", CI[0])  + "," + String.Format("{0:0}", CI[1])  + "]";
             //var chart = Chart.Histogram(x:results.ToList());
 
             //.WithTraceInfo("Data Points", ShowLegend: true)
@@ -179,7 +171,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             ChartConfigJson = chartJson;
             var response = new
             {
-                Data = new { Fields = new[] { results } } // This is your existing data structure
+                Data = new { Fields = new[] { results } },
+                Confidence = confidence,
+                Dependent = DependentVariable
+                // This is your existing data structure
             };
             var jsonResponse = JsonConvert.SerializeObject(response, new JsonSerializerSettings
             {

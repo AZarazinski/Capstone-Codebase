@@ -107,10 +107,14 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         {
             Console.WriteLine("Creating What-If Scenario Result");
             Console.WriteLine($"Input count: {WhatIfInputs.Count}");
+            string inputs = "";
             foreach (var input in WhatIfInputs)
             {
+                inputs += input + ",";
                 Console.WriteLine($"Input: {input}");
             }
+            inputs = inputs.Remove(inputs.Length - 1);
+            HttpContext.Session.SetString("inputs", inputs);
             // Prepare the inputs dictionary from the form submission
             double expectedOutcome = CalculateExpectedOutcome(WhatIfInputs, Slopes, Intercept);
             // Calculate confidence intervals (placeholder for actual calculation)
@@ -145,6 +149,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             HttpContext.Session.SetString("ExpectedOutcome", expectedOutcome.ToString());
             HttpContext.Session.SetString("LowerBound", lowerBound.ToString());
             HttpContext.Session.SetString("UpperBound", upperBound.ToString());
+
+            // Serialize and store in session
+            var whatIfValuesJson = JsonSerializer.Serialize(WhatIfInputs);
+            HttpContext.Session.SetString("WhatIfValues", whatIfValuesJson);
+
 
             // Redirect to the WhatIfOutput page
             return RedirectToPage("WhatIfOutput", new { ExpectedOutcome = expectedOutcome, LowerBound = lowerBound, UpperBound = upperBound });

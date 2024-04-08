@@ -78,5 +78,51 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
             return tempReader;
         }
+        public static string AccountReader(string datasetName, string independentVariable)
+        {
+            SqlCommand attributeRead = new SqlCommand();
+            attributeRead.Connection = MainDBconnection;
+            attributeRead.Connection.ConnectionString = MainDBconnString;
+            attributeRead.CommandText = $"SELECT {independentVariable} FROM {datasetName}";
+            Console.WriteLine(attributeRead.CommandText.ToString());
+            Console.WriteLine("Dataset: " + datasetName);
+            Console.WriteLine("Var: " + independentVariable);
+            attributeRead.Connection.Open(); // Open connection here, close in Model!
+
+            SqlDataReader tempReader = attributeRead.ExecuteReader();
+            List<double> values = new List<double>();
+            bool firstRow = true;
+            while (tempReader.Read())
+            {
+                values.Add(Convert.ToDouble(tempReader[independentVariable].ToString().Replace("(","-").Replace(",","").Replace("$","").Replace(")","")));
+
+            }
+            return values.ToArray().Average().ToString();
+        }
+        public static string AccountDeviation(string datasetName, string independentVariable)
+        {
+            SqlCommand attributeRead = new SqlCommand();
+            attributeRead.Connection = MainDBconnection;
+            attributeRead.Connection.ConnectionString = MainDBconnString;
+            attributeRead.CommandText = $"SELECT {independentVariable} FROM {datasetName}";
+            Console.WriteLine("Dataset: " + datasetName);
+            Console.WriteLine("Var: " + independentVariable);
+            attributeRead.Connection.Open(); // Open connection here, close in Model!
+
+            SqlDataReader tempReader = attributeRead.ExecuteReader();
+            List<double> values = new List<double>();
+            bool firstRow = true;
+            while (tempReader.Read())
+            {
+                values.Add(Convert.ToDouble(tempReader[independentVariable].ToString().Replace("(", "-").Replace(",", "").Replace("$", "").Replace(")", "")));
+
+            }
+            double[] dev = values.ToArray();
+            double average = dev.Average();
+            double sumOfSquaresOfDifferences = dev.Select(val => (val - average) * (val - average)).Sum();
+            double sd = Math.Sqrt(sumOfSquaresOfDifferences / dev.Length);
+            return sd.ToString();
+        }
     }
 }
+

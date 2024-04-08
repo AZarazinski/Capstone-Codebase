@@ -76,7 +76,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         }
         public async Task<IActionResult> OnPostAsync()
         {
-            // Ensure data is loaded (this might already be handled in OnGet or another place)
+            IndependentVariables = Request.Form["IndependentVariables"].ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();            // Ensure data is loaded (this might already be handled in OnGet or another place)
             LoadData();
 
             // Check for data validity or early returns that might be causing issues
@@ -128,6 +128,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
             HttpContext.Session.SetString("Variables", variablesJson);
             HttpContext.Session.SetString("DependentVariable", dependentVariableJson);
             HttpContext.Session.SetString("DegreesOfFreedom", DegreesOfFreedom.ToString());
+
 
 
             // Redirect to the receiving page

@@ -13,6 +13,13 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         // Connection Object at Data Field Level
         public static SqlConnection MainDBconnection = new SqlConnection();
 
+        //// Connection String - How to find and connect to DB
+        //private static readonly String? MainDBconnString =
+        //    "Server=Localhost;Database=MainDB;Trusted_Connection=True";
+        //// Connection String for AUTH database for Hashed Credentials
+        //private static readonly String? AuthConnString =
+        //    "Server=Localhost;Database=AUTH;Trusted_Connection=True";
+
         // Connection String - How to find and connect to DB
         private static readonly String? MainDBconnString =
             "Server = upstreamconsulting.database.windows.net,1433; Initial Catalog = MainDB; Persist Security Info=False;User ID = SQLAdmin; Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30";
@@ -45,7 +52,21 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             MainDBconnection.Close();
         }
 
+        //GENERAL SEARCH STATEMENT
+        public static SqlDataReader GeneralReaderQueryWithParameters(string sqlQuery, Dictionary<string, object> parameters)
+        {
+            var connection = new SqlConnection(MainDBconnString);
+            var cmdGeneralRead = new SqlCommand(sqlQuery, connection);
 
+            // Add parameters to command
+            foreach (var param in parameters)
+            {
+                cmdGeneralRead.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+            }
+
+            connection.Open();
+            return cmdGeneralRead.ExecuteReader(CommandBehavior.CloseConnection);
+        }
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -236,6 +257,42 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                     }
                 }
             }
+        }
+
+        public static List<string> GetAllUniqueDocumentTypesForProcess(int ProcessID)
+        {
+            List<string> documentTypes = new List<string>();
+
+            using (var connection = new SqlConnection(MainDBconnString))
+            {
+                // Adjust the query based on your actual schema.
+                // This example assumes there's a direct reference from documents to ProcessID.
+                var query = @"SELECT 
+                                DISTINCT d.documentType 
+                              FROM 
+                                Document d, DocumentProcess docP
+                              WHERE 
+                                d.documentID = docP.documentID AND docP.processID = @ProcessID
+                              ORDER BY 
+                                d.documentType;";
+
+                using (var cmd = new SqlCommand(query, connection))
+                {
+                    cmd.Parameters.AddWithValue("@ProcessID", ProcessID);
+                    connection.Open();
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string documentType = reader["documentType"].ToString();
+                            documentTypes.Add(documentType);
+                        }
+                    }
+                }
+            }
+
+            return documentTypes;
         }
 
 
