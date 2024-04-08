@@ -19,11 +19,11 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         //    "Server=Localhost;Database=MainDB;Trusted_Connection=True;";
 
         private static readonly String? MainDBconnString =
-            "Server=tcp:upstreamconsultingdata.database.windows.net,1433;Initial Catalog=MainDB;Persist Security Info=False;User ID=SQLAdmin;Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            "Server=upstreamconsultingdata.database.windows.net,1433;Initial Catalog=MainDB;Persist Security Info=False;User ID=SQLAdmin;Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
         
         // Connection String for AUTH database for Hashed Credentials
         private static readonly String? AuthConnString =
-            "Server=tcp:upstreamconsultingdata.database.windows.net,1433;Initial Catalog=AUTH;Persist Security Info=False;User ID=SQLAdmin;Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+            "Server=upstreamconsultingdata.database.windows.net,1433;Initial Catalog=AUTH;Persist Security Info=False;User ID=SQLAdmin;Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
 
         //GENERAL READER STATEMENT -- PARKER T. SHORT
