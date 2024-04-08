@@ -13,7 +13,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
 
     public class FileHandlingModel : PageModel
     {
-        private static readonly string MainDBconnString = "Server = upstreamconsulting.database.windows.net,1433; Initial Catalog = MainDB; Persist Security Info=False;User ID = SQLAdmin; Password=GoDukes1$;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout = 30";
+        private static readonly string MainDBconnString = "Server = Server = Server=Localhost;Database=MainDB;Trusted_Connection=True;";
 
         [BindProperty(SupportsGet = true)]
         public string FilePath { get; set; }
