@@ -355,7 +355,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                             d.documentType,
                             d.dateCreated,
                             u.userName,
-                            u.lastName + ', ' + u.firstName AS userFullName -- Concatenate last and first names
+                            u.lastName + ', ' + u.firstName AS userFullName,
+                            d.isPublic
                         FROM
                             Document d
                             JOIN Users u ON d.userID = u.userID
@@ -381,6 +382,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                         displayDocName = reader.IsDBNull(reader.GetOrdinal("displayDocName")) ? null : reader.GetString(reader.GetOrdinal("displayDocName")),
                         documentType = reader.IsDBNull(reader.GetOrdinal("documentType")) ? null : reader.GetString(reader.GetOrdinal("documentType")),
                         userFullName = reader.IsDBNull(reader.GetOrdinal("userFullName")) ? null : reader.GetString(reader.GetOrdinal("userFullName")),
+                        isPublic = reader.GetBoolean(reader.GetOrdinal("isPublic")),
                         dateCreated = reader.GetDateTime(reader.GetOrdinal("dateCreated")),
                         //userID = reader.GetInt32(reader.GetOrdinal("userID")) // Assuming you have a UserID field
                     };
