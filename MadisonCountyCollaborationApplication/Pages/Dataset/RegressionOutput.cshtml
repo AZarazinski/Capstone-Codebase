@@ -4,9 +4,8 @@
     var regressionSuccessful = Model.Slopes.Zip(Model.PValues.Skip(1), (slope, pValue) => pValue <= Model.Aplha).All(x => x); // Assuming Model.Alpha is the significance level (commonly 0.05)
 }
 
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <style>
     .custom-curved-box {
         border-radius: 15px;
@@ -37,7 +36,7 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
         <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="ViewData">@Model.DatasetName</a></li>
+        <li class="breadcrumb-item"><a asp-page="ViewData" asp-route-datasetID="@Model.datasetID">@Model.DatasetName</a></li>
         <li class="breadcrumb-item"><a asp-page="MultiRegression">Multi Regression</a></li>
         <li class="breadcrumb-item active" aria-current="page">Regression Output</li>
     </ol>

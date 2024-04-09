@@ -1,8 +1,10 @@
 using MadisonCountyCollaborationApplication.Pages.DataClasses;
+using MadisonCountyCollaborationApplication.Pages.DB;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Plotly.NET.CSharp;
+using System.Data;
 
 namespace MadisonCountyCollaborationApplication.Pages
 {
@@ -42,8 +44,12 @@ namespace MadisonCountyCollaborationApplication.Pages
         public double confidenceInterval { get; set; }
 
         public string ChartConfigJson { get; private set; }
-
-
+        [BindProperty]
+        public string ProcessName { get; set; }
+        [BindProperty]
+        public string DatasetName { get; set; }
+        [BindProperty]
+        public int datasetID { get; set; }
 
         public IActionResult OnGet()
         {
@@ -52,6 +58,10 @@ namespace MadisonCountyCollaborationApplication.Pages
                 ViewData["LoginMessage"] = "Login for "
                     + HttpContext.Session.GetString("username")
                     + " successful!";
+                ProcessName = HttpContext.Session.GetString("processName");
+                datasetID = (int)HttpContext.Session.GetInt32("datasetID");
+                DatasetName = DBClass.ExtractDatasetName(datasetID);
+                DBClass.MainDBconnection.Close();
                 return Page();
             }
             else
@@ -68,7 +78,8 @@ namespace MadisonCountyCollaborationApplication.Pages
                 Community, Nondepartmental, Capital, Principal, Interest);
             double[] CI = new Simulation().ConfidenceInterval(results, confidenceInterval);
 
-            string confidence = confidenceInterval + "% Confidence Interval[" + String.Format("{0:0}", CI[0])  + "," + String.Format("{0:0}", CI[1])  + "]";
+            string confidence = "With a " + confidenceInterval*100 + "% certainty we can say that your Expenses " + years +
+                " years out from today will be between " + String.Format("{0:0}", CI[0]) + " and " + String.Format("{0:0}", CI[1]);
             var chart = Chart.Histogram<double, double, string>(X: results)
                 .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
                 .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Frequency"));

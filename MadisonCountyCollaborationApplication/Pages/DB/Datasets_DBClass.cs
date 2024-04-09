@@ -21,7 +21,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             List<T> values = new List<T>();
             using (SqlConnection connection = new SqlConnection(MainDBconnString))
             {
-                using (SqlCommand cmdContentRead = new SqlCommand($"SELECT {column} FROM {dataSet}", connection))
+                using (SqlCommand cmdContentRead = new SqlCommand($"SELECT {column} FROM [dbo].[{dataSet}]", connection))
                 {
                     connection.Open();
                     using (SqlDataReader tempReader = cmdContentRead.ExecuteReader())
@@ -48,7 +48,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             {
                 // Build the SELECT statement dynamically to include all independent columns and the dependent column
                 string columns = string.Join(", ", independentColumns) + ", " + dependentColumn;
-                using (SqlCommand cmd = new SqlCommand($"SELECT {columns} FROM {dataSet}", connection))
+                using (SqlCommand cmd = new SqlCommand($"SELECT {columns} FROM [dbo].[{dataSet}]", connection))
                 {
                     connection.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -72,7 +72,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlCommand attributeRead = new SqlCommand();
             attributeRead.Connection = MainDBconnection;
             attributeRead.Connection.ConnectionString = MainDBconnString;
-            attributeRead.CommandText = $"SELECT _Account FROM {datasetName}";
+            attributeRead.CommandText = $"SELECT _Account FROM [dbo].[{datasetName}]";
             attributeRead.Connection.Open(); // Open connection here, close in Model!
 
             SqlDataReader tempReader = attributeRead.ExecuteReader();
@@ -84,7 +84,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlCommand attributeRead = new SqlCommand();
             attributeRead.Connection = MainDBconnection;
             attributeRead.Connection.ConnectionString = MainDBconnString;
-            attributeRead.CommandText = $"SELECT {independentVariable} FROM {datasetName}";
+            attributeRead.CommandText = $"SELECT {independentVariable} FROM [dbo].[{datasetName}]";
             Console.WriteLine(attributeRead.CommandText.ToString());
             Console.WriteLine("Dataset: " + datasetName);
             Console.WriteLine("Var: " + independentVariable);
@@ -105,7 +105,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
             SqlCommand attributeRead = new SqlCommand();
             attributeRead.Connection = MainDBconnection;
             attributeRead.Connection.ConnectionString = MainDBconnString;
-            attributeRead.CommandText = $"SELECT {independentVariable} FROM {datasetName}";
+            attributeRead.CommandText = $"SELECT {independentVariable} FROM [dbo].[{datasetName}]";
             Console.WriteLine("Dataset: " + datasetName);
             Console.WriteLine("Var: " + independentVariable);
             attributeRead.Connection.Open(); // Open connection here, close in Model!

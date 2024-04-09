@@ -6,6 +6,7 @@ using System.Data;
 using MadisonCountyCollaborationApplication.Pages.DataClasses;
 using Newtonsoft.Json;
 using Plotly.NET.CSharp;
+using MadisonCountyCollaborationApplication.Pages.DB;
 
 
 
@@ -61,6 +62,10 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
         public Parameters param9 { get; set; }
 
         public string ChartConfigJson { get; private set; }
+        [BindProperty]
+        public string ProcessName { get; set; }
+        [BindProperty]
+        public string DatasetName { get; set; }
         public IActionResult OnGet()
         {
             if (HttpContext.Session.GetString("username") != null)
@@ -73,6 +78,11 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 // Deserialize data
                 IndependentVariables = System.Text.Json.JsonSerializer.Deserialize<List<string>>(variablesJson);
                 DependentVariable = System.Text.Json.JsonSerializer.Deserialize<string>(dependentVariableJson);
+                ProcessName = HttpContext.Session.GetString("processName");
+
+                datasetID = (int)HttpContext.Session.GetInt32("datasetID");
+                DatasetName = DBClass.ExtractDatasetName(datasetID);
+                DBClass.MainDBconnection.Close();
 
                 // Optionally, you can call other methods here to perform additional initialization or processing
 
@@ -154,12 +164,8 @@ namespace MadisonCountyCollaborationApplication.Pages.Dataset
                 .WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Revenue"))
                 .WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Frequency"));
 
-            string confidence = confidenceInterval + "% Confidence Interval[" + String.Format("{0:0}", CI[0])  + "," + String.Format("{0:0}", CI[1])  + "]";
-            //var chart = Chart.Histogram(x:results.ToList());
-
-            //.WithTraceInfo("Data Points", ShowLegend: true)
-            //.WithXAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Independent Variable"))
-            //.WithYAxisStyle<double, double, string>(Title: Plotly.NET.Title.init("Dependent Variable"));
+            string confidence = "With a " + confidenceInterval*100 + "% certainty we can say that your "+DependentVariable+ " " + years +
+                " years out from today will be between " + String.Format("{0:0}", CI[0]) + " and " + String.Format("{0:0}", CI[1]);
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // Ignore circular references

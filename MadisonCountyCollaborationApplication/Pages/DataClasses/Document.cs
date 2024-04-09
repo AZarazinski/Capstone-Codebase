@@ -11,5 +11,6 @@ namespace MadisonCountyCollaborationApplication.Pages.DataClasses
         public DateTime dateCreated { get; set; }
         public int userID { get; set; }
         public string userFullName {  get; set; }
+        public bool isPublic { get; set; }
     }
 }

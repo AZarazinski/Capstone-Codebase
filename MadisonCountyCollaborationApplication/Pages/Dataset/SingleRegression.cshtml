@@ -4,11 +4,13 @@
 @model MadisonCountyCollaborationApplication.Pages.Dataset.SingleRegressionModel
 @{
 }
+
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-page="../Home">Home</a></li>
         <li class="breadcrumb-item"><a asp-page="../Process/Index">@Model.ProcessName</a></li>
-        <li class="breadcrumb-item"><a asp-page="../Process/Index/ViewData">@Model.DatasetName</a></li>
+        <li class="breadcrumb-item"><a asp-page="../Process/Index/ViewData" asp-route-datasetID="@Model.datasetID">@Model.DatasetName.TrimStart('_').Replace("_", " ")</a></li>
         <li class="breadcrumb-item active" aria-current="page">Single Regression</li>
     </ol>
 </nav>

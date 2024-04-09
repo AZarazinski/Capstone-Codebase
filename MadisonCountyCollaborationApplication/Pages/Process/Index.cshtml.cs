@@ -169,7 +169,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             var fileExtension = Path.GetExtension(fileName).ToLowerInvariant();
             int userID = Convert.ToInt32(DBClass.UserNameIDConverter(HttpContext.Session.GetString("username")));
             // Inserting FileUpload info into the Document and ProcessDocument Tables HERE
-
+            
             if (fileExtension == ".csv")
             {
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "fileupload", fileName);
@@ -390,4 +390,5 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             }
         }
     }
+
 }
