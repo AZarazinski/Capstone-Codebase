@@ -172,7 +172,9 @@ namespace MadisonCountyCollaborationApplication.Pages
             string removeUserQuery = $"DELETE FROM Users WHERE userID =" + RemoveUserID + ";";
             DBClass.GeneralInsertQuery(removeUserQuery);
 
-            
+            string processUserQuery = $"DELETE FROM UserProces WHERE userID =" + RemoveUserID + ";";
+            DBClass.GeneralInsertQuery(processUserQuery);
+
             var userName = DBClass.UserIDtoName(RemoveUserID);
 
             TempData["SuccessMessage"] = userName + " has been removed from the system successfully!";

@@ -683,20 +683,28 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         //ADMIN DASHBOARD SESSION
         public static bool UserProcessExist(int userID, int processID)
         {
-
-            SqlCommand cmdProductRead = new SqlCommand();
-            cmdProductRead.Connection = MainDBconnection;
-            cmdProductRead.Connection.ConnectionString = MainDBconnString;
-            cmdProductRead.Parameters.AddWithValue("@userID", userID);
-            cmdProductRead.Parameters.AddWithValue("@processID", processID);
-            cmdProductRead.CommandText = $"SELECT Count(*) FROM UserProcess WHERE userID = @userID AND processID = @processID;";
-            cmdProductRead.Connection.Open();
-            if (((int)cmdProductRead.ExecuteScalar()) > 0)
+            using (SqlConnection connection = new SqlConnection(MainDBconnString)) // **Create a new connection**
             {
-                return true;
-            }
 
-            return false;
+                if (MainDBconnection.State == ConnectionState.Open)
+                {
+                    MainDBconnection.Close();
+                }
+
+                SqlCommand cmdUserProcessRead = new SqlCommand();
+                cmdUserProcessRead.Connection = MainDBconnection;
+                cmdUserProcessRead.Connection.ConnectionString = MainDBconnString;
+                cmdUserProcessRead.Parameters.AddWithValue("@userID", userID);
+                cmdUserProcessRead.Parameters.AddWithValue("@processID", processID);
+                cmdUserProcessRead.CommandText = $"SELECT Count(*) FROM UserProcess WHERE userID = @userID AND processID = @processID;";
+                cmdUserProcessRead.Connection.Open();
+                if (((int)cmdUserProcessRead.ExecuteScalar()) > 0)
+                {
+                    return true;
+                }
+
+                return false;
+            }
         }
 
     }
