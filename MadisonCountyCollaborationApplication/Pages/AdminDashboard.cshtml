@@ -19,8 +19,12 @@
         .card{
             padding:3%;
             margin: 3%;
+            min-height: 200px;
+            box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
         }
 
+        
+        
     </style>
 </head>
 
@@ -34,8 +38,168 @@
     </div>
 }
 
+@if (TempData["Error Message"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["Error Message"]
+    </div>
+}
+
 <div class="container text-center container-md">
 
+    
+    
+    <div class="row row-1">
+        <div class="col">
+        <div class="card">
+            <h3>Current System Users</h3>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        string userQuery = $"SELECT userID, userName, firstName, lastName FROM Users";
+                        SqlDataReader userReader = DBClass.GeneralReaderQuery(userQuery);
+
+                        while (userReader.Read())
+                        {
+                            <tr>
+                                <td>@userReader["userID"].ToString()</td>
+                                <td>@userReader["userName"].ToString()</td>
+                                <td>@userReader["firstName"].ToString()</td>
+                                <td>@userReader["lastName"].ToString()</td>
+                            </tr>
+                        }
+                        userReader.Close();
+                    }
+                </tbody>
+
+            </table>
+        </div>
+        </div>
+    </div>
+    
+    
+    
+    
+    <div class="row row-cols-1 row-cols-md-2">
+        <div class="col-lg">
+            <div class="card">
+                <h3>Create a New User</h3>
+
+
+                <form method="post" asp-page-handler="AddUser">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                            <input type="text" asp-for="NewUser.userName" class="form-control" id="floatingInput" placeholder="Enter username">
+                            <label for="floatingInput">Username</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                            <input type="password" asp-for="NewUser.userPassword" class="form-control" id="floatingInput" placeholder="Password">
+                            <label for="floatingInput">Password</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating mb-3">
+                            <input type="text" asp-for="NewUser.firstName" class="form-control" id="floatingInput" placeholder="Enter first name">
+                            <label for="floatingInput">First Name</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                                <div class="form-floating mb-3">
+                            <input type="text" asp-for="NewUser.lastName" class="form-control" id="floatingInput" placeholder="Enter last name">
+                            <label for="floatingInput">Last Name</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row"></div>
+                    <div class="form-group">
+                        <div class="form-floating mb-3">
+                        <input type="email" asp-for="NewUser.email" class="form-control" id="floatingInput" placeholder="Enter email">
+                        <label for="floatingInput">Email Address</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-floating mb-3">
+                        <input type="phone" asp-for="NewUser.phone" class="form-control" id="floatingInput" placeholder="Enter phone number">
+                        <label for="floatingInput">Phone Number</label>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col">
+                            <select asp-for="NewUser.userType" asp-items="Model.UserTypeList" class="form-select" id="userType">
+                                <option value="">Select a User Type</option>
+                            </select>
+                        </div>
+                    <br />
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">Create User</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg">
+
+            <div class="card">
+                <h3>Add a User to a Process</h3>
+                <div class="row">
+                    <form method="post" asp-page-handler="AddUserToProcess">
+                        <div class="col">
+                            <select asp-for="NewUserProcess.UserID" asp-items="Model.UserList" class="form-select">
+                                <option value="">Select a User</option>
+                            </select>
+                        </div>
+
+                        <div class="col">
+                            <select asp-for="NewUserProcess.ProcessID" asp-items="Model.ProcessList" class="form-select">
+                                <option value="">Select a Process</option>
+                            </select>
+                        </div>
+
+                        <br />
+                        <input type="submit" value="Add User to Process" class="btn btn-primary" />
+
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Remove a User</h3>
+                <form method="post" asp-page-handler="RemoveUser">
+                    <select asp-for="RemoveUserID" asp-items="Model.UserList" class="form-select">
+                        <option value="">Select a User</option>
+                    </select>
+
+                    <br />
+                    <button type="submit" class="btn btn-primary" data-bs-target="#myModal">Remove User</button>
+                </form>
+            </div>
+
+
+        </div>
+
+    </div>
+    
     <div class="row justify-content-md-center">
 
         <!--CREATE PROCESS-->
@@ -48,7 +212,6 @@
                         <input type="text" asp-for="ProcessName" class="form-control" id="floatingInput" placeholder="Process Name" >
                         <label for="floatingInput">Process Name</label>
                     </div>
-                <br />
                     <input type="submit" value="Add Process" class="btn btn-primary" data-bs-target="#myModal" />
                 
                 </form>
@@ -73,149 +236,10 @@
             </div>
         </div>
     </div>
-    
-
-    <!--CREATE USER-->
-    <div class="row">
-        <div class="col-lg">
-            <div class="card">
-               <h3>Create a New User</h3>
-
-
-                <form method="post" asp-page-handler="AddUser">
-                    <div class="row">
-                        <div class="col">
-                            <label for="userName">Username</label>
-                            <input type="text" asp-for="NewUser.userName" class="form-control" id="userName" placeholder="Enter username">
-                        </div>
-                        <div class="col">
-                            <label for="userPassword">Password</label>
-                            <input type="password" asp-for="NewUser.userPassword" class="form-control" id="userPassword" placeholder="Password">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <label for="firstName">First Name</label>
-                            <input type="text" asp-for="NewUser.firstName" class="form-control" id="firstName" placeholder="Enter first name">
-                        </div>
-                        <div class="col">
-                            <label for="lastName">Last Name</label>
-                            <input type="text" asp-for="NewUser.lastName" class="form-control" id="lastName" placeholder="Enter last name">
-                        </div>
-                    </div>
-                    <div class="row"></div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" asp-for="NewUser.email" class="form-control" id="email" placeholder="Enter email">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="phone" asp-for="NewUser.phone" class="form-control" id="phone" placeholder="Enter phone number">
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <label for="userType">User Type</label>
-                            <select asp-for="NewUser.userType" asp-items="Model.UserTypeList" class="form-select" id="userType">
-                                <option value="">Select a User Type</option>
-                            </select>
-                        </div>
-                        <div class="col">
-                        <button type="submit" class="btn btn-primary">Create User</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="col-lg">
-
-            <div class="card">
-                <h3>Add a User to a Process</h3>
-
-                <form method="post" asp-page-handler="AddUserToProcess">
-
-                    <select asp-for="NewUserProcess.UserID" asp-items="Model.UserList" class="form-select">
-                        <option value="">Select a User</option>
-                    </select>
-
-                    <select asp-for="NewUserProcess.ProcessID" asp-items="Model.ProcessList" class="form-select">
-                        <option value="">Select a Process</option>
-                    </select>
-
-                    <input type="submit" value="Add User to Process" class="btn btn-primary" />
-
-                </form>
-            </div>
-
-            <div class="card">
-            <h3>Remove a User</h3>
-                <form method="post" asp-page-handler="RemoveUser">
-                    <select asp-for="RemoveUserID" asp-items="Model.UserList" class="form-select">
-                        <option value="">Select a User</option>
-                    </select>
-
-                    <button type="submit" class="btn btn-primary" data-bs-target="#myModal">Remove User</button>
-                </form>
-            </div>
-
-
-            </div>
-
-        </div>
 
 
 </div>
 
-<div class="card">
-    <h3>Current System Users</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Username</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-            </tr>
-        </thead>
-    
-        <tbody>
-            @{
-                string userQuery = $"SELECT userID, userName, firstName, lastName FROM Users";
-                SqlDataReader userReader = DBClass.GeneralReaderQuery(userQuery);
-    
-                while (userReader.Read())
-                {
-                    <tr>
-                        <td>@userReader["userID"].ToString()</td>
-                        <td>@userReader["userName"].ToString()</td>
-                        <td>@userReader["firstName"].ToString()</td>
-                        <td>@userReader["lastName"].ToString()</td>
-                    </tr>
-                }
-                userReader.Close();
-            }
-        </tbody>
-    
-    </table>
-</div>
 
 
-<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <button  type="submit" class="btn btn-outline-primary">Yes, I'm Sure'</button>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Send message</button>
-            </div>
-        </div>
-    </div>
-</div>
+

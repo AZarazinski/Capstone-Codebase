@@ -319,6 +319,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
             string sqlQuery = @"
                                 SELECT
                                     d.documentID,
+                                    d.documentName,
                                     STUFF(d.documentName, 1, CHARINDEX('_', d.documentName, CHARINDEX('_', d.documentName) + 1), '') AS displayDocName,
                                     d.documentType,
                                     d.dateCreated,
@@ -346,6 +347,7 @@ namespace MadisonCountyCollaborationApplication.Pages.Process
                     var document = new Document
                     {
                         documentID = reader.GetInt32(reader.GetOrdinal("documentID")), // "d." prefix not needed here
+                        documentName = reader.IsDBNull(reader.GetOrdinal("documentName")) ? null : reader.GetString(reader.GetOrdinal("documentName")),
                         displayDocName = reader.IsDBNull(reader.GetOrdinal("displayDocName")) ? null : reader.GetString(reader.GetOrdinal("displayDocName")),
                         documentType = reader.IsDBNull(reader.GetOrdinal("documentType")) ? null : reader.GetString(reader.GetOrdinal("documentType")),
                         userFullName = reader.IsDBNull(reader.GetOrdinal("userFullName")) ? null : reader.GetString(reader.GetOrdinal("userFullName")),
