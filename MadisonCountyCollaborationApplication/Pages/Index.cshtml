@@ -97,7 +97,7 @@
     </thead>
    <tbody>
         @{
-            string budgetQuery = $"SELECT Document.documentName, STUFF(documentName, 1, CHARINDEX('_', documentName, CHARINDEX('_', documentName) + 1), '') AS displayName, Document.datePublished FROM Document INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE Document.datePublished IS NOT NULL AND Document.fileType = '.pdf' AND DocumentProcess.processID = 1;";
+            string budgetQuery = $"SELECT Document.documentName, STUFF(documentName, 1, CHARINDEX('_', documentName, CHARINDEX('_', documentName) + 1), '') AS displayName, Document.datePublished FROM Document INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE Document.isPublic = 1  AND DocumentProcess.processID = 1;";
             SqlDataReader BudgetReportReader = DBClass.GeneralReaderQuery(budgetQuery);
 
             while (BudgetReportReader.Read())
