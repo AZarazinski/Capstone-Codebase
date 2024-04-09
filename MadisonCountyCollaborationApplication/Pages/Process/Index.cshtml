@@ -1,4 +1,4 @@
-﻿@page
+﻿﻿@page
 @using System.Data.SqlClient;
 @using MadisonCountyCollaborationApplication.Pages.DB;
 @using System.IO;
@@ -7,7 +7,8 @@
 @model MadisonCountyCollaborationApplication.Pages.Process.IndexModel
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css
 <link rel="stylesheet" href="~/MadisonCountyCollaborationApplication.Custom.css" asp-append-version="true" />
 
 
@@ -74,7 +75,7 @@
         }
 
         .button-spacing {
-            margin-right: 10px; /* Adjust the value as needed */
+            margin-left: 10px; /* Adjust the value as needed */
         }
 
       
@@ -196,13 +197,13 @@
                 </h5>
             </div>
 
-            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#searchAccordion">
+            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#searchAccordion">
                 <div class="card-body">
                     <form id="searchForm" method="post" asp-page-handler="Search">
                         <div class="form-row">
                             <div class="form-group col-md-2">
                                 <label for="documentName">Document Name</label>
-                                <input type="text" class="form-control" id="documentName" name="DocumentName" placeholder="Enter Document Name"/>
+                                <input type="text" class="form-control" id="documentName" name="DocumentName" placeholder="Enter Document Name" />
                             </div>
                             <!-- Document Type Dropdown -->
                             <div class="form-group col-md-2">
@@ -217,7 +218,7 @@
                             </div>
                             <!-- User Name Input -->
                             <div class="form-group col-md-2">
-                            <label for="userFullName">Uploaded By</label>
+                                <label for="userFullName">Uploaded By</label>
                                 <input type="text" class="form-control" id="userFullName" name="userFullName" placeholder="Enter user name">
                             </div>
                             <!-- Date From Input -->
@@ -242,7 +243,7 @@
     </div>
     <br />
     <form asp-page-handler="Clear">
-    <button type="submit" class="btn btn-warning">Clear Search</button>
+        <button type="submit" class="btn btn-warning">Clear Search</button>
     </form>
     <ul class="nav nav-tabs" id="contentTabs">
         <li class="nav-item">
@@ -277,39 +278,39 @@
                 </thead>
                 <tbody>
                     @*-------------------------OLD READER TABLE DISPLAY-------------------------------*@
-                   @*  @{ 
-                        string documentQuery = $@"SELECT Document.documentName, STUFF(documentName, 1, CHARINDEX('_', documentName, CHARINDEX('_', documentName) + 1), '') AS displayDocName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
-                        SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
+                    @*  @{
+                    string documentQuery = $@"SELECT Document.documentName, STUFF(documentName, 1, CHARINDEX('_', documentName, CHARINDEX('_', documentName) + 1), '') AS displayDocName, Document.documentType, Users.userName, Document.dateCreated FROM Document INNER JOIN Users ON Users.userID = Document.userID INNER JOIN DocumentProcess ON Document.documentID = DocumentProcess.documentID WHERE DocumentProcess.processID = {Model.ProcessID};";
+                    SqlDataReader DocumentReader = DBClass.GeneralReaderQuery(documentQuery);
 
-                        while (DocumentReader.Read())
-                        {
-                            <tr>
-                                <td>@DocumentReader["displayDocName"].ToString()</td>
-                                <td>@DocumentReader["documentType"].ToString()</td>
-                                <td>@DocumentReader["userName"].ToString()</td>
-                                <td>@DocumentReader["dateCreated"].ToString()</td>
-                                <td>
-                                    
-                                  
-                                
-                                    <!-- Download button form -->
-                                    <form method="post" asp-page-handler="DownloadDocument">
-                                        <input type="hidden" name="documentName" value="@DocumentReader["documentName"].ToString()" />
-                                        
-                                        <button type="submit" class="btn btn-primary btn-sm">
-                                            <div class="icons">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
-                                                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
-                                                </svg>
-                                            </div>
-                                            Download
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                        DocumentReader.Close();
+                    while (DocumentReader.Read())
+                    {
+                    <tr>
+                    <td>@DocumentReader["displayDocName"].ToString()</td>
+                    <td>@DocumentReader["documentType"].ToString()</td>
+                    <td>@DocumentReader["userName"].ToString()</td>
+                    <td>@DocumentReader["dateCreated"].ToString()</td>
+                    <td>
+
+
+
+                    <!-- Download button form -->
+                    <form method="post" asp-page-handler="DownloadDocument">
+                    <input type="hidden" name="documentName" value="@DocumentReader["documentName"].ToString()" />
+
+                    <button type="submit" class="btn btn-primary btn-sm">
+                    <div class="icons">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+                    </svg>
+                    </div>
+                    Download
+                    </button>
+                    </form>
+                    </td>
+                    </tr>
+                    }
+                    DocumentReader.Close();
                     } *@
                     @foreach (var doc in Model.Documents)
                     {
@@ -319,6 +320,22 @@
                             <td>@doc.userFullName</td> <!-- Concatenated user full name (Last, First) -->
                             <td>@doc.dateCreated.ToString("yyyy-MM-dd")</td> <!-- Format date as desired -->
                             <td>
+                                @if (doc.isPublic)
+                                {
+                                    <!-- Unpublish button form -->
+                                    <form method="post" asp-page-handler="Unpublish">
+                                        <input type="hidden" name="documentID" value="@doc.documentID" />
+                                        <button type="submit" class="btn btn-warning btn-sm">Unpublish</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <!-- Publish button form -->
+                                    <form method="post" asp-page-handler="Publish">
+                                        <input type="hidden" name="documentID" value="@doc.documentID" />
+                                        <button type="submit" class="btn btn-success btn-sm">Publish</button>
+                                    </form>
+                                }
                                 <!-- Download button form -->
                                 <form method="post" asp-page-handler="DownloadDocument">
                                     <!-- Use doc.documentName to reference the actual document name for the form's input value -->
@@ -342,6 +359,7 @@
         </div>
     </div>
 
+
     <div class="tab-content" id="DatasetTableContainer" style="display: none;">
         <table class="table table-hover">
             <thead>
@@ -354,33 +372,37 @@
             </thead>
             <tbody>
                 @{
-                    string datasetQuery = $@"SELECT Dataset.datasetID, DataSet.dataSetName, STUFF(DataSet.dataSetName, 1, CHARINDEX('_', DataSet.dataSetName, CHARINDEX('_', DataSet.dataSetName) + 1), '') AS displayName, DataSet.dateCreated, Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
+                    string datasetQuery = $@"SELECT Dataset.datasetID, DataSet.dataSetName, DataSet.dateCreated, Users.userName FROM DataSet INNER JOIN Users ON Users.userID = DataSet.userID INNER JOIN DatasetProcess ON DatasetProcess.datasetID = DataSet.datasetID WHERE DatasetProcess.ProcessID = {Model.ProcessID};";
                     SqlDataReader DatasetReader = DBClass.GeneralReaderQuery(datasetQuery);
 
                     while (DatasetReader.Read())
                     {
                         <tr>
-                            <td> @DatasetReader["displayName"].ToString()</td>
+                            <td>
+                                <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]">
+                                    @DatasetReader["dataSetName"].ToString()
+                                </a>
+                            </td>
                             <td>@DatasetReader["userName"].ToString()</td>
                             <td>@DatasetReader.GetDateTime(DatasetReader.GetOrdinal("dateCreated")).ToString("yyyy-MM-dd")</td> <!-- Adjusted for date formatting -->
                             <td>
                                 <div class="col">
-                                <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]" class="btn btn-secondary">View Dataset</a>
-                            </div>
+                                    <a asp-page="../Dataset/ViewData" asp-route-datasetID="@DatasetReader["datasetID"]" class="btn btn-danger btn-sm button-spacing">Analyze Dataset</a>
+                                </div>
 
-                            <div class="col">
-                                <form method="post" asp-page-handler="DownloadDataset">
-                                    <input type="hidden" name="datasetName" value="@DatasetReader["datasetName"].ToString()" />
-                                    <button type="submit" class="btn btn-primary btn-sm">
-                                        <div class="icons">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
-                                                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
-                                            </svg>
-                                        </div>
-                                        Download
-                                    </button>
-                                </form>
+                                <div class="col">
+                                    <form method="post" asp-page-handler="DownloadDataset">
+                                        <input type="hidden" name="datasetName" value="@DatasetReader["datasetName"].ToString()" />
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <div class="icons">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+                                                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+                                                </svg>
+                                            </div>
+                                            Download
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -480,4 +502,3 @@
         @TempData["ErrorMessage"]
     </div>
 }
-
