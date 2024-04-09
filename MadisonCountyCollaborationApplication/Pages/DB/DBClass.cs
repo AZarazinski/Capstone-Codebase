@@ -309,9 +309,11 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
 
         public static void SetDocumentPublic(int documentID)
         {
+            string dateTimeString = DateTime.Now.ToString("dd/MM/yyyy hh:mm tt");
             string sqlQuery = @"
         UPDATE Document
-        SET isPublic = 1
+        SET isPublic = 1,
+        datePublished = @dateTimeString
         WHERE documentID = @DocumentID;
     ";
 
@@ -320,6 +322,7 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
                 using (var cmdUpdate = new SqlCommand(sqlQuery, connection))
                 {
                     cmdUpdate.Parameters.AddWithValue("@DocumentID", documentID);
+                    cmdUpdate.Parameters.AddWithValue("@dateTimeString", dateTimeString);
                     connection.Open();
                     cmdUpdate.ExecuteNonQuery();
                 }
@@ -330,7 +333,8 @@ namespace MadisonCountyCollaborationApplication.Pages.DB
         {
             string sqlQuery = @"
         UPDATE Document
-        SET isPublic = 0
+        SET isPublic = 0,
+        datePublished = null
         WHERE documentID = @DocumentID;
     ";
 
